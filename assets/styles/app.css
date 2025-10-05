@@ -23,6 +23,12 @@ body{
     background-color: theme('colors.blue.400');
 }
 
+.bottom-menu{
+    bottom: env(safe-area-inset-bottom, 0);
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
 .carousel-item {
     scroll-snap-align: start;
     width: calc(100% - 32px);
