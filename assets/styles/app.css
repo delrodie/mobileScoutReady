@@ -23,14 +23,27 @@ body{
     background-color: theme('colors.blue.400');
 }
 
-.bottom-menu{
+/*.bottom-menu{*/
+/*    position: fixed;*/
+/*    bottom: env(safe-area-inset-bottom, 0);*/
+/*    left: 0;*/
+/*    right: 0;*/
+/*    z-index: 1000;*/
+/*    padding-bottom: env(safe-area-inset-bottom, 8px);*/
+/*}*/
+
+.bottom-menu {
     position: fixed;
-    bottom: env(safe-area-inset-bottom, 0);
     left: 0;
     right: 0;
+    bottom: 0; /* toujours collé au bas */
     z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom, 8px);
+    background-color: white;
+    border-top: 1px solid #e5e7eb;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+    height: calc(4rem + env(safe-area-inset-bottom, 0px));
 }
+
 
 .carousel-item {
     scroll-snap-align: start;
