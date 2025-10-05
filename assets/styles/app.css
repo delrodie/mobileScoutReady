@@ -29,7 +29,7 @@ body{
     left: 0;
     right: 0;
     z-index: 1000;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    padding-bottom: env(safe-area-inset-bottom, 8px);
 }
 
 .carousel-item {
