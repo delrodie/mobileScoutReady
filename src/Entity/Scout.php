@@ -63,6 +63,11 @@ class Scout
     #[ORM\OneToOne(mappedBy: 'scout', cascade: ['persist', 'remove'])]
     private ?Utilisateur $utilisateur = null;
 
+    public function __construct()
+    {
+        $this->slug = Uuid::v4();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
