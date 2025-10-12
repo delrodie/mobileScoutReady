@@ -28,6 +28,11 @@ class HomeController extends AbstractController
             $scout = $scoutRepository->findOneBy(['telephone' => $phoneRequest]);
 
             if (!$scout){
+                if ($request->headers->has('Turbo-Frame')){
+                    return $this->render('default/_search_error.html.twig', [
+                        'message' => "Numéro introuvable. Veuillez réessayer."
+                    ]);
+                }
                 return $this->redirectToRoute('app_inscription_civile');
             }
 
