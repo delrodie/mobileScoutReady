@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Instance;
 use App\Enum\InstanceType;
+use App\Services\InstanceImportService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -13,8 +14,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Filter\Type\EntityFilterType;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class InstanceCrudController extends AbstractCrudController
 {
@@ -57,6 +62,43 @@ class InstanceCrudController extends AbstractCrudController
                 ->setFormTypeOption('attr', ['autocomplete' => 'off']),
         ];
     }
-    
+
+    #[Route('/admin/instance/import/excel', name: 'admin_import_excel', methods: ['GET','POST'])]
+    public function instance(Request $request, InstanceImportService $importService, AdminUrlGenerator $adminUrlGenerator): Response
+    {
+        if (
+            $request->isMethod('POST') &&
+            $this->isCsrfTokenValid('instanceImported', $request->getPayload()->getString('_instanceCsrfToken'))
+        ){
+            $file = $request->files->get('instance_file');
+
+            if (!$file || $file->getClientOriginalExtension() !== 'xlsx') {
+                $this->addFlash("error", "Échec, Veuillez uploader un fichierExcel (.xlsx)");
+                return $this->redirectToRoute('admin_import_excel_instance');
+            }
+
+            try{
+                $result = $importService->import($file);
+                $this->addFlash('success', "Importation terminée: {$result['imported']} instances ajoutées, {$result['skipped']} ignorés");
+
+                if(!empty($result['errors'])){
+                    foreach ($result['errors'] as $error){
+                        $this->addFlash("error", $error);
+                    }
+                }
+
+                return $this->redirectToRoute('admin_instance_index');
+            } catch(\Throwable $e){
+                $this->addFlash("error", "Erreur d'importation: {$e->getMessage()}");
+            }
+
+        }
+        return $this->render('@EasyAdmin/page/content.html.twig', [
+            'page_title' => 'Test affichage',
+            'page-content' => '<div style="padding:2rem;background:#eef">TEST : contenu injecté ici</div>',
+        ]);
+
+    }
+
 
 }

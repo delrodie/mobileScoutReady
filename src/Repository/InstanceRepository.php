@@ -22,6 +22,25 @@ class InstanceRepository extends ServiceEntityRepository
             ->orderBy('i.nom', 'ASC');
     }
 
+    public function findByQuery(string $parent, string $type, string $nom)
+    {
+        $query = $this->createQueryBuilder('i')
+            ->addSelect('p')
+            ->leftJoin('i.instanceParent', 'p')
+            ->where('i.type = :type AND i.nom = :nom');
+
+        $type === 'REGION'
+            ? $query->andWhere('p.sigle = :parent')
+            : $query->andWhere('p.nom = :parent');
+
+            $query->setParameter('parent', $parent)
+            ->setParameter('type', $type)
+            ->setParameter('nom', $nom);
+
+            return $query->getQuery()->getResult();
+    }
+
+
     //    /**
     //     * @return Instance[] Returns an array of Instance objects
     //     */

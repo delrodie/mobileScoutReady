@@ -1,0 +1,23 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content_title 'Importation des instances' %}
+
+{% block main %}
+    <div class="container mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form action="{{ path('admin_import_excel_instances') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Importer un fichier Excel (.xlsx)</label>
+                        <input type="file" name="instance_file" class="form-control" accept=".xlsx" required>
+                    </div>
+                    <input type="hidden" name="_instanceCsrfToken" value="{{ csrf_token('instanceImported') }}">
+                    <div class="text-end">
+                        <button class="btn btn-primary">Importer</button>
+                        <a href="{{ path('admin_instance_index') }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -56,7 +56,8 @@ class DashboardController extends AbstractDashboardController
          yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class);
 
          yield MenuItem::section();
-         yield MenuItem::linkToCrud('Instance', 'fas fa-building', Instance::class);
+        yield MenuItem::linkToCrud('Instances', 'fas fa-layer-group', Instance::class);
+        yield MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances');
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu
