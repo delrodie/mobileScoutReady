@@ -22,7 +22,7 @@
             data-action="turbo:submit-start->form-loader#disable turbo:submit-end->form-loader#enable"
         >
             <div class="w-full max-w-xs sm:max-w-sm">
-                <div class="relative flex items-center border border-gray-300 rounded-lg p-3 mb-2 input-focus-blue">
+                <div class="relative flex border border-gray-300 rounded-lg p-3 mb-2 input-focus-blue">
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"></path>
@@ -53,7 +53,9 @@
             <button
                 type="submit"
                 data-form-loader-target="button"
-                class="w-full max-w-xs sm:max-w-sm mt-8 py-3 bg-[--color-blue-main] text-white font-semibold rounded-lg shadow-md hover:bg-[--color-blue-dark] transition duration-150">
+                class="w-full max-w-xs sm:max-w-sm mt-8 py-3 bg-[--color-blue-main] text-white font-semibold rounded-lg shadow-md hover:bg-[--color-blue-dark] transition duration-150 btn-main"
+{#                style="background: var(--color-blue-main); cursor: pointer; :hover{background: var(--color-blue-dark)}"#}
+            >
 
                 <span data-form-loader-target="text">Soumettre</span>
 

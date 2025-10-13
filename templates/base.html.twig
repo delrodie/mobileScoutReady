@@ -9,6 +9,15 @@
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
+        <style>
+            .btn-main{
+                background: var(--color-blue-main);
+                cursor: pointer;
+            }
+            .btn-main:hover{
+                background: var(--color-blue-dark);
+            }
+        </style>
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
