@@ -1,0 +1,217 @@
+{% extends 'base.html.twig' %}
+
+    {% block turbo_frame %}
+        <turbo-frame id="inscription-frame">
+            {% block body %}
+                <div class="bg-white min-h-screen flex flex-col content-center">
+                    <header class="p-4 flex items-center justify-start sticky top-0 bg-white z-20 shadow-sm">
+                        <a href="{{ path('app_inscription_civile') }}" class="text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                                </path>
+                            </svg>
+                        </a>
+                        <h1 class="flex-grow text-center text-lg font-semibold text-gray-800 pr-6">Inscription</h1>
+                    </header>
+
+                    <main class="flex flex-col items-center p-6 ">
+
+                        <div class="max-w-sm">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">Étape 2/2 : Informations Scoutes</h2>
+
+                            <form action="{{ path('app_inscription_civile') }}"
+                                  class="space-y-4"
+                                  data-turbo-frame="inscription-frame"
+                            >
+
+                                <div class="flex items-center border border-gray-300 rounded-full p-4 bg-gray-50">
+                                    <svg class="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z">
+                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span class="w-full text-base text-gray-500">
+                                        <span class="text-sm">Région : </span>
+                                        <span class="text-base font-semibold">{{ region.nom  }}</span>
+                                    </span>
+                                </div>
+
+                                <div data-controller="fonction">
+
+                                    {% if statut.value == 'ADULTE' %}
+                                        <div class="relative border border-gray-300 rounded-full p-4 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+                                            </svg>
+
+
+                                            <select
+                                                class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                                name="_fonction"
+                                                data-action="change->fonction#toggleFields"
+                                            >
+                                                <option value="" disabled selected>-- Selectionnez la fonction --</option>
+                                                <option value="Equipe Regionale">Equipe Regionale</option>
+                                                <option value="Equipe de district">Equipe de district</option>
+                                                <option value="Equipe de groupe">Equipe de groupe</option>
+                                                <option value="Chef d'unité">Chef d'unité</option>
+                                            </select>
+                                            <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+
+                                    <div
+                                        class="relative border border-gray-300 rounded-full p-4 flex items-center mt-3"
+                                        data-fonction-target="district"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                                        </svg>
+
+
+                                        <select
+                                            id="district"
+                                            class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                            name="_district"
+                                            data-fonction-target="districtselected"
+                                            data-action="change->fonction#loadGroupes"
+                                        >
+                                            <option value="" disabled selected>-- Selectionnez le district --</option>
+                                            {% for district in districts %}
+                                                <option value="{{ district.id }}">{{ district.nom }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+
+                                    <div
+                                        class="relative border border-gray-300 rounded-full p-4 flex items-center mt-3"
+                                        data-fonction-target="groupe"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
+                                        </svg>
+
+                                        <select
+                                            id="groupe"
+                                            class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                            name="_inscription_groupe"
+                                            data-fonction-target="groupelist"
+                                        >
+                                            <option value="" disabled selected>-- Selectionnez le groupe --</option>
+                                            <option value="groupeID">groupeNom</option>
+                                        </select>
+                                        <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+
+
+                                    <div
+                                        class="relative border border-gray-300 rounded-full p-4 flex items-center mt-3"
+                                        data-fonction-target="branche"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"></path>
+                                        </svg>
+
+                                        {% if statut.value == 'ADULTE' %}
+                                            <select
+                                                class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                                nom="_inscription_branche"
+                                                data-fonction-target="brancheselect"
+                                            >
+                                                <option value="" disabled selected>-- Selectionnez la branche --</option>
+                                                <option value="LOUVETEAU">Louveteau</option>
+                                                <option value="ECLAIREUR">Éclaireur</option>
+                                                <option value="CHEMINOT">Cheminot</option>
+                                                <option value="ROUTIER">Routier</option>
+                                            </select>
+                                        {% else %}
+                                            <select
+                                                class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                                nom="_inscription_branche"
+                                                data-fonction-target="brancheselect"
+                                            >
+                                                {% if age < 12 %}
+                                                    <option value="LOUVETEAU" selected>Louveteau</option>
+                                                {% elseif age >= 12 and age < 15 %}
+                                                    <option value="ECLAIREUR" selected>Éclaireur</option>
+                                                {% elseif age >= 15 and age < 18 %}
+                                                    <option value="CHEMINOT" selected>Cheminot</option>
+                                                {% else %}
+                                                    <option value="ROUTIER" selected>Routier</option>
+                                                {% endif %}
+                                            </select>
+                                        {% endif %}
+                                        <svg class="w-4 h-4 text-gray-500 absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                                             fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+
+
+                                    {% if statut.value == 'ADULTE' %}
+                                        <div class="flex items-center border border-gray-300 rounded-full p-4 input-focus mt-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"></path>
+                                            </svg>
+
+                                            <input
+                                                type="text"
+                                                placeholder="Poste, ex: ACR Finances, CDBR, Akela..."
+                                                class="block min-w-0 grow pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                                                name="_inscription_poste"
+                                            >
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="pt-4 space-y-4">
+                                    <label class="flex items-start">
+                                        <input type="checkbox" name="_inscription_confidentialite"
+                                               class="mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                        <span class="ml-3 text-base color-blue-main leading-tight">
+                                            <a href="https://scoutready.net/confidentialite/" target="_blank">J'ai lu et j'accepte la Politique de confidentialité</a>
+                                        </span>
+                                    </label>
+                                    <label class="flex items-start">
+                                        <input type="checkbox" name="_inscription_conditions"
+                                               class="mt-1 h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300">
+                                        <span class="ml-3 text-base color-blue-main leading-tight">
+                                            <a href="https://scoutready.net/cgu/" target="_blank">J'ai lu et j'accepte les Conditions générales d'utilisation</a>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('_scout_token') }}">
+
+                                <div class="columns-2 mt-10">
+                                    <div>
+                                        <button
+                                            class="flex-1 py-3 btn-main text-white font-semibold rounded-lg shadow-md hover:bg-blue-900 transition duration-150 w-full">
+                                            S'inscrire
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </main>
+                </div>
+            {% endblock %}
+        </turbo-frame>
+    {% endblock %}
+

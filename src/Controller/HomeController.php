@@ -37,7 +37,7 @@ class HomeController extends AbstractController
                         'message' => "Numéro introuvable. Veuillez réessayer."
                     ]);
                 }
-                return $this->redirectToRoute('app_inscription_civile');
+                return $this->redirectToRoute('app_inscription_choixregion');
             }
 
             return $this->redirectToRoute('app_home');
