@@ -27,8 +27,8 @@ class Scout
     #[ORM\Column(length: 25, nullable: true)]
     private ?string $code = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $qrCodeToken = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private ?Uuid $qrCodeToken = null;
 
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $nom = null;
@@ -66,6 +66,7 @@ class Scout
     public function __construct()
     {
         $this->slug = Uuid::v4();
+        $this->qrCodeToken = Uuid::v4();
     }
 
     public function getId(): ?int
@@ -97,12 +98,12 @@ class Scout
         return $this;
     }
 
-    public function getQrCodeToken(): ?string
+    public function getQrCodeToken(): ?Uuid
     {
         return $this->qrCodeToken;
     }
 
-    public function setQrCodeToken(?string $qrCodeToken): static
+    public function setQrCodeToken(?Uuid $qrCodeToken): static
     {
         $this->qrCodeToken = $qrCodeToken;
 

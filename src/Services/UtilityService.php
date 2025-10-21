@@ -23,8 +23,23 @@ class UtilityService
         return (new \DateTime())->diff($naissance)->y;
     }
 
-    public function validForm(string $str): string
+    public static function annee(): string
     {
-        return htmlspecialchars(stripcslashes(trim($str)));
+        $anneeEncours = (int) Date('Y');
+        $moisEncours = (int) Date('m');
+
+        $debutAnnee = $moisEncours > 9 ? $anneeEncours : $anneeEncours - 1;
+        $finAnnee = $moisEncours > 9 ? $anneeEncours + 1 : $anneeEncours;
+
+        return sprintf('%d-%d', $debutAnnee, $finAnnee);
+    }
+
+    /**
+     * @param $str
+     * @return string
+     */
+    public function validForm($str): string
+    {
+        return htmlspecialchars(stripslashes(trim($str)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 }
