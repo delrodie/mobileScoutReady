@@ -24,7 +24,7 @@ export default class extends Controller {
         // this.branchTarget.clssList.add('hidden');
 
         // conditions d’affichage
-        if (fonction === "Equipe Regionale") {
+        if (fonction === "REGIONAL") {
             this.districtselectedTarget.disabled = true;
             this.brancheselectTarget.disabled = true;
 
@@ -40,7 +40,7 @@ export default class extends Controller {
             this.groupeTarget.classList.add("hidden");
             this.brancheTarget.classList.add("hidden");
 
-        } else if (fonction === "Equipe de groupe") {
+        } else if (fonction === "GROUPE") {
             this.districtselectedTarget.disabled = false;
             this.brancheselectTarget.disabled = true;
 
@@ -48,7 +48,7 @@ export default class extends Controller {
             this.groupeTarget.classList.remove("hidden");
             this.brancheTarget.classList.add("hidden");
 
-        } else if (fonction === "Chef d'unité") {
+        } else if (fonction === "UNITE") {
             this.districtselectedTarget.disabled = false;
             this.brancheselectTarget.disabled = false;
 

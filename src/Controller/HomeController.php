@@ -15,8 +15,8 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->redirectToRoute('app_search_phone');
-//        return $this->render('default/home.html.twig');
+//        return $this->redirectToRoute('app_search_phone');
+        return $this->render('default/_search_phone.html.twig');
     }
 
     #[Route('/phone', name:'app_search_phone', methods: ['GET','POST'])]
@@ -40,7 +40,7 @@ class HomeController extends AbstractController
                 return $this->redirectToRoute('app_inscription_choixregion');
             }
 
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_accueil');
         }
         return $this->render('default/_search_phone.html.twig');
     }

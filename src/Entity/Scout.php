@@ -10,7 +10,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: ScoutRepository::class)]
-#[Broadcast]
+//#[Broadcast]
 class Scout
 {
     #[ORM\Id]
@@ -62,6 +62,9 @@ class Scout
 
     #[ORM\OneToOne(mappedBy: 'scout', cascade: ['persist', 'remove'])]
     private ?Utilisateur $utilisateur = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $phoneParent = null;
 
     public function __construct()
     {
@@ -260,6 +263,18 @@ class Scout
         }
 
         $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+    public function isPhoneParent(): ?bool
+    {
+        return $this->phoneParent;
+    }
+
+    public function setPhoneParent(?bool $phoneParent): static
+    {
+        $this->phoneParent = $phoneParent;
 
         return $this;
     }

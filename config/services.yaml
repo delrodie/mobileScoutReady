@@ -20,6 +20,6 @@ services:
     # please note that last definitions always *replace* previous ones
 
 
-    App\Service\GestionQrCode:
+    App\Services\GestionQrCode:
         arguments:
             $qrCodeDirectory: '%kernel.project_dir%/public/qrcode'

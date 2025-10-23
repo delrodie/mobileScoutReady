@@ -23,7 +23,7 @@ class UtilityService
         return (new \DateTime())->diff($naissance)->y;
     }
 
-    public static function annee(): string
+    public function annee(): string
     {
         $anneeEncours = (int) Date('Y');
         $moisEncours = (int) Date('m');

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\ScoutStatut;
 use App\Repository\ScoutRepository;
 
 class ScoutService
@@ -12,8 +13,11 @@ class ScoutService
     {
     }
 
-    public function generateCode(?string $statut): string
+    public function generateCode(ScoutStatut|string|null $statut): string
     {
+        if ($statut instanceof ScoutStatut){
+            $statut = $statut->value;
+        }
         //CF2504182554-A4 SC2504186547-3C
         $prefix = $statut === 'ADULTE' ? 'CF' : 'SC';
         do{

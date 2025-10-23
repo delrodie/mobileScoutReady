@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-#[Broadcast]
+//#[Broadcast]
 class Utilisateur
 {
     #[ORM\Id]
