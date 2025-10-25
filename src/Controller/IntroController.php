@@ -27,7 +27,7 @@ class IntroController extends AbstractController
         if ($this->isCsrfTokenValid('_searchPhone', $request->get('_csrf_token'))){
             $phoneRequest = $request->request->get('_phone_search');
             $scout = $scoutRepository->findOneBy(['telephone' => $phoneRequest]);
-            sleep(2);
+//            sleep(2);
 
             // Mise en session du numero de telephone
             $session->set('_phone_input', $phoneRequest);

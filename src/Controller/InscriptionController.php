@@ -71,7 +71,7 @@ class InscriptionController extends AbstractController
                 'sexe' => $this->utilityService->validForm($request->get('_inscription_sexe')),
                 'dateNaissance' => $request->get('_inscription_datenaissance'),
                 'phone' => $request->get('_inscription_phone'),
-                'phoneParent' => $request->get('_inscription_phoneparent') === 'OUI',
+                'phoneParent' =>  $request->get('_inscription_phoneparent') === 'OUI',
                 'email' => $this->utilityService->validForm($request->get('_inscription_email')),
             ]);
 
