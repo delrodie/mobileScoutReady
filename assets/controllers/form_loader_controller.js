@@ -5,37 +5,39 @@ export default class extends Controller{
 
     connect() {
         //super.connect();
-        if(this.loadingTarget) this.loadingTarget.classList.add("hidden")
-        if(this.spinnerTarget) this.spinnerTarget.classList.add('hidden')
+        if(this.loadingTarget) this.loadingTarget.classList.add("d-none")
+        if(this.spinnerTarget) this.spinnerTarget.classList.add('d-none')
     }
 
-    disable(event){
+    disable(event) {
         this.buttonTarget.disabled = true
         this.buttonTarget.classList.add("opacity-75", "cursor-not-allowed")
 
-        if (this.textTarget) this.textTarget.classList.add("hidden")
+        // Change le texte du bouton
+        if (this.textTarget) this.textTarget.classList.add("d-none")
 
         // Affiche le spinner
-        if (this.spinnerTarget) this.spinnerTarget.classList.remove("hidden")
-        if (this.loadingTarget) this.loadingTarget.classList.remove("hidden")
+        if (this.spinnerTarget) this.spinnerTarget.classList.remove("d-none")
+        if (this.loadingTarget) this.loadingTarget.classList.remove("d-none")
 
-        // Animation
-        this.buttonTarget.classList.add("transition-all", "duration-300")
+        this.buttonTarget.classList.add("transition-all")
     }
 
-    enable(event){
-        // Si la requete a échoué
+    enable(event) {
         if (!event.detail.success) {
-            // Reactive le bouton
             this.buttonTarget.disabled = false
             this.buttonTarget.classList.remove("opacity-75", "cursor-not-allowed")
 
-            // Réinitialise le contenu
-            if (this.spinnerTarget) this.spinnerTarget.classList.add('hidden')
-            if (this.loadingTarget) this.loadingTarget.classList.add('hidden')
-            if (this.textTarget) this.textTarget.classList.remove("hidden")
+            // Réinitialise le texte
+            if (this.textTarget) {
+                this.textTarget.textContent = "Soumettre"
+                this.textTarget.classList.remove("d-none")
+            }
 
-            console.log('Reactivation du bouton après echec de la requête')
+            if (this.spinnerTarget) this.spinnerTarget.classList.add("d-none")
+            if (this.loadingTarget) this.loadingTarget.classList.add("d-none")
+
+            console.log('Reactivation du bouton après échec de la requête')
         }
     }
 }

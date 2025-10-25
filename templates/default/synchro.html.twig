@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="d-flex justify-content-center align-items-center vh-100 bg-blue-dark">
+        <div class="mx-w-sm mx-auto d-flex flex-column justify-content-center align-items-center text-white">
+            <img src="{{ asset('img/logo-scoutready-bw.png') }}" alt="" class="img-fluid" style="width:250px">
+            <div class="d-flex justify-content-center align-items-center mt-3" disabled>
+                <span class="spinner-border " aria-hidden="true"></span>
+                <span class="px-3" role="status">Synchronisation...</span>
+            </div>
+            <p class="fst-italic fw-medium fs-5 mt-5 text-white">Toujours prêt pour l'aventure !</p>
+            <a href="{{ path('app_search_phone') }}" class="text-white text-decoration-none fst-italic">Recherche</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block title %}
+
+{% endblock %}
+
