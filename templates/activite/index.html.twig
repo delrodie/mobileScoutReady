@@ -1,218 +1,113 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-    {{ include('default/_partial_header.html.twig') }}
+    {{ render(url('app_main_header'))}}
 
-    <section class="pl-4 pt-2 pb-4">
-        <div id="featured-carousel-container" class="flex overflow-x-scroll snap-x snap-mandatory space-x-4 pr-4">
+    <main class="max-w-sm mx-auto mt-3 mb-5">
+        <section class="carousel px-3 border-rou">
+            <div class="swiffy-slider slider-item-show2-sm slider-item-ratio slider-nav-arrow slider-nav-visible slider-nav-autohide slider-nav-autoplay  slider-nav-autopause slider-indicators-round slider-indicators-dark slider-indicators-outside slider-indicators-sm slider-nav-animation slider-nav-animation-appear slider-nav-animation-slow slider-nav-mousedrag"
+                 data-slider-nav-autoplay-interval="7000">
+                <ul class="slider-container" style="">
+                    <li class="slide-visible">
+                        <div id="slide1">
+                            <a href="#">
+                                <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid rounded">
+                            </a>
+                        </div>
+                    </li>
+                    <li class="slide-visible">
+                        <div id="slide2">
+                            <a href="#">
+                                <img src="{{ asset('img/activites/jambognan.png') }}" alt="" class="img-fluid rounded">
+                            </a>
+                        </div>
+                    </li>
 
-            <div class="featured-carousel-item relative rounded-xl overflow-hidden shadow-lg bg-cover bg-center"
-                 style="background-image: url({{ asset('img/activites/jambognan2.png') }});">
-                <div class="absolute inset-0 bg-black/30 flex flex-col justify-end p-4">
-                    <div class="flex items-center space-x-3 text-white text-sm font-medium">
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            253
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            16/08/2025 - 27/08/2025
-                        </span>
-                    </div>
-                </div>
+                </ul>
+
+
+                <ul class="slider-indicators">
+                    <li class="active"></li>
+                    <li class=""></li>
+                </ul>
             </div>
+        </section>
 
-            <div class="featured-carousel-item relative rounded-xl overflow-hidden shadow-lg bg-cover bg-center"
-                 style="background-image: url('placeholder-africa-scout.jpg'); background-color: #2D679E;">
-                <div class="absolute inset-0 bg-black/40 flex flex-col justify-end p-4">
-                    <div class="flex items-center space-x-3 text-white text-sm font-medium">
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            1053
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            25/07/2025
-                        </span>
-                    </div>
+        <section class="activites px-3 mt-5">
+            <h5 class="fs-6 text-color-main fw-semibold mb-3">Liste des activités</h5>
+            <div class="row row-cols-1 g-2">
+                <div class="col mb-3">
+                    <a href="#" class="text-decoration-none">
+                        <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
+                            <div class="card-body py-3 px-2">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <div class="fsize-12 fw-semibold text-color-main">Abidjan (Les Requins)</div>
+                                        <h5 class="fs-6 py-1">Retrouvailles des anciens chefs du groupe</h5>
+
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start align-items-center">
+                                    <span class="text-color-main fw-medium fsize-12">
+                                        <i class="bi bi-people-fill text-body"></i> 255
+                                    </span>
+                                    <span class="text-color-main fw-medium fsize-12 ms-3">
+                                        <i class="bi bi-calendar-event text-body"></i> 25/10/2025 - 01/11/2025
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
+
+                <div class="col mb-3">
+                    <a href="#" class="text-decoration-none">
+                        <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
+                            <div class="card-body py-3 px-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="fsize-12 fw-semibold text-color-main">Requin Pelerin</div>
+                                        <h5 class="fs-6 py-1">Formation des chefs de meute</h5>
+
+                                    </div>
+
+                                </div>
+                                <div class="d-flex justify-content-start align-items-center">
+                                    <span class="text-color-main fw-medium fsize-12">
+                                        <i class="bi bi-people-fill text-body"></i> 255
+                                    </span>
+                                    <span class="text-color-main fw-medium fsize-12 ms-3">
+                                        <i class="bi bi-calendar-event text-body"></i> 25/10/2025 - 01/11/2025
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
             </div>
+        </section>
 
-            <div class="featured-carousel-item relative rounded-xl overflow-hidden shadow-lg bg-cover bg-center"
-                 style="background-image: url('placeholder-nature.jpg'); background-color: #4CAF50;">
-                <div class="absolute inset-0 bg-black/30 flex flex-col justify-end p-4">
-                    <div class="flex items-center space-x-3 text-white text-sm font-medium">
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            55
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            01/09/2025
-                        </span>
-                    </div>
-                </div>
-            </div>
 
-        </div>
-    </section>
 
-    <section class="p-4 pt-0">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Activités</h2>
+    </main>
 
-        <div class="space-y-3">
+    <div class="max-w-sm me-auto">
+        <a href="#"
+           class="btn-flottant d-flex justify-content-center align-items-center shadow text-white">
+            <i class="bi bi-plus fs-2"></i>
+        </a>
+    </div>
 
-            <a href="detail_activite.html"
-               class="activity-list-item flex items-center p-3 rounded-lg border border-gray-100 shadow-sm">
-                <div class="flex-grow space-y-1">
-                    <p class="text-xs text-gray-500">Région d'Abidjan</p>
-                    <h3 class="text-base font-semibold text-gray-800 leading-tight">Journée Africaine du Scoutisme 2023
-                    </h3>
-                    <div class="flex items-center space-x-3 text-xs text-gray-500 mt-1">
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            253
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            16/08/2025 - 27/08/2025
-                        </span>
-                    </div>
-                </div>
-                <div class="w-16 h-16 ml-3 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src="placeholder-africa-scout-small.png" alt="Africa Scout Day"
-                         class="w-full h-full object-cover">
-                </div>
-            </a>
-
-            <a href="detail_activite.html"
-               class="activity-list-item flex items-center p-3 rounded-lg border border-gray-100 shadow-sm">
-                <div class="flex-grow space-y-1">
-                    <p class="text-xs text-gray-500">Région d'Abidjan</p>
-                    <h3 class="text-base font-semibold text-gray-800 leading-tight">Techniques et Bivouac en Nature</h3>
-                    <div class="flex items-center space-x-3 text-xs text-gray-500 mt-1">
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            253
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            16/08/2025 - 27/08/2025
-                        </span>
-                    </div>
-                </div>
-                <div class="w-16 h-16 ml-3 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src="placeholder-techniques.png" alt="Techniques Scoutes" class="w-full h-full object-cover">
-                </div>
-            </a>
-
-            <a href="detail_activite.html"
-               class="activity-list-item flex items-center p-3 rounded-lg border border-gray-100 shadow-sm">
-                <div class="flex-grow space-y-1">
-                    <p class="text-xs text-gray-500">Région d'Abidjan</p>
-                    <h3 class="text-base font-semibold text-gray-800 leading-tight">Atelier de Protection de la Nature
-                    </h3>
-                    <div class="flex items-center space-x-3 text-xs text-gray-500 mt-1">
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zM9.014 12H8a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2v-2a2 2 0 00-2-2h-.995A5.996 5.996 0 0010 10a5.996 5.996 0 00-.986 2z">
-                                </path>
-                            </svg>
-                            253
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"
-                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-2 0v1H6zm4 8a1 1 0 110-2 1 1 0 010 2z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                            16/08/2025 - 27/08/2025
-                        </span>
-                    </div>
-                </div>
-                <div class="w-16 h-16 ml-3 rounded-lg overflow-hidden flex-shrink-0">
-                    <img src="placeholder-nature-activity.png" alt="Nature" class="w-full h-full object-cover">
-                </div>
-            </a>
-
-        </div>
-    </section>
-
-    <a href="creer_activite.html"
-       class="fixed bottom-20 right-5 w-14 h-14 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center transition duration-300 hover:bg-blue-700 hover:scale-110 z-30">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-    </a>
-
-    {{ include ('default/_nav.html.twig') }}
+    {{ include('default/_nav.html.twig')}}
 {% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-        document.getElementById('notification-btn').addEventListener('click', function () {
-            const dropdown = document.getElementById('notification-dropdown');
-            dropdown.classList.toggle('hidden');
-        });
-        document.addEventListener('click', function (event) {
-            const dropdown = document.getElementById('notification-dropdown');
-            const button = document.getElementById('notification-btn');
-            if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    </script>
+{% block extra_stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+{% endblock %}
+{% block extra_javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous"
+            defer></script>
 {% endblock %}

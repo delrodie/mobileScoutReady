@@ -27,7 +27,6 @@ class IntroController extends AbstractController
         if ($this->isCsrfTokenValid('_searchPhone', $request->get('_csrf_token'))){
             $phoneRequest = $request->request->get('_phone_search');
             $scout = $scoutRepository->findOneBy(['telephone' => $phoneRequest]);
-//            sleep(2);
 
             // Mise en session du numero de telephone
             $session->set('_phone_input', $phoneRequest);
@@ -41,6 +40,8 @@ class IntroController extends AbstractController
                 return $this->redirectToRoute('app_inscription_choixregion');
             }
 
+            // Mise en session du scout
+            $session->set('_profil', $scout);
             return $this->redirectToRoute('app_accueil');
         }
         return $this->render('default/_search_phone.html.twig');
