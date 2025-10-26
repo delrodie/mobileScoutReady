@@ -11,9 +11,17 @@
 <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
     <div class="d-flex justify-content-between align-items-center pt-5">
         <a href="#" class="d-flex align-items-center text-decoration-none text-secondary">
-            <img src="{{ avatarFile }}" alt="{{ profil.nom }} {{ profil.prenom }}"
-                 class="img-fluid rounded-circle border border-info"
-                 style="width:50px; height:auto; object-fit:cover">
+            <div
+                data-controller="image-loader"
+                data-image-loader-src-value="{{ avatarFile }}"
+                data-image-loader-native-src-value="asset://{{ avatarFile }}"
+                data-image-loader-preload-value="true"
+            >
+                <img alt="{{ profil.nom }} {{ profil.prenom }}"
+                     class="img-fluid rounded-circle border border-info"
+                     style="width:50px; height:auto; object-fit:cover">
+            </div>
+
             <div class=" ms-2">
                 <h5 class="fs-6 mb-0 pb-0 fsize-14 text-nowrap text-truncate">{{ profil.nom }}</h5>
                 <div class="fsize-13 text-color-main fw-bold">{{ profil.code }}</div>

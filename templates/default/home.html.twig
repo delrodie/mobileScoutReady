@@ -10,15 +10,30 @@
                 <ul class="slider-container" style="">
                     <li class="slide-visible">
                         <div id="slide1">
-                            <a href="#">
-                                <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid rounded">
+                            <a href="{{ path('app_activite_index') }}">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/activites/jambognan2.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/activites/jambognan2.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img src="" alt="" class="img-fluid rounded">
+                                </div>
                             </a>
                         </div>
                     </li>
                     <li class="slide-visible">
                         <div id="slide2">
                             <a href="#">
-                                <img src="{{ asset('img/activites/jambognan.png') }}" alt="" class="img-fluid rounded">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/activites/jambognan.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/activites/jambognan.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img alt="" class="img-fluid rounded">
+                                </div>
+
                             </a>
                         </div>
                     </li>
@@ -41,8 +56,15 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/01-technique-scout.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/01-technique-scout.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/01-technique-scout.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">Techniques scoutes</h5>
                             </div>
                         </a>
@@ -53,8 +75,15 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/02_civisme.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/02_civisme.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/02_civisme.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img alt="" class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">Civisme</h5>
                             </div>
                         </a>
@@ -65,8 +94,16 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/03-sante.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/02_civisme.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/02_civisme.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img src="{{ asset('img/champs/03-sante.png') }}" alt=""
+                                         class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">Santé</h5>
                             </div>
                         </a>
@@ -78,8 +115,16 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/04-technologie.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/04-technologie.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/04-technologie.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img src="" alt=""
+                                         class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">T.I.C</h5>
                             </div>
                         </a>
@@ -91,8 +136,15 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/05-environnement.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/05-environnement.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/05-environnement.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img alt="" class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">Environnement</h5>
                             </div>
                         </a>
@@ -104,8 +156,15 @@
                         <a href="#" class="text-decoration-none text-secondary">
                             <div
                                 class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
-                                <img src="{{ asset('img/champs/06-education-familliale.png') }}" alt=""
-                                     class="img-fluid rounded-pill p-1 bg-main-30">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/champs/06-education-familliale.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/champs/06-education-familliale.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img alt="" class="img-fluid rounded-pill p-1 bg-main-30">
+                                </div>
+
                                 <h5 class="fsize-13 py-1">Vie familliale</h5>
                             </div>
                         </a>
