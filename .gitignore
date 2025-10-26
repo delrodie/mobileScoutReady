@@ -20,4 +20,6 @@
 ###< symfony/asset-mapper ###
 
 .idea
-/public/qrcode
+/public/qrcode/*
+!/public/qrcode/.gitkeep
+
