@@ -3,33 +3,56 @@
 <div class="" style="margin-top: 150px;">.</div>
 <footer class="max-w-sm mx-auto fixed-bottom">
     <ul class=" navbar bg-body-tertiary nav nav-fill fsize-12 pb-5 app-bottom-nav">
+        {# Lien Accueil #}
         <li class="nav-item">
             <a href="{{ path('app_accueil') }}"
                class="nav-link {% if _route starts with 'app_accueil' or _route starts with 'app_accueil' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+                {% if not (_route starts with 'app_accueil') %}
+                    data-controller="page-preloader"
+                    data-page-preloader-url-value="{{ path('app_accueil') }}"
+                {% endif %}
             >
                 <i class="bi bi-house-fill fs-5"></i>
                 <span>Accueil</span>
             </a>
         </li>
+
+        {# Lien activité #}
         <li class="nav-item">
             <a href="{{ path('app_activite_index') }}"
                class="nav-link {% if _route starts with 'app_activite_' or _route starts with 'app_activite_' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+                {% if not (_route starts with 'app_activite_') %}
+                    data-controller="page-preloader"
+                    data-page-preloader-url-value="{{ path('app_activite_index') }}"
+                {% endif %}
             >
                 <i class="bi bi-calendar2-event-fill fs-5"></i>
                 Activités
             </a>
         </li>
+
+        {# Lien communauté #}
         <li class="nav-item">
             <a href="{{ path('app_communaute_list') }}"
                class="nav-link {% if _route starts with 'app_communaute_' or _route starts with 'app_communaute_' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+                {% if not (_route starts with 'app_communaute_') %}
+                    data-controller="page-preloader"
+                    data-page-preloader-url-value="{{ path('app_communaute_list') }}"
+                {% endif %}
             >
                 <i class="bi bi-people-fill fs-5"></i>
                 Communauté
             </a>
         </li>
+
+        {# Lien plus de fonctionnalités #}
         <li class="nav-item">
             <a href="{{ path('app_fonctionnalite_list') }}"
                class="nav-link {% if _route starts with 'app_fonctionnalite_' or _route starts with 'app_plus_' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+                {% if not (_route starts with 'app_fonctionnalite_') %}
+                    data-controller="page-preloader"
+                    data-page-preloader-url-value="{{ path('app_fonctionnalite_list') }}"
+                {% endif %}
             >
                 <i class="bi bi-three-dots fs-5"></i>
                 Plus
