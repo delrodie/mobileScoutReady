@@ -20,13 +20,17 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="communaute.html" class="nav-link d-flex flex-column justify-content-center align-items-center">
+            <a href="{{ path('app_communaute_list') }}"
+               class="nav-link {% if _route starts with 'app_communaute_' or _route starts with 'app_communaute_' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="bi bi-people-fill fs-5"></i>
                 Communauté
             </a>
         </li>
         <li class="nav-item">
-            <a href="plus.html" class="nav-link d-flex flex-column justify-content-center align-items-center">
+            <a href="{{ path('app_fonctionnalite_list') }}"
+               class="nav-link {% if _route starts with 'app_fonctionnalite_' or _route starts with 'app_plus_' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
+            >
                 <i class="bi bi-three-dots fs-5"></i>
                 Plus
             </a>
