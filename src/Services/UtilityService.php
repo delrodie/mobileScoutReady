@@ -8,6 +8,7 @@ class UtilityService
 {
     public function calculAge(string|\DateTimeInterface $dateNaissance): ?int
     {
+
         if ($dateNaissance instanceof \DateTimeInterface) {
             $naissance = $dateNaissance;
         } else {
@@ -23,6 +24,7 @@ class UtilityService
                 throw new \InvalidArgumentException("Format de date invalide : '$dateNaissance'.");
             }
         }
+
 
         return (new \DateTime())->diff($naissance)->y;
     }

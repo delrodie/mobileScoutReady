@@ -26,7 +26,8 @@ class IntroController extends AbstractController
 
         if ($this->isCsrfTokenValid('_searchPhone', $request->get('_csrf_token'))){
             $phoneRequest = $request->request->get('_phone_search');
-            $scout = $scoutRepository->findOneBy(['telephone' => $phoneRequest]);
+//            $scout = $scoutRepository->findOneBy(['telephone' => $phoneRequest]);
+            $scout = $scoutRepository->findBy(['telephone' => $phoneRequest]);
 
             // Mise en session du numero de telephone
             $session->set('_phone_input', $phoneRequest);
@@ -40,10 +41,31 @@ class IntroController extends AbstractController
                 return $this->redirectToRoute('app_inscription_choixregion');
             }
 
-            // Mise en session du scout
-            $session->set('_profil', $scout);
+            // Si le numero associé est celui d'un parent alors afficher l'interface de selection de profil
+            if($scout[0]->isPhoneParent()){
+               $session->set('_getScouts', $scout);
+                return $this->redirectToRoute('app_choix_profil');
+            }
+
+            // Sauvegarde dans la base de données locale IndexedDB
+            // Puis redirection vers la page d'accueil
+            //$session->set('_profil', $scout);
             return $this->redirectToRoute('app_accueil');
+
         }
         return $this->render('default/_search_phone.html.twig');
+    }
+
+    #[Route('/choix/profil', name: 'app_choix_profil', methods: ['GET','POST'])]
+    public function choixProfil(Request $request): Response
+    {
+        $session = $request->getSession();
+        $getScouts = $session->get('_getScouts');
+        if (!$getScouts) return $this->redirectToRoute('app_search_phone');
+
+        return $this->render('default/_choix_profil.html.twig', [
+            'scouts' => $getScouts,
+            'phone' => $session->get('_phone_input')
+        ]);
     }
 }

@@ -28,9 +28,10 @@ class HomeController extends AbstractController
     public function header(Request $request): Response
     {
         $profil = $request->getSession()->get('_profil');
+
         return $this->render('default/_main_header.html.twig',[
-            'profil' => $profil,
-            'avatar' => $this->utilityService->avatar($profil->getDateNaissance(), $profil->getSexe()),
+            'profil' => $profil[0],
+            'avatar' => $this->utilityService->avatar($profil[0]->getDateNaissance(), $profil[0]->getSexe()),
         ]);
     }
 }
