@@ -1,57 +1,57 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
-    <div class="d-flex justify-content-center align-items-center align-content-center vh-100">
+    <div
+        data-controller="search-phone form-loader"
+        class="d-flex justify-content-center align-items-center align-content-center vh-100"
+    >
         <div class="mx-w-sm mx-auto d-flex flex-column justify-content-center align-items-center">
             <img src="{{ asset('img/logo-scoutready.png') }}" alt="" class="img-fluid" style="width:250px">
+
             <div class="d-flex flex-column justify-content-center align-items-center mt-3">
                 <p class="px-4 text-center" style="font-size: 15px;">
                     Afin d'avoir une expérience utilisateur performante, il faut renseigner votre téléphone.
                 </p>
+
                 <form
+                    data-search-phone-target="form"
+                    data-action="submit->search-phone#submit turbo:submit-start->form-loader#disable turbo:submit-end->form-loader#enable"
                     action="{{ path('app_search_phone') }}"
                     method="post"
-                    data-controller="form-loader"
-                    data-action="turbo:submit-start->form-loader#disable turbo:submit-end->form-loader#enable"
                 >
-                    <div class="position-relative mb-3 mt-5"  style="max-width: 340px; width: 100%;">
+                    <div class="position-relative mb-3 mt-5" style="max-width: 340px; width: 100%;">
                         <input type="tel"
                                name="_phone_search"
                                class="form-control form-control-lg input-style ps-5"
                                id="phoneInput"
                                placeholder="Entre votre numéro de téléphone"
-                               minlength="10" maxlength="10" autocomplete="off"
-                               required
-                        >
-                        <i class="bi bi-phone position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5" ></i>
+                               minlength="10" maxlength="10"
+                               autocomplete="off" required>
+                        <i class="bi bi-phone position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
                     </div>
+
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('_searchPhone') }}">
+
                     <div class="d-grid gap-2 mt-3">
                         <button class="btn btn-main btn-lg"
                                 type="submit"
-                                data-form-loader-target="button"
-                        >
+                                data-form-loader-target="button">
                             <span data-form-loader-target="text">Soumettre</span>
-                            <div class="d-flex justify-content-center align-items-center"
-                                 data-form-loader-target="spinner"
-                                 disabled
-                            >
+                            <div class="d-flex justify-content-center align-items-center d-none"
+                                 data-form-loader-target="spinner">
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                                <span data-form-loader-target="loading" class="px-3" role="status">Veuillez patientez...</span>
+                                <span data-form-loader-target="loading" class="px-3" role="status">Veuillez patienter...</span>
                             </div>
-
                         </button>
                     </div>
-
                 </form>
             </div>
+
             <p class="fst-italic fw-light text-center mt-5 px-4" style="font-size:13px">
                 NB: Le numéro de téléphone ne sera partagé à aucun membre de la communauté sauf aux Admins.
             </p>
         </div>
     </div>
-
 {% endblock %}
 
 {% block title %}{% endblock %}

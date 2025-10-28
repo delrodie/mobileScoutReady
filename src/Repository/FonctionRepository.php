@@ -16,6 +16,23 @@ class FonctionRepository extends ServiceEntityRepository
         parent::__construct($registry, Fonction::class);
     }
 
+    /**
+     * @param int $scoutId
+     * @return mixed
+     */
+    public function findAllByScout(int $scoutId): mixed
+    {
+        return $this->createQueryBuilder('f')
+            ->addSelect('s', 'i')
+            ->leftJoin('f.scout', 's')
+            ->leftJoin('f.instance', 'i')
+            ->andWhere('s.id = :scout')
+            ->orderBy('f.id', 'DESC')
+            ->setParameter('scout', $scoutId)
+            ->getQuery()->getResult()
+            ;
+    }
+
     //    /**
     //     * @return Fonction[] Returns an array of Fonction objects
     //     */

@@ -98,7 +98,11 @@
             <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Comptes</h5>
             <ul class="list-group list-group-flus">
                 <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3"
+                   data-controller="logout"
+                   data-action="click->logout#logout"
+                   data-logout-redirect-url-value="{{ path('app_search_phone') }}"
+                >
                     <span class="text-danger">
                         <i class="bi bi-box-arrow-right fs-5 me-2"></i>
                     Déconnexion

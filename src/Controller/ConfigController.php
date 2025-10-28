@@ -30,11 +30,27 @@ class ConfigController extends AbstractController
                     ],
                 ],
                 [
-                    'patterns' => ['/login$', '/register$', '/new$', '/edit$'],
+                    'patterns' => ['/fonctionnalites$'],
+                    'properties' => [
+                        'context' => 'default',
+                        'uri' => 'hotwire://fragment/web',
+                        'pull_to_refresh_enabled' => false,
+                    ],
+                ],
+                [
+                    'patterns' => ['/intro/phone$', '/intro$', '/new$', '/edit$'],
                     'properties' => [
                         'context' => 'modal',
                         'uri' => 'hotwire://fragment/web/modal/sheet',
                         'pull_to_refresh_enabled' => false,
+                    ],
+                ],
+                [
+                    'patterns' => ['/accueil$', '/activites$', '/communaute$'],
+                    'properties' => [
+                        'context' => 'default',
+                        'uri' => 'hotwire://fragment/web/',
+                        'pull_to_refresh_enabled' => true,
                     ],
                 ],
             ],

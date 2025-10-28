@@ -25,13 +25,9 @@ class HomeController extends AbstractController
     }
 
     #[Route('/header', name: 'app_main_header')]
-    public function header(Request $request): Response
+    public function header(): Response
     {
-        $profil = $request->getSession()->get('_profil');
 
-        return $this->render('default/_main_header.html.twig',[
-            'profil' => $profil[0],
-            'avatar' => $this->utilityService->avatar($profil[0]->getDateNaissance(), $profil[0]->getSexe()),
-        ]);
+        return $this->render('default/_main_header.html.twig');
     }
 }
