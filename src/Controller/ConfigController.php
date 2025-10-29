@@ -43,6 +43,8 @@ class ConfigController extends AbstractController
                         'context' => 'modal',
                         'uri' => 'hotwire://fragment/web/modal/sheet',
                         'pull_to_refresh_enabled' => false,
+                        "title" => "",
+                        "toolbar_hidden" => true
                     ],
                 ],
                 [
