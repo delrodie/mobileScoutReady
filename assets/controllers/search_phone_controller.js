@@ -12,6 +12,7 @@ export default class extends Controller {
 
         const form = this.formTarget
         const formData = new FormData(form)
+        console.log(formData);
 
         try {
             const response = await fetch(form.action, {
