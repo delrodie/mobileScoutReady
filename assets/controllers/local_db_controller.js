@@ -21,14 +21,23 @@ export default class extends Controller {
      * Si oui → redirige vers /accueil
      */
     async checkLocalProfile() {
-        const hasProfile = await this.hasLocalProfile();
-        if (hasProfile) {
-            console.log("Profil déjà présent localement. Redirection vers /accueil");
-            window.location.href = "/accueil";
-        }else{
-            window.location.href = "/intro/phone"
+        try {
+            const hasProfile = await this.hasLocalProfile();
+
+            if (hasProfile) {
+                console.log("✅ Profil trouvé en base locale. Redirection vers /accueil");
+                Turbo.visit("/accueil", { action: "replace" });
+            } else {
+                console.log("🚀 Aucun profil local. Redirection vers /intro/phone");
+                Turbo.visit("/intro/phone", { action: "replace" });
+            }
+        } catch (error) {
+            console.error("Erreur lors de la vérification du profil local :", error);
+            // En cas de problème d’accès à IndexedDB, on redirige vers l’écran de saisie
+            Turbo.visit("/intro/phone", { action: "replace" });
         }
     }
+
 
     /**
      * Vérifie la présence de données dans IndexedDB
