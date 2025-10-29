@@ -25,8 +25,8 @@ export default class extends Controller {
             const data = await response.json()
             console.log("✅ Données reçues du backend:", data)
 
-            // await this.saveToIndexedDB(data)
-            await localDb.saveProfilData(data)
+            await this.saveToIndexedDB(data)
+            // await localDb.saveProfilData(data)
 
             // Redirection vers /accueil après succès
             // window.location.href="/accueil"
