@@ -24,19 +24,36 @@ export default class extends Controller {
         try {
             const hasProfile = await this.hasLocalProfile();
 
-            if (hasProfile) {
-                console.log("✅ Profil trouvé en base locale. Redirection vers /accueil");
-                Turbo.visit("/accueil", { action: "replace" });
+            // URL de destination selon la présence du profil
+            const destination = hasProfile ? "/accueil" : "/intro/phone";
+
+            console.log(
+                hasProfile
+                    ? "Profil déjà présent localement. Redirection vers /accueil"
+                    : "Aucun profil local trouvé. Redirection vers /intro/phone"
+            );
+
+            // 🧠 Vérifie si Turbo Native bridge est disponible
+            const isBridgeReady =
+                window.TurboNativeBridge &&
+                typeof window.TurboNativeBridge.visit === "function";
+
+            if (isBridgeReady) {
+                // ✅ Utilise la navigation Turbo Native
+                await window.TurboNativeBridge.visit(destination);
             } else {
-                console.log("🚀 Aucun profil local. Redirection vers /intro/phone");
-                Turbo.visit("/intro/phone", { action: "replace" });
+                // ⚙️ Fallback classique navigateur
+                console.warn("Turbo bridge non disponible, fallback vers window.location.href");
+                window.location.href = destination;
             }
         } catch (error) {
             console.error("Erreur lors de la vérification du profil local :", error);
-            // En cas de problème d’accès à IndexedDB, on redirige vers l’écran de saisie
-            Turbo.visit("/intro/phone", { action: "replace" });
+
+            // En cas d’erreur imprévue, on redirige vers la page de démarrage
+            window.location.href = "/intro/phone";
         }
     }
+
 
 
     /**
