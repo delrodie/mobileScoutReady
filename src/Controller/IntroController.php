@@ -64,7 +64,7 @@ class IntroController extends AbstractController
                 $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
                 $profilDTO = ProfilDTO::fromScout($fonctions);
 
-                dump($profilDTO);
+//                dump($profilDTO);
 
                 return $this->json([
                     'profil' => $profilDTO->profil,
