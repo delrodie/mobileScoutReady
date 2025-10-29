@@ -38,7 +38,7 @@ class ConfigController extends AbstractController
                     ],
                 ],
                 [
-                    'patterns' => ['/intro/phone$', '/intro$', '/new$', '/edit$'],
+                    'patterns' => ['/new$', '/edit$'],
                     'properties' => [
                         'context' => 'modal',
                         'uri' => 'hotwire://fragment/web/modal/sheet',
