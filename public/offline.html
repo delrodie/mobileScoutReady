@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScoutReady — Hors ligne</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f3f4f6;
+            color: #374151;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        button {
+            background-color: #006400;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<h1>🌍 Mode hors ligne</h1>
+<p>Vous n’êtes pas connecté à Internet.<br>Reconnectez-vous pour continuer sur ScoutReady.</p>
+<button onclick="window.location.reload()">Réessayer</button>
+</body>
+</html>
