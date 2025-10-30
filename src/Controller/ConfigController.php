@@ -19,6 +19,7 @@ class ConfigController extends AbstractController
         $config = [
             'settings' => [
                 'screenshots_enabled' => true,
+                "use_local_db" => true,
             ],
             'rules' => [
                 [
