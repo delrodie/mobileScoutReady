@@ -35,9 +35,15 @@
 
             // Expose tes chemins d’assets principaux pour ton JS
             window.APP_ASSETS = {
-                css: "{{ asset('app.css') }}",
-                js: "{{ asset('app.js') }}",
-                logo: "{{ asset('img/logo-scoutready.png') }}",
+                local: {
+                    css: "{{ asset('app.css') }}",
+                    js: "{{ asset('app.js') }}",
+                    logo: "{{ asset('img/logo-scoutready.png') }}"
+                },
+                cdn: [
+                    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css",
+                    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js",
+                ]
             };
         </script>
     {% endblock %}
