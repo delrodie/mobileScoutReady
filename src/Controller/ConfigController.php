@@ -22,22 +22,6 @@ class ConfigController extends AbstractController
             ],
             'rules' => [
                 [
-                    'patterns' => ['.*'],
-                    'properties' => [
-                        'context' => 'default',
-                        'uri' => 'hotwire://fragment/web',
-                        'pull_to_refresh_enabled' => true,
-                    ],
-                ],
-                [
-                    'patterns' => ['/fonctionnalites$'],
-                    'properties' => [
-                        'context' => 'default',
-                        'uri' => 'hotwire://fragment/web',
-                        'pull_to_refresh_enabled' => false,
-                    ],
-                ],
-                [
                     'patterns' => ['/new$', '/edit$'],
                     'properties' => [
                         'context' => 'modal',
@@ -55,6 +39,22 @@ class ConfigController extends AbstractController
                         'pull_to_refresh_enabled' => true,
                     ],
                 ],
+                [
+                    'patterns' => ['/fonctionnalites$'],
+                    'properties' => [
+                        'context' => 'default',
+                        'uri' => 'hotwire://fragment/web',
+                        'pull_to_refresh_enabled' => false,
+                    ],
+                ],
+                [
+                    'patterns' => ['.*'],
+                    'properties' => [
+                        'context' => 'default',
+                        'uri' => 'hotwire://fragment/web',
+                        'pull_to_refresh_enabled' => true,
+                    ],
+                ]
             ],
         ];
 
