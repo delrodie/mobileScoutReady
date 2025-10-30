@@ -13,6 +13,13 @@ const DB_VERSION = 1
 export default class extends Controller {
     connect() {
         console.log("🧩 LocalDbController connecté.");
+        this.boundOnTurboLoad = this.onTurboLoad.bind(this);
+        document.addEventListener('turbo:load', this.boundOnTurboLoad);
+    }
+
+    onTurboLoad(){
+        console.log("turbo:load détecté. Vérification du profil local...")
+        document.removeEventListener('turbo:load', this.boundOnTurboLoad);
         this.checkLocalProfile();
     }
 
