@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use App\Entity\Scout;
+use App\Enum\FonctionPoste;
 use App\Enum\ScoutStatut;
 use App\Repository\FonctionRepository;
 use App\Repository\InstanceRepository;
@@ -50,14 +51,15 @@ class ProfilDTO
 
         $dto->profil_fonction = [
             'id' => $fonction->getId(),
-            'poste' => $fonction->getPoste(),
+            'type' => $fonction->getPoste(),
+            'poste' => $fonction->getPoste() ? FonctionPoste::from($fonction->getPoste())->label() : "" ,
             'detailPoste' => $fonction->getDetailPoste(),
             'branche' => $fonction->getBranche(),
             'annee' => $fonction->getAnnee(),
             'validation' => $fonction->isValidation()
         ];
 
-        $instance = $fonctionsScout[0]->getInstance(); dump($instance);
+        $instance = $fonctionsScout[0]->getInstance();
 
         $dto->profil_instance = [
             'id' => $instance->getId(),

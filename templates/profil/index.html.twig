@@ -13,14 +13,14 @@
         </div>
     </header>
 
-    <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="profil">
+    <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
         <section class="avatar d-flex flex-column justify-content-center align-items-center mt-5 mb-5">
             <div
                 data-controller="image-loader"
                 data-image-loader-src-value="{{ asset('img/avatar/avatar_garcon.png') }}"
-                data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_garcon.png') }}"
+{#                data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_garcon.png') }}"#}
                 data-image-loader-preload-value="true"
-                data-header-target="avatar"
+                data-header-target="avatarLoader"
             >
                 <img src="#" alt="" class="img img-fluid rounded-circle bg-main-30"
                      style="width: 130px;">
@@ -41,7 +41,7 @@
                     <i class="bi bi-chevron-right"></i>
                 </a>
 
-                <a href="#"
+                <a href="{{ path('app_profil_infos_scoute') }}"
                    class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
                     Informations scoutes de base
                     <i class="bi bi-chevron-right"></i>

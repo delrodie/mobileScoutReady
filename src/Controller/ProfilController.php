@@ -22,4 +22,10 @@ class ProfilController extends AbstractController
     {
         return $this->render('profil/civil.html.twig');
     }
+
+    #[Route('/infos/scoute', name: 'app_profil_infos_scoute')]
+    public function infosScoute()
+    {
+        return $this->render('profil/infos_scoute.html.twig');
+    }
 }

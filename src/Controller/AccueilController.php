@@ -15,9 +15,7 @@ class AccueilController extends AbstractController
     #[Route('/', name: 'app_accueil')]
     public function index(Request $request): Response
     {
-//        if (!$request->getSession()->get('_profil')){
-//            return $this->redirectToRoute('app_search_phone');
-//        }
+
         return $this->render('default/home.html.twig');
     }
 }
