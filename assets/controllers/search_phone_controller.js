@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import localDb from "./local_db_controller.js";
 
 const DB_NAME = 'db_scoutready'
-const DB_VERSION = 1
+const DB_VERSION = 1.1
 
 export default class extends Controller {
     static targets = ['form', 'phone']

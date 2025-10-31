@@ -1,4 +1,4 @@
-const CACHE_NAME = "scoutready-cache-v1";
+const CACHE_NAME = "scoutready-cache-v1.1";
 const OFFLINE_URL = "/offline.html";
 
 // Fonction pour charger la liste d'assets depuis le manifest AssetMapper

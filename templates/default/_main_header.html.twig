@@ -13,12 +13,13 @@
         <a href="#" class="d-flex align-items-center text-decoration-none text-secondary">
             <div
                 data-controller="image-loader"
-                data-image-loader-src-value="{{ asset('img/avatar/avatar_garcon.png') }}"
+                data-image-loader-src-value="{{ asset('img/avatar/avatar_fille.png') }}"
+{#                data-image-loader-src-value="{{ asset('img/avatar/avatar_fille.png') }}"#}
 {#                data-image-loader-native-src-value="asset://{{ avatarFile }}"#}
                 data-image-loader-preload-value="true"
-                data-header-target="avatar"
+                data-header-target="avatarLoader"
             >
-                <img alt=""
+                <img alt="Avatar"
                      class="img-fluid rounded-circle border border-info"
                      style="width:50px; height:auto; object-fit:cover">
             </div>

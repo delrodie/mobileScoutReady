@@ -2,7 +2,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 const DB_NAME = 'db_scoutready'
-const DB_VERSION = 1
+const DB_VERSION = 1.1
 
 /**
  * Contrôleur responsable de la gestion de la base locale IndexedDB.

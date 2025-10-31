@@ -3,12 +3,16 @@
 namespace App\DTO;
 
 use App\Entity\Scout;
+use App\Enum\ScoutStatut;
+use App\Repository\FonctionRepository;
+use App\Repository\InstanceRepository;
 
 class ProfilDTO
 {
     public array $profil;
     public array $profil_fonction;
     public array $profil_instance;
+
 
     public static function fromScout(array $fonctionsScout): ?self
     {
@@ -18,6 +22,10 @@ class ProfilDTO
 
         $dto = new self();
         $scout = $fonctionsScout[0]->getScout();
+        $avatar = match($scout->getSexe()){
+            "HOMME" => ScoutStatut::ADULTE ? "avatar_homme.png" : "avatar_garcon.png",
+            default => ScoutStatut::ADULTE ? "avatar_femme.png" : "avatar_fille.png"
+        };
 
         $dto->profil = [
             'id' => $scout->getId(),
@@ -35,6 +43,7 @@ class ProfilDTO
             'qrCodeFile' => $scout->getQrCodeFile(),
             'isParent' => $scout->isPhoneParent(),
             'telephone' => $scout->getTelephone(),
+            'avatar' => $avatar,
         ];
 
         $fonction = $fonctionsScout[0];
@@ -48,7 +57,7 @@ class ProfilDTO
             'validation' => $fonction->isValidation()
         ];
 
-        $instance = $fonctionsScout[0]->getInstance();
+        $instance = $fonctionsScout[0]->getInstance(); dump($instance);
 
         $dto->profil_instance = [
             'id' => $instance->getId(),
@@ -56,7 +65,8 @@ class ProfilDTO
             'nom' => $instance->getNom(),
             'type' => $instance->getType()?->value,
             'sigle' => $instance->getSigle(),
-            //'parent' => $instance->getInstanceParent(),
+            'parentId' => $instance->getInstanceParent()?->getId(),
+            'parentNom' => $instance->getInstanceParent()?->getNom(),
         ];
 
         return $dto;

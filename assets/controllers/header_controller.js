@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import localDb from "./local_db_controller.js";
 
 export default class extends Controller {
-    static targets = ["avatar", "nom", "code", "fonctions", "instances"];
+    static targets = ["avatarLoader", "nom", "code", "fonctions", "instances"];
 
     connect() {
         this.populateHeader();
@@ -28,9 +28,27 @@ export default class extends Controller {
     }
 
     updateDOM(profil, fonction, instance) {
-        console.log(`Mon profil dataLocal : ${profil.code}`)
-        if (this.hasAvatarTarget) {
-            this.avatarTarget.src = profil.avatar ?? "/assets/img/avatar/avatar_homme.png";
+        console.log(`Mon profil dataLocal : ${profil.code}`);
+        console.log(`/avatar/${profil.avatar}`)
+        if (this.hasAvatarLoaderTarget) {
+            const newSrc = profil.avatar?.startsWith("/avatar/")
+                ? profil.avatar
+                : `/avatar/${profil.avatar ?? "avatar_homme.png"}`;
+
+            this.avatarLoaderTarget.dataset.imageLoaderSrcValue = newSrc;
+
+            // ⚙️ Récupère le contrôleur image-loader lié
+            const imageLoaderController = this.application.getControllerForElementAndIdentifier(
+                this.avatarLoaderTarget,
+                "image-loader"
+            );
+
+            // 🔄 Rafraîchit l'image
+            if (imageLoaderController) {
+                imageLoaderController.loadImage();
+            } else {
+                console.warn("Contrôleur image-loader non trouvé pour l'avatar");
+            }
         }
 
         if (this.hasNomTarget) {
