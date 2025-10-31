@@ -7,13 +7,15 @@ use App\Enum\ScoutStatut;
 use App\Repository\FonctionRepository;
 use App\Repository\ScoutRepository;
 use App\Services\UtilityService;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\RuntimeExtensionInterface;
 
 class AppExtensionRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private readonly FonctionRepository $fonctionRepository,
-        private readonly UtilityService $utilityService
+        private readonly UtilityService $utilityService,
+        private readonly RequestStack $requestStack,
     )
     {
         // Inject dependencies if needed
@@ -33,5 +35,10 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
             default => $fonction->getBranche()
         };
 
+    }
+
+    public function historiqueNavigation(): ?string
+    {
+        return $this->requestStack->getCurrentRequest()?->headers->get('referer');
     }
 }

@@ -22,7 +22,7 @@ class AppExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('function_name', [AppExtensionRuntime::class, 'doSomething']),
+            new TwigFunction('historique_navigation', [AppExtensionRuntime::class, 'historiqueNavigation']),
         ];
     }
 }

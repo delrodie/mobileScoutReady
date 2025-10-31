@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <header class="max-w-sm mx-auto px-2 py-3">
+        <div class="row">
+            <div class="col-3">
+                <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                </a>
+            </div>
+            <div class="col-9">
+                <h5 class="fs-4">Informations civiles</h5>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil">
+        <ul class="list-group list-group-flus">
+            <li class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-person-badge text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Nom de famille</small>
+                    <span class="fw-semibold" data-profil-target="nom"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-person-badge-fill text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Prénoms</small>
+                    <span class="fw-semibold" data-profil-target="prenom"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-people-fill text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Sexe</small>
+                    <span class="fw-semibold" data-profil-target="sexe"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-calendar-event text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Date de naissance</small>
+                    <span class="fw-semibold" data-profil-target="dateNaissance"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-phone text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Téléphone</small>
+                    <span class="fw-semibold" data-profil-target="telephone"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-telephone-inbound-fill text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Est-ce pour un parent?</small>
+                    <span class="fw-semibold" data-profil-target="phoneParent"></span>
+                </div>
+            </li>
+
+            <li
+                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                <i class="bi bi-envelope text-color-main fs-1 ms-1 me-3"></i>
+                <div class="d-flex flex-column justify-content-center align-items-start">
+                    <small class="text-muted fst-italic">Adresse email</small>
+                    <span class="fw-semibold" data-profil-target="email"></span>
+                </div>
+            </li>
+
+        </ul>
+        <div class="text-end mt-4">
+            <a href="#" class="text-decoration-none text-color-main fw-medium">
+                <i class="bi bi-pencil-square me-2"></i>
+                Modifier les informations
+            </a>
+        </div>
+    </main>
+
+{% endblock %}

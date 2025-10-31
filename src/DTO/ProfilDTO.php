@@ -34,6 +34,7 @@ class ProfilDTO
             'qrCodeToken' => $scout->getQrCodeToken(),
             'qrCodeFile' => $scout->getQrCodeFile(),
             'isParent' => $scout->isPhoneParent(),
+            'telephone' => $scout->getTelephone(),
         ];
 
         $fonction = $fonctionsScout[0];
