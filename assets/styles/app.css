@@ -11,6 +11,8 @@
 body {
     font-family: "Inter", sans-serif;
     font-size: 16px;
+    transition: opacity 0.3s ease-in-out;
+    opacity:1;
 }
 
 header{
@@ -145,6 +147,10 @@ header{
     border-radius: 50%;
     background-color: var(--color-blue-main);
     z-index: 9999;
+}
+
+.turbo-transition{
+    opacity:0;
 }
 
 footer a.nav-link.active{
