@@ -59,58 +59,24 @@ export default class extends Controller {
 
         // --- QrCode --- qrCodeFile
         console.log(`QrCodeFile: ${profil.qrCodeFile}`)
-        // if (this.hasQrCodeFileTarget) {
-        //     console.log(`Image : ${this.qrCodeFileTarget}`)
-        //     const newSrc = profil.qrCodeFile?.startsWith("/qrcode/")
-        //         ? profil.qrCodeFile
-        //         : `/qrcode/${profil.qrCodeFile ?? "qr-code.png"}`;
-        //
-        //     this.qrCodeFileTarget.dataset.imageLoaderSrcValue = newSrc;
-        //
-        //     const imageLoaderController = this.application.getControllerForElementAndIdentifier(
-        //         this.qrCodeFileTarget,
-        //         "image-loader"
-        //     );
-        //
-        //     if (imageLoaderController) {
-        //         imageLoaderController.loadImage();
-        //     }
-        // }
+        if (this.hasQrCodeFileTarget) {
+            console.log(`Image : ${this.qrCodeFileTarget}`)
+            const newSrc = profil.qrCodeFile?.startsWith("/qrcode/")
+                ? profil.qrCodeFile
+                : `/qrcode/${profil.qrCodeFile ?? "qr-code.png"}`;
 
-        // --- QR Code OFFLINE (lecture IndexedDB ou fallback distant) ---
-        if (this.hasQrCodeFileTarget && profil.qrCodeFile) {
-            try {
-                const dbRequest = indexedDB.open("db_scoutready", 1.2);
+            this.qrCodeFileTarget.dataset.imageLoaderSrcValue = newSrc;
 
-                dbRequest.onsuccess = (event) => {
-                    const db = event.target.result;
-                    const tx = db.transaction("qrcode", "readonly");
-                    const store = tx.objectStore("qrcode");
+            const imageLoaderController = this.application.getControllerForElementAndIdentifier(
+                this.qrCodeFileTarget,
+                "image-loader"
+            );
 
-                    const qrReq = store.get(profil.qrCodeFile);
-
-                    qrReq.onsuccess = () => {
-                        const result = qrReq.result;
-
-                        if (result && result.blob) {
-                            // ✅ QR Code trouvé localement → affichage base64
-                            const blobUrl = URL.createObjectURL(result.blob);
-                            this.qrCodeFileTarget.src = blobUrl;
-                            console.log("📸 QR Code chargé depuis IndexedDB !");
-                        } else {
-                            // ⚙️ Sinon, fallback en ligne
-                            const newSrc = profil.qrCodeFile.startsWith("/qrcode/")
-                                ? profil.qrCodeFile
-                                : `/qrcode/${profil.qrCodeFile}`;
-                            this.qrCodeFileTarget.src = newSrc;
-                            console.log("🌐 QR Code affiché depuis le serveur");
-                        }
-                    };
-                };
-            } catch (err) {
-                console.warn("⚠️ Erreur lors de la lecture du QR code offline :", err);
+            if (imageLoaderController) {
+                imageLoaderController.loadImage();
             }
         }
+
 
         // --- Profil principal ---
         this.setField("nomPrenom", `${profil.nom ?? ""} ${profil.prenom ?? ""}`);
