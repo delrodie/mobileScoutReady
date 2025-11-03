@@ -149,8 +149,14 @@ header{
     z-index: 9999;
 }
 
-.turbo-transition{
-    opacity:0;
+.fade-out{
+    transition: opacity 0.3s ease-out;
+    opacity:0 !important;
+}
+
+.fade-in{
+    transition: opacity 0.3s ease-in;
+    opacity:1 !important;
 }
 
 footer a.nav-link.active{
