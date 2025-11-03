@@ -57,6 +57,26 @@ export default class extends Controller {
             }
         }
 
+        // --- QrCode --- qrCodeFile
+        console.log(`QrCodeFile: ${profil.qrCodeFile}`)
+        if (this.hasQrCodeFileTarget) {
+            console.log(`Image : ${this.qrCodeFileTarget}`)
+            const newSrc = profil.qrCodeFile?.startsWith("/qrcode/")
+                ? profil.qrCodeFile
+                : `/qrcode/${profil.qrCodeFile ?? "qr-code.png"}`;
+
+            this.qrCodeFileTarget.dataset.imageLoaderSrcValue = newSrc;
+
+            const imageLoaderController = this.application.getControllerForElementAndIdentifier(
+                this.qrCodeFileTarget,
+                "image-loader"
+            );
+
+            if (imageLoaderController) {
+                imageLoaderController.loadImage();
+            }
+        }
+
         // --- Profil principal ---
         this.setField("nomPrenom", `${profil.nom ?? ""} ${profil.prenom ?? ""}`);
         this.setField("nom", profil.nom);

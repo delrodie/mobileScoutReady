@@ -28,4 +28,10 @@ class ProfilController extends AbstractController
     {
         return $this->render('profil/infos_scoute.html.twig');
     }
+
+    #[Route('/infos/scoute/qr-code', name: 'app_profil_infos_scoute_qrcode')]
+    public function qrCode()
+    {
+        return $this->render('profil/qrcode.html.twig');
+    }
 }

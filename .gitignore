@@ -22,4 +22,5 @@
 .idea
 /public/qrcode/*
 !/public/qrcode/.gitkeep
+!/public/qrcode/qr-code.png
 

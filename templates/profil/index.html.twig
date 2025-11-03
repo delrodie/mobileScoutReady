@@ -1,12 +1,15 @@
 {% extends 'base.html.twig' %}
 {% block turbo_frame %}
-    <turbo-frame id="profil-frame">
+    <turbo-frame id="main-frame">
 
         {% block body %}
             <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
                 <div class="row pt-4">
                     <div class="col-3">
-                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                        <a href="{{ path('app_fonctionnalite_list') }}"
+                           data-turbo-frame="_top"
+                           class="retour"
+                        >
                             <i class="bi bi-arrow-left fs-5"></i>
                         </a>
                     </div>
@@ -31,7 +34,7 @@
 
                     <h5 class="fs-5 mt-3 mb-1 fw-semibold" data-profil-target="nomPrenom"></h5>
                     <span class="text-color-main fw-semibold" data-profil-target="code"></span>
-                    <a href="qrcode.html" class="fs-1 mt-3 text-decoration-none">
+                    <a href="{{ path('app_profil_infos_scoute_qrcode') }}" class="fs-1 mt-3 text-decoration-none">
                         <i class="bi bi-qr-code-scan qr-code"></i>
                     </a>
                 </section>

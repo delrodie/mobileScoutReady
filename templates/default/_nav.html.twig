@@ -6,6 +6,7 @@
         {# Lien Accueil #}
         <li class="nav-item">
             <a href="{{ path('app_accueil') }}"
+               data-turbo-frame="_top"
                class="nav-link {% if _route starts with 'app_accueil' or _route starts with 'app_accueil' %} active {% endif%} d-flex flex-column justify-content-center align-items-center"
                 {% if not (_route starts with 'app_accueil') %}
                     data-controller="page-preloader"
