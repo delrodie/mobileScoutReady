@@ -1,127 +1,134 @@
 {% extends 'base.html.twig' %}
-{% block body %}
-    <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
-        <div class="row pt-4">
-            <div class="col-3">
-                <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
-                    <i class="bi bi-arrow-left fs-5"></i>
-                </a>
-            </div>
-            <div class="col-9">
-                <h5 class="fs-4">Infos scoutes de base</h5>
-            </div>
-        </div>
-    </header>
 
-    <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil">
-        <ul class="list-group list-group-plus">
-            <li
-                data-profil-wrapper="matricule"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-person-lock text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Matricule</small>
-                    <span class="fw-semibold" data-profil-target="matricule"></span>
+{% block turbo_frame %}
+    <turbo-frame id="profil-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Infos scoutes de base</h5>
+                    </div>
                 </div>
-            </li>
+            </header>
 
-            <li
-                data-profil-wrapper="instanceASN"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-geo-alt-fill text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">ASN</small>
-                    <span class="fw-semibold" data-profil-target="instanceASN"></span>
+            <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil">
+                <ul class="list-group list-group-plus">
+                    <li
+                        data-profil-wrapper="matricule"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-person-lock text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Matricule</small>
+                            <span class="fw-semibold" data-profil-target="matricule"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="instanceASN"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-geo-alt-fill text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">ASN</small>
+                            <span class="fw-semibold" data-profil-target="instanceASN"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="instanceRegion"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-geo-alt-fill text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Région</small>
+                            <span class="fw-semibold" data-profil-target="instanceRegion"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="instanceDistrict"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-building text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">District</small>
+                            <span class="fw-semibold" data-profil-target="instanceDistrict"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="instanceGroupe"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-house-add text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Groupe</small>
+                            <span class="fw-semibold" data-profil-target="instanceGroupe"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="poste"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-briefcase-fill text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Fonction</small>
+                            <span class="fw-semibold" data-profil-target="poste"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="detailPoste"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-cup-hot-fill text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Poste</small>
+                            <span class="fw-semibold" data-profil-target="detailPoste"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="branche"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-stack text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Branche</small>
+                            <span class="fw-semibold" data-profil-target="branche"></span>
+                        </div>
+                    </li>
+
+                    <li
+                        data-profil-wrapper="validation"
+                        class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
+                    >
+                        <i class="bi bi-clipboard2-check text-color-main fs-2 ms-1 me-3"></i>
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <small class="text-muted fst-italic">Statut</small>
+                            <span class="fw-semibold" data-profil-target="validation"></span>
+                        </div>
+                    </li>
+
+
+                </ul>
+                <div class="text-end mt-4">
+                    <a href="#" id="edit-link" class="text-decoration-none text-color-main fw-medium">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Modifier les informations
+                    </a>
                 </div>
-            </li>
+            </main>
 
-            <li
-                data-profil-wrapper="instanceRegion"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-geo-alt-fill text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Région</small>
-                    <span class="fw-semibold" data-profil-target="instanceRegion"></span>
-                </div>
-            </li>
+        {% endblock %}
 
-            <li
-                data-profil-wrapper="instanceDistrict"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-building text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">District</small>
-                    <span class="fw-semibold" data-profil-target="instanceDistrict"></span>
-                </div>
-            </li>
-
-            <li
-                data-profil-wrapper="instanceGroupe"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-house-add text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Groupe</small>
-                    <span class="fw-semibold" data-profil-target="instanceGroupe"></span>
-                </div>
-            </li>
-
-            <li
-                data-profil-wrapper="poste"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-briefcase-fill text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Fonction</small>
-                    <span class="fw-semibold" data-profil-target="poste"></span>
-                </div>
-            </li>
-
-            <li
-                data-profil-wrapper="detailPoste"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-cup-hot-fill text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Poste</small>
-                    <span class="fw-semibold" data-profil-target="detailPoste"></span>
-                </div>
-            </li>
-
-            <li
-                data-profil-wrapper="branche"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-stack text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Branche</small>
-                    <span class="fw-semibold" data-profil-target="branche"></span>
-                </div>
-            </li>
-
-            <li
-                data-profil-wrapper="validation"
-                class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2 d-none"
-            >
-                <i class="bi bi-clipboard2-check text-color-main fs-2 ms-1 me-3"></i>
-                <div class="d-flex flex-column justify-content-center align-items-start">
-                    <small class="text-muted fst-italic">Statut</small>
-                    <span class="fw-semibold" data-profil-target="validation"></span>
-                </div>
-            </li>
-
-
-        </ul>
-        <div class="text-end mt-4">
-            <a href="#" id="edit-link" class="text-decoration-none text-color-main fw-medium">
-                <i class="bi bi-pencil-square me-2"></i>
-                Modifier les informations
-            </a>
-        </div>
-    </main>
-
+    </turbo-frame>
 {% endblock %}

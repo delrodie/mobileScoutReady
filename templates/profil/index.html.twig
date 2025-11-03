@@ -1,104 +1,110 @@
 {% extends 'base.html.twig' %}
-{% block body %}
-    <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
-        <div class="row pt-4">
-            <div class="col-3">
-                <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
-                    <i class="bi bi-arrow-left fs-5"></i>
-                </a>
-            </div>
-            <div class="col-9">
-                <h5 class="fs-4">Profil</h5>
-            </div>
-        </div>
-    </header>
+{% block turbo_frame %}
+    <turbo-frame id="profil-frame">
 
-    <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
-        <section class="avatar d-flex flex-column justify-content-center align-items-center mt-5 mb-5">
-            <div
-                data-controller="image-loader"
-                data-image-loader-src-value="{{ asset('img/avatar/avatar_garcon.png') }}"
-{#                data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_garcon.png') }}"#}
-                data-image-loader-preload-value="true"
-                data-header-target="avatarLoader"
-            >
-                <img src="#" alt="" class="img img-fluid rounded-circle bg-main-30"
-                     style="width: 130px;">
-            </div>
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Profil</h5>
+                    </div>
+                </div>
+            </header>
 
-            <h5 class="fs-5 mt-3 mb-1 fw-semibold" data-profil-target="nomPrenom"></h5>
-            <span class="text-color-main fw-semibold" data-profil-target="code"></span>
-            <a href="qrcode.html" class="fs-1 mt-3 text-decoration-none">
-                <i class="bi bi-qr-code-scan qr-code"></i>
-            </a>
-        </section>
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Informations générales</h5>
-            <ul class="list-group list-group-plus">
-                <a href="{{ path('app_profil_civil') }}"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Informations civiles
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
+                <section class="avatar d-flex flex-column justify-content-center align-items-center mt-5 mb-5">
+                    <div
+                        data-controller="image-loader"
+                        data-image-loader-src-value="{{ asset('img/avatar/avatar_garcon.png') }}"
+                        {#                data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_garcon.png') }}"#}
+                        data-image-loader-preload-value="true"
+                        data-header-target="avatarLoader"
+                    >
+                        <img src="#" alt="" class="img img-fluid rounded-circle bg-main-30"
+                             style="width: 130px;">
+                    </div>
 
-                <a href="{{ path('app_profil_infos_scoute') }}"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Informations scoutes de base
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                    <h5 class="fs-5 mt-3 mb-1 fw-semibold" data-profil-target="nomPrenom"></h5>
+                    <span class="text-color-main fw-semibold" data-profil-target="code"></span>
+                    <a href="qrcode.html" class="fs-1 mt-3 text-decoration-none">
+                        <i class="bi bi-qr-code-scan qr-code"></i>
+                    </a>
+                </section>
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Informations générales</h5>
+                    <ul class="list-group list-group-plus">
+                        <a href="{{ path('app_profil_civil') }}"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Informations civiles
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Informations complémentaires
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="{{ path('app_profil_infos_scoute') }}"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Informations scoutes de base
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
-                    <span class="text-color-main">Evaluation COREFOR</span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Informations complémentaires
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
-                    <span class="text-color-main">Suivi COREFOR</span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </ul>
-        </section>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                            <span class="text-color-main">Evaluation COREFOR</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">ScoutReady</h5>
-            <ul class="list-group list-group-flus"><a href="#"
-                                                      class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Progression
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                            <span class="text-color-main">Suivi COREFOR</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </ul>
+                </section>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Parcours
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">ScoutReady</h5>
+                    <ul class="list-group list-group-flus"><a href="#"
+                                                              class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Progression
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Quiz
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Parcours
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3 mt-5">
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Quiz
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3 mt-5">
                     <span class="text-danger fw-medium">
                         <i class="bi bi-box-arrow-right fs-5 me-2"></i>
                         Déconnexion
                     </span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-            </ul>
-        </section>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </ul>
+                </section>
 
-    </main>
-    <div class="" style="margin-top: 50px;">.</div>
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
 
+        {% endblock %}
+
+    </turbo-frame>
 {% endblock %}
