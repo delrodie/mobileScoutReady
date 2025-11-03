@@ -1,128 +1,134 @@
 {% extends 'base.html.twig' %}
-{% block body %}
-    {{ render(url('app_main_header'))}}
 
-    <main class="max-w-sm mx-auto mt-3 mb-5">
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+        {% block body %}
+            {{ render(url('app_main_header'))}}
 
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Fonctionnalités</h5>
-            <ul class="list-group list-group-flus">
-                <a href="{{ path('app_profil_index') }}"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Profil
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+            <main class="max-w-sm mx-auto mt-3 mb-5">
 
-                <a href="qrcode.html"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    QrCode
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Fonctionnalités</h5>
+                    <ul class="list-group list-group-plus">
+                        <a href="{{ path('app_profil_index') }}"
+                           data-turbo-frame="_top"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Profil
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Notifications
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="{{ path('app_profil_infos_scoute_qrcode') }}"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            QrCode
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
-                    <span class="">Activités archivées</span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Notifications
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-            </ul>
-        </section>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                            <span class="">Activités archivées</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Paramètres</h5>
-            <ul class="list-group list-group-flus">
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Notification
-                    <i class="bi bi-toggle-on text-color-main"></i>
-                </a>
+                    </ul>
+                </section>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Scanner
-                    <i class="bi bi-toggle-off"></i>
-                </a>
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Paramètres</h5>
+                    <ul class="list-group list-group-flus">
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Notification
+                            <i class="bi bi-toggle-on text-color-main"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Localisation
-                    <i class="bi bi-toggle-on text-color-main"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Scanner
+                            <i class="bi bi-toggle-off"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
-                    <span class="">Son</span>
-                    <i class="bi bi-toggle-off"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Localisation
+                            <i class="bi bi-toggle-on text-color-main"></i>
+                        </a>
 
-            </ul>
-        </section>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                            <span class="">Son</span>
+                            <i class="bi bi-toggle-off"></i>
+                        </a>
 
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Aide</h5>
-            <ul class="list-group list-group-flus">
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    Poser une question
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                    </ul>
+                </section>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
-                    FAQ ScoutReady
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Aide</h5>
+                    <ul class="list-group list-group-flus">
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            Poser une question
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="https://scoutready.net/cgu"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3" target="_top">
-                    Politiques de confidentialités
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                            FAQ ScoutReady
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
-                    <span class="">Conditions d'utilisations</span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                        <a href="https://scoutready.net/cgu"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3" target="_top">
+                            Politiques de confidentialités
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-            </ul>
-        </section>
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                            <span class="">Conditions d'utilisations</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-        <section class="infos mt-5 px-4">
-            <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Comptes</h5>
-            <ul class="list-group list-group-flus">
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3"
-                   data-controller="logout"
-                   data-action="click->logout#logout"
-                   data-logout-redirect-url-value="{{ path('app_search_phone') }}"
-                >
+                    </ul>
+                </section>
+
+                <section class="infos mt-5 px-4">
+                    <h5 class="fs-6 text-body-secondary fw-medium mb-3 ">Comptes</h5>
+                    <ul class="list-group list-group-flus">
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3"
+                           data-controller="logout"
+                           data-action="click->logout#logout"
+                           data-logout-redirect-url-value="{{ path('app_search_phone') }}"
+                        >
                     <span class="text-danger">
                         <i class="bi bi-box-arrow-right fs-5 me-2"></i>
                     Déconnexion
                     </span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-                <a href="#"
-                   class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
+                        <a href="#"
+                           class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-center shadow-sm py-3">
                     <span class="text-danger">
                         <i class="bi bi-trash3 fs-5 me-2"></i>
                     Supprimer mon compte
                     </span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
 
-            </ul>
-        </section>
+                    </ul>
+                </section>
 
-    </main>
+            </main>
 
-    {{ include('default/_nav.html.twig')}}
+            {{ include('default/_nav.html.twig')}}
+        {% endblock %}
+    </turbo-frame>
 {% endblock %}

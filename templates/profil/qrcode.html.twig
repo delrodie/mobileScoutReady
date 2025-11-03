@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+
+    <turbo-frame id="main-frame">
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Qr code</h5>
+                    </div>
+                </div>
+            </header>
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="profil">
+                <div class="text-center mt-5 mb-3">
+                    <div
+                        data-controller="image-loader"
+                        data-image-loader-src-value="{{ asset('qrcode/qr-code.png') }}"
+                        {#                data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_garcon.png') }}"#}
+                        data-image-loader-preload-value="true"
+                        data-profil-target="qrCodeFile"
+                    >
+                        <img src="#" alt="" class="img img-fluid p-4">
+                    </div>
+                </div>
+                <div class="row row-cols-2 g-2 px-4">
+                    <div class="col">
+                        <div class="card h-100 shadow bg-body-tertiary border-0">
+                            <div class="card-body py-4 text-center">
+                                <h5 class="fs-2 fw-bold text-color-main">0</h5>
+                                <div class="text-muted fw-semibold">Actvités</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 shadow bg-body-tertiary border-0">
+                            <div class="card-body py-4 text-center">
+                                <h5 class="fs-2 fw-bold text-color-main">0</h5>
+                                <div class="text-muted fw-semibold">Réunions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
+        {% endblock %}
+    </turbo-frame>
+
+{% endblock %}
+
