@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import LoadDbController from './local_db_controller.js';
 
 const DB_NAME = 'db_scoutready';
 const DB_VERSION = 1.2; // 🔹 Incrémenté car on ajoute un nouveau champ (qrCodeLocal)
@@ -24,7 +25,16 @@ export default class extends Controller {
             const data = await response.json();
             console.log("✅ Données reçues du backend:", data);
 
-            await this.saveToIndexedDB(data);
+            console.log("Donnees unique : ", data.profil.isParent)
+
+            if (data.profil.isParent === true){
+                console.log("Profile parent")
+                Turbo.visit('/intro/choix/profil');
+                return;
+            }
+
+            await LoadDbController.saveToIndexedDB(data);
+            // await this.saveToIndexedDB(data);
 
             // Redirection vers l’accueil après succès
             Turbo.visit('/accueil');
@@ -77,7 +87,8 @@ export default class extends Controller {
 
                     try {
                         // ⚡ Téléchargement et stockage du QR code APRÈS la transaction
-                        await this.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
+                        await LoadDbController.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
+                        // await this.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
                     } catch (e) {
                         console.warn("⚠️ Échec téléchargement QR Code :", e);
                     }

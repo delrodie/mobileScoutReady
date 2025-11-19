@@ -9,9 +9,12 @@
                     Le numero de téléphone <b>{{ phone }}</b> est associé au(x) compte(s) :
                 </p>
 
-                <div class="px-4 mt-4 position-relative">
+                <div class="px-4 mt-4 position-relative" data-controller="choix-profil">
                     {% for scout in scouts %}
-                        <a href="#" class="text-decoration-none text-secondary w-100" style="width: 100%">
+                        <a href="{{ path('app_profil_selectionne', {'slug': scout.slug}) }}"
+                           class="text-decoration-none text-secondary w-100"
+                           data-action="click->choix-profil#select"
+                           style="width: 100%">
                             <div class="card mb-3 shadow-sm w-100" style="width: 100%">
                                 <div class="row g-0 d-flex align-items-center">
                                     <div class="col-3">

@@ -53,7 +53,15 @@ class IntroController extends AbstractController
             // Si c’est un parent → choix du profil
             if ($scouts[0]->isPhoneParent()) {
                 $session->set('_getScouts', $scouts);
-                return $this->redirectToRoute('app_choix_profil');
+
+//                if ($request->isXmlHttpRequest()){
+//                    return $this->json([
+//                        'liste' => $scouts[0]
+//                    ]);
+//                }
+
+
+//                return $this->redirectToRoute('app_choix_profil');
             }
 
 
@@ -93,5 +101,33 @@ class IntroController extends AbstractController
             'scouts' => $getScouts,
             'phone' => $session->get('_phone_input')
         ]);
+    }
+
+    #[Route('/profil/{slug}', name: 'app_profil_selectionne', methods: ['GET'])]
+    public function selectProfil(Request $request, ScoutRepository $scoutRepository, string $slug): Response
+    {
+        $scout = $scoutRepository->findOneBy(['slug' => $slug]);
+        if (!$scout){
+            if ($request->isXmlHttpRequest()){
+                return $this->json([
+                    'error' => 'Profil non trouvé'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            return $this->redirectToRoute('app_search_phone');
+        }
+
+        if ($request->isXmlHttpRequest()){
+            $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
+            $profilDTO = ProfilDTO::fromScout($fonctions);
+
+            return $this->json([
+                'profil' => $profilDTO->profil,
+                'profil_fonction' => $profilDTO->profil_fonction,
+                'profil_instance' => $profilDTO->profil_instance,
+            ]);
+        }
+
+        $request->getSession()->set('profil', $scout);
+        return $this->redirectToRoute('app_accueil');
     }
 }
