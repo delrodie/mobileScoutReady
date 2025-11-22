@@ -2,10 +2,12 @@ import { Controller } from '@hotwired/stimulus';
 import LocalDbController from './local_db_controller.js';
 
 export default class extends Controller {
-    static targets = ['list', 'template', 'loader', 'empty'];
+    static targets = ['list', 'template', 'loader', 'empty', 'input'];
     static values = {
         apiUrl: String
     }
+
+    allScouts = [];
 
     async connect() {
         await this.loadCommunaute();
@@ -17,12 +19,13 @@ export default class extends Controller {
             const profil = await LocalDbController.getAllFromStore('profil');
             const instance = await LocalDbController.getAllFromStore('profil_instance');
 
-            if (!profil) {
+            if (!profil || profil.length === 0) {
                 console.warn("Aucun profil local trouvé.");
+                this.loaderTarget.classList.add('d-none');
                 return;
             }
 
-            console.log("👤 Profil local récupéré :", profil);
+            console.log("👤 Profil local récupéré :", profil[0]);
 
             // 2. Appel API avec les infos du profil (ex: region ou instance)
             // On envoie l'ID ou le slug pour que le serveur détermine la région
@@ -42,15 +45,15 @@ export default class extends Controller {
 
             if (!response.ok) throw new Error('Erreur API');
 
-            // console.log('Response :')
-            // console.log(response.json())
-
             const scouts = await response.json();
+
+            // Sauvegarde de la liste complète
+            this.allScouts = scouts;
 
             // 3. Affichage
             this.loaderTarget.classList.add('d-none');
 
-            if (scouts.length === 0) {
+            if (!scouts || scouts.length === 0) {
                 this.emptyTarget.classList.remove('d-none');
                 return;
             }
@@ -62,6 +65,48 @@ export default class extends Controller {
             this.loaderTarget.classList.add('d-none');
             // Optionnel : Afficher un message d'erreur
         }
+    }
+
+    /**
+     * 🔍 Méthode de recherche dynamique
+     * Appelée à chaque frappe dans l'input
+     */
+    search() {
+        const query = this.normalize(this.inputTarget.value);
+
+        // Si champ vide, on réaffiche tout
+        if (query.length === 0) {
+            this.emptyTarget.classList.add('d-none');
+            this.renderList(this.allScouts);
+            return;
+        }
+
+        // Filtrage
+        const filtered = this.allScouts.filter(scout => {
+            // On construit une chaîne unique avec toutes les infos cherchables
+            const searchableText = this.normalize(
+                `${scout.nom} ${scout.prenom} ${scout.fonction || ''} ${scout.instance || ''}`
+            );
+            return searchableText.includes(query);
+        });
+
+        // Gestion état vide ou affichage
+        if (filtered.length === 0) {
+            this.listTarget.innerHTML = '';
+            this.emptyTarget.classList.remove('d-none');
+            // Optionnel : changer le texte de emptyTarget pour dire "Aucun résultat pour..."
+        } else {
+            this.emptyTarget.classList.add('d-none');
+            this.renderList(filtered);
+        }
+    }
+
+    /**
+     * Utilitaire pour nettoyer le texte (minuscules, sans accents)
+     * Ex: "Hélène" -> "helene"
+     */
+    normalize(str) {
+        return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
     renderList(scouts) {
