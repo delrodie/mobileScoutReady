@@ -7,7 +7,8 @@ export default class extends Controller {
         "branche",
         "districtselected",
         "groupelist",
-        "brancheselect"
+        "brancheselect",
+        "statutProfil"
     ];
 
     static values = {
@@ -20,7 +21,20 @@ export default class extends Controller {
         this.toggleFields();
         this.groupelistTarget.disabled = true;
         this.brancheselectTarget.setAttribute('readonly', 'readonly');
-        // console.log(this.statutValue);
+        this.isJeune();
+    }
+
+    isJeune(){
+        const statutJeune = this.statutProfilTarget.value;
+        if (statutJeune === 'JEUNE'){
+            this.showAndRequire(this.districtTarget);
+            this.showAndRequire(this.groupeTarget);
+            this.showAndRequire(this.brancheTarget);
+        }else{
+            this.hideAndUnrequire(this.districtTarget);
+            this.hideAndUnrequire(this.groupeTarget);
+            this.hideAndUnrequire(this.brancheTarget);
+        }
     }
 
     toggleFields(event) {

@@ -47,21 +47,16 @@ class IntroController extends AbstractController
                         'message' => "Numéro introuvable. Veuillez réessayer."
                     ]);
                 }
+
+                if ($request->isXmlHttpRequest()){
+                    return $this->json(['status' => 'nouveau'], Response::HTTP_OK);
+                }
                 return $this->redirectToRoute('app_inscription_choixregion');
             }
 
             // Si c’est un parent → choix du profil
             if ($scouts[0]->isPhoneParent()) {
                 $session->set('_getScouts', $scouts);
-
-//                if ($request->isXmlHttpRequest()){
-//                    return $this->json([
-//                        'liste' => $scouts[0]
-//                    ]);
-//                }
-
-
-//                return $this->redirectToRoute('app_choix_profil');
             }
 
 

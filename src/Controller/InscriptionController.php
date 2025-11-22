@@ -49,6 +49,7 @@ class InscriptionController extends AbstractController
         }
         return $this->render('scout/choix-region.html.twig',[
             'regions' => $this->instanceRepository->findBy(['type' => InstanceType::REGION], ['nom' => "ASC"]),
+            'phone' => $session->get('_phone_input'),
         ]);
     }
     #[Route('/civile', name:'app_inscription_civile')]

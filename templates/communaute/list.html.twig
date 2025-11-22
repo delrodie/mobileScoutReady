@@ -5,7 +5,10 @@
         {% block body %}
             {{ render(url('app_main_header'))}}
 
-            <main class="max-w-sm mx-auto mt-3 mb-5">
+            <main class="max-w-sm mx-auto mt-3 mb-5"
+                  data-controller="communaute"
+                  data-communaute-api-url-value="{{ path('api_communaute_index') }}"
+            >
 
                 <div class="px-4 me-auto">
                     <form action="">
@@ -19,53 +22,48 @@
                 </div>
 
                 <section class="liste mt-5 px-3">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item shadow-sm mb-2">
-                            <a href="#" class="text-decoration-none text-secondary">
-                                <div class="row g-2 d-flex align-items-center">
-                                    <div class="col-3">
-                                        <div
-                                            data-controller="image-loader"
-                                            data-image-loader-src-value="{{ asset('img/avatar/avatar_femme.png') }}"
-                                            data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
-                                            data-image-loader-preload-value="true"
-                                        >
-                                            <img alt="" class="img-fluid">
-                                        </div>
+                    {# Loader #}
+                    <div data-communaute-target="loader" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="mt-2 text-muted fsize-12">Recherche des scouts de votre région...</p>
+                    </div>
+                    {# Message vide #}
+                    <div data-communaute-target="empty" class="d-none text-center py-5">
+                        <p class="text-muted">Aucun scout trouvé dans instance.</p>
+                    </div>
+                    {# Liste des scouts#}
+                    <ul class="list-group list-group-flush" data-communaute-target="list">
 
-                                    </div>
-                                    <div class="col-9">
-                                        <h5 class="fsize-13 text-body mb-0 pb-0">AMOIKON Ama Eden Marie-Immaculée</h5>
-                                        <div class="fsize-12 text-color-main mb-0 pb-0">Equipe Régionale - CRA Communication</div>
-                                        <div class="text-muted fsize-12 fst-italic mt-0 pt-0">Abidjan (Les Requins)</div>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item shadow-sm">
-                            <a href="#" class="text-decoration-none text-secondary">
-                                <div class="row g-2 d-flex align-items-center">
-                                    <div class="col-3">
-                                        <div
-                                            data-controller="image-loader"
-                                            data-image-loader-src-value="{{ asset('img/avatar/avatar_homme.png') }}"
-                                            data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_homme.png') }}"
-                                            data-image-loader-preload-value="true"
-                                        >
-                                            <img alt="" class="img-fluid">
-                                        </div>
-
-                                    </div>
-                                    <div class="col-9">
-                                        <h5 class="fsize-13 text-body mb-0 pb-0">AMOIKON Ama Eden Marie-Immaculée</h5>
-                                        <div class="fsize-12 text-color-main mb-0 pb-0">Equipe Régionale - CRA Communication</div>
-                                        <div class="text-muted fsize-12 fw-light fst-italic mt-0 pt-0">Abidjan (Les Requins)</div>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
                     </ul>
                 </section>
+
+                {# Lignes des scouts #}
+                <template data-communaute-target="template">
+                    <li class="list-group-item shadow-sm mb-2">
+                        <a href="#" class="text-decoration-none text-secondary">
+                            <div class="row g-2 d-flex align-items-center">
+                                <div class="col-3">
+                                    <div
+                                        data-controller="image-loader"
+                                        data-image-loader-src-value="{{ asset('img/avatar/avatar_femme.png') }}"
+                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
+                                        data-image-loader-preload-value="true"
+                                    >
+                                        <img alt="" class="img-fluid">
+                                    </div>
+
+                                </div>
+                                <div class="col-9">
+                                    <h5 class="fsize-13 text-body mb-0 pb-0 js-nom">Nom</h5>
+                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">Fonction</div>
+                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">Instance</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </template>
 
             </main>
             {{ include('default/_nav.html.twig')}}

@@ -20,9 +20,17 @@ export default class extends Controller {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
 
+            //console.log(` response: ${response}`);
+
             if (!response.ok) throw new Error("Erreur serveur");
 
             const data = await response.json();
+
+            if (data.status === 'nouveau'){
+                Turbo.visit('/inscription');
+                return;
+            }
+
             console.log("✅ Données reçues du backend:", data);
 
             console.log("Donnees unique : ", data.profil.isParent)
