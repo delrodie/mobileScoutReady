@@ -41,8 +41,13 @@
                     </div>
                     {# Liste des scouts#}
                     <ul class="list-group list-group-flush" data-communaute-target="list">
-
                     </ul>
+
+                    <div data-communaute-target="pagination" class="text-center py-3 d-none">
+                        <div class="spinner-border spinner-border text-secondary" role="status">
+                            <div class="visually-hidden">Loading...</div>
+                        </div>
+                    </div>
                 </section>
 
                 {# Lignes des scouts #}
@@ -53,9 +58,10 @@
                                 <div class="col-3">
                                     <div
                                         data-controller="image-loader"
-                                        data-image-loader-src-value="{{ asset('img/avatar/avatar_femme.png') }}"
-                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
+                                        data-image-loader-src-value="{{ asset('img/avatar/avatar_fille.png') }}"
+{#                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"#}
                                         data-image-loader-preload-value="true"
+                                        data-communaute-target="avatarLoader"
                                     >
                                         <img alt="" class="img-fluid">
                                     </div>

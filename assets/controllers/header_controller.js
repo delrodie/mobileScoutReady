@@ -36,6 +36,8 @@ export default class extends Controller {
                 : `/avatar/${profil.avatar ?? "avatar_homme.png"}`;
 
             this.avatarLoaderTarget.dataset.imageLoaderSrcValue = newSrc;
+            console.log('head-image')
+            console.log(this.avatarLoaderTarget)
 
             // ⚙️ Récupère le contrôleur image-loader lié
             const imageLoaderController = this.application.getControllerForElementAndIdentifier(

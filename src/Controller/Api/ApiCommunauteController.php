@@ -101,11 +101,11 @@ class ApiCommunauteController extends AbstractController
     {
         $type = $this->utilityService->avatar($dateNaiss, $genre);
         return match ($type){
-            'Garçon' => 'img/avatar/avatar_garcon.png',
-            'Fille' => 'img/avatar/avatar_fille.png',
-            'Homme' => 'img/avatar/avatar_homme.png',
-            'Femme' => 'img/avatar/avatar_femme.png',
-            default => 'img/avatar/garcon.png',
+            'Garçon' => '/avatar/avatar_garcon.png',
+            'Fille' => '/avatar/avatar_fille.png',
+            'Homme' => '/avatar/avatar_homme.png',
+            'Femme' => '/avatar/avatar_femme.png',
+            default => '/avatar/garcon.png',
         };
     }
 
