@@ -192,25 +192,41 @@ export default class extends Controller {
                 }
 
                 tx.oncomplete = async () => {
-                    console.log("💾 Données principales sauvegardées avec succès dans IndexedDB");
+                    console.log("💾 Données texte sauvegardées. Lancement du téléchargement des médias...");
 
-                    try {
-                        // ⚡ Téléchargement et stockage du QR code APRÈS la transaction
-                        await this.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
+                    // On prépare toutes les promesses de téléchargement
+                    const tasks = [];
 
-                        if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
-                            for (const champ of data.champs_activite.champs) {
-                                if (champ && typeof champ === 'object' && champ.id) {
-                                    await this.fetchAndStoreChampActivite(champ.media, champ.id);
-                                }
-                            }
-                            console.log(`💾 ${data.champs_activite.champs.length} champs traités.`);
-                        }
-                    } catch (e) {
-                        console.warn("⚠️ Échec téléchargement QR Code :", e);
+                    // A. Tâche QR Code
+                    if (data.profil && data.profil.qrCodeFile) {
+                        tasks.push(this.processQrCode(data.profil.qrCodeFile, data.profil.slug));
                     }
 
-                    resolve();
+                    // B. Tâche Images Activités (Parallélisation)
+                    if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
+                        data.champs_activite.champs.forEach(champ => {
+                            if (champ && champ.id && champ.media) {
+                                tasks.push(this.processChampImage(champ.media, champ.id));
+                            }
+                        });
+                    }
+
+                    // On attend que TOUT soit téléchargé avant de rouvrir la base UNE SEULE FOIS
+                    try {
+                        const results = await Promise.all(tasks);
+
+                        // Si on a des résultats (images téléchargées), on sauvegarde tout en un bloc
+                        if (results.length > 0) {
+                            await this.batchSaveImages(results);
+                        }
+
+                        console.log("✅ Tous les médias ont été téléchargés et sauvegardés.");
+                        resolve();
+
+                    } catch (err) {
+                        console.warn("⚠️ Erreur lors du téléchargement des médias (mode offline partiel) :", err);
+                        resolve(); // On resolve quand même pour ne pas bloquer l'app
+                    }
                 };
 
                 tx.onerror = (e) => reject(e.target.error);
@@ -220,80 +236,64 @@ export default class extends Controller {
         });
     }
 
-    static async fetchAndStoreQrCode(url, slug) {
-        if (!url) return console.warn("⚠️ Aucun QR Code à télécharger");
-
-        const absoluteUrl = url.startsWith('http')
-            ? url
-            : `${window.location.origin}/qrcode/${url.replace(/^\/+/, '')}`;
-
-        console.log("📡 Téléchargement du QR Code depuis :", absoluteUrl);
-
+    static async processQrCode(url, slug) {
         try {
-            const response = await fetch(absoluteUrl);
-            if (!response.ok) throw new Error(`Erreur téléchargement (${response.status})`);
-
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-
-            // On sauvegarde le blob dans une transaction séparée
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onsuccess = (event) => {
-                const db = event.target.result;
-                const tx = db.transaction(['profil'], 'readwrite');
-                const store = tx.objectStore('profil');
-
-                const getReq = store.get(slug);
-                getReq.onsuccess = () => {
-                    const profil = getReq.result;
-                    if (profil) {
-                        profil.qrCodeBlob = blobUrl;
-                        store.put(profil);
-                        console.log("📸 QR Code sauvegardé localement !");
-                    }
-                };
-            };
+            const blobUrl = await this.fetchBlobUrl(url);
+            return { type: 'profil', key: slug, field: 'qrCodeBlob', value: blobUrl };
         } catch (e) {
-            console.error("⚠️ Échec du téléchargement du QR Code :", e);
+            console.warn("Skip QR Code:", e);
+            return null;
         }
     }
 
-    static async fetchAndStoreChampActivite(url, id) {
-        if (!url) return console.warn("⚠️ Aucune illustration à télécharger");
-
-        const absoluteUrl = url.startsWith('http')
-            ? url
-            : `${window.location.origin}/${url.replace(/^\/+/, '')}`;
-
-        console.log("📡 Téléchargement de l'illustration de l'activité depuis :", absoluteUrl);
-
+    static async processChampImage(url, id) {
         try {
-            const response = await fetch(absoluteUrl);
-            if (!response.ok) throw new Error(`Erreur téléchargement (${response.status})`);
+            const blobUrl = await this.fetchBlobUrl(url);
+            return { type: 'champs_activite', key: id, field: 'champActiviteBlob', value: blobUrl };
+        } catch (e) {
+            console.warn(`Skip image ${id}:`, e);
+            return null;
+        }
+    }
 
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
+    static async fetchBlobUrl(url) {
+        if (!url) throw new Error("URL vide");
+        const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}/${url.replace(/^\/+/, '')}`;
+        const response = await fetch(absoluteUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    }
 
-            // On sauvegarde le blob dans une transaction séparée
+    // --- Sauvegarde groupée (Batch) ---
+
+    static async batchSaveImages(items) {
+        return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
+
             request.onsuccess = (event) => {
                 const db = event.target.result;
-                const tx = db.transaction(['champs_activite'], 'readwrite');
-                const store = tx.objectStore('champs_activite');
+                const tx = db.transaction(['profil', 'champs_activite'], 'readwrite');
 
-                const getReq = store.get(id);
-                getReq.onsuccess = () => {
-                    const champs = getReq.result;
-                    if (champs) {
-                        champs.champActiviteBlob = blobUrl;
-                        store.put(champs);
-                        console.log("📸 Illustration champs d'activité sauvegardé localement !");
-                    }
-                };
+                items.forEach(item => {
+                    if (!item) return; // Ignore les échecs
+
+                    const store = tx.objectStore(item.type);
+                    const getReq = store.get(item.key);
+
+                    getReq.onsuccess = () => {
+                        const record = getReq.result;
+                        if (record) {
+                            record[item.field] = item.value;
+                            store.put(record);
+                        }
+                    };
+                });
+
+                tx.oncomplete = () => resolve();
+                tx.onerror = (e) => reject(e);
             };
-        } catch (e) {
-            console.error("⚠️ Échec du téléchargement du champs d'activité :", e);
-        }
+        });
     }
 
 }

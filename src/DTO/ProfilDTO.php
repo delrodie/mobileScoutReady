@@ -41,7 +41,7 @@ class ProfilDTO
             'email' => $scout->getEmail(),
             'photo' => $scout->getPhoto(),
             'qrCodeToken' => $scout->getQrCodeToken(),
-            'qrCodeFile' => $scout->getQrCodeFile(),
+            'qrCodeFile' => "/qrcode/{$scout->getQrCodeFile()}",
             'isParent' => $scout->isPhoneParent(),
             'telephone' => $scout->getTelephone(),
             'avatar' => $avatar,
