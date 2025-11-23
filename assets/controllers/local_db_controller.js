@@ -1,4 +1,3 @@
-// assets/controllers/local_db_controller.js
 import { Controller } from "@hotwired/stimulus";
 
 const DB_NAME = 'db_scoutready'
@@ -60,8 +59,6 @@ export default class extends Controller {
             window.location.href = "/intro/phone";
         }
     }
-
-
 
     /**
      * Vérifie la présence de données dans IndexedDB
@@ -130,8 +127,13 @@ export default class extends Controller {
     }
 
 
-
+    /**
+     * Sauvegarde les données et gère l'affichage du loader
+     */
     static async saveToIndexedDB(data) {
+        // 1. AFFICHER LE LOADER
+        this.showLoader();
+
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -177,13 +179,10 @@ export default class extends Controller {
                 }
 
                 // --- CHAMPS D'ACTIVITÉ ---
-                // On vérifie si on a bien reçu les champs (objet DTO avec propriété 'champs')
                 if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
-                    champsStore.clear(); // On vide avant de remettre à jour
+                    champsStore.clear();
 
                     data.champs_activite.champs.forEach(champ => {
-                        // IMPORTANT: Le DTO renvoie parfois un '0' en premier élément pour les select,
-                        // ou null. On ne stocke que les vrais objets avec un ID.
                         if (champ && typeof champ === 'object' && champ.id) {
                             champsStore.put(champ);
                         }
@@ -194,7 +193,6 @@ export default class extends Controller {
                 tx.oncomplete = async () => {
                     console.log("💾 Données texte sauvegardées. Lancement du téléchargement des médias...");
 
-                    // On prépare toutes les promesses de téléchargement
                     const tasks = [];
 
                     // A. Tâche QR Code
@@ -211,7 +209,7 @@ export default class extends Controller {
                         });
                     }
 
-                    // On attend que TOUT soit téléchargé avant de rouvrir la base UNE SEULE FOIS
+                    // On attend que TOUT soit téléchargé
                     try {
                         const results = await Promise.all(tasks);
 
@@ -221,18 +219,27 @@ export default class extends Controller {
                         }
 
                         console.log("✅ Tous les médias ont été téléchargés et sauvegardés.");
-                        resolve();
-
                     } catch (err) {
                         console.warn("⚠️ Erreur lors du téléchargement des médias (mode offline partiel) :", err);
-                        resolve(); // On resolve quand même pour ne pas bloquer l'app
+                    } finally {
+                        // 2a. CACHER LE LOADER (Succès ou Erreur partielle)
+                        this.hideLoader();
+                        resolve();
                     }
                 };
 
-                tx.onerror = (e) => reject(e.target.error);
+                tx.onerror = (e) => {
+                    // 2b. CACHER LE LOADER (Erreur Transaction)
+                    this.hideLoader();
+                    reject(e.target.error);
+                };
             };
 
-            request.onerror = (e) => reject(e.target.error);
+            request.onerror = (e) => {
+                // 2c. CACHER LE LOADER (Erreur Ouverture)
+                this.hideLoader();
+                reject(e.target.error);
+            };
         });
     }
 
@@ -294,6 +301,41 @@ export default class extends Controller {
                 tx.onerror = (e) => reject(e);
             };
         });
+    }
+
+    // --- UI HELPERS POUR LE LOADER ---
+
+    static showLoader() {
+        // Crée le loader s'il n'existe pas déjà dans le DOM
+        let loader = document.getElementById('db-save-loader');
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'db-save-loader';
+            // Styles inline pour assurer que ça marche sans framework CSS externe
+            loader.innerHTML = `
+                <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; font-family:system-ui, sans-serif;">
+                    <style>
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                        .loader-spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+                    </style>
+                    <div class="loader-spinner"></div>
+                    <p style="font-size: 1.1rem; font-weight: 500;">Synchronisation des données...</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">Veuillez ne pas quitter.</p>
+                </div>
+            `;
+            document.body.appendChild(loader);
+        }
+        loader.style.display = 'flex';
+    }
+
+    static hideLoader() {
+        const loader = document.getElementById('db-save-loader');
+        if (loader) {
+            // Petit délai pour éviter le flash si c'est trop rapide
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 300);
+        }
     }
 
 }
