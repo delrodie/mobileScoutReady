@@ -134,7 +134,8 @@ class ApiCommunauteController extends AbstractController
                 'fonction' => $titre,
                 'instance' => $fonction->getInstance()->getNom(),
                 'avatar' => $this->getAvatarFile($fonction->getScout()->getDateNaissance(), $fonction->getScout()->getSexe()),
-                'validation' => $fonction->isValidation()
+                'validation' => $fonction->isValidation(),
+                'url' => $this->generateUrl('app_communaute_membre',['slug' => $fonction->getScout()->getSlug()]),
             ];
         }
 

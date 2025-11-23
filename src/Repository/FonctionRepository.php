@@ -3,17 +3,22 @@
 namespace App\Repository;
 
 use App\Entity\Fonction;
+use App\Services\UtilityService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Fonction>
  */
 class FonctionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private UtilityService $utilityService;
+
+    public function __construct(ManagerRegistry $registry, UtilityService $utilityService)
     {
         parent::__construct($registry, Fonction::class);
+        $this->utilityService = $utilityService;
     }
 
     /**
@@ -42,9 +47,27 @@ class FonctionRepository extends ServiceEntityRepository
             ->andWhere('s.id = :scout')
             ->orderBy('f.id', 'DESC')
             ->setParameter('scout', $scoutId)
+            ->setMaxResults(1)
             ->getQuery()->getOneOrNullResult()
             ;
     }
+
+    public function findOneByScoutSlug($slug)
+    {
+        $uuid = $this->utilityService->convertSlugToUuid($slug);
+        if (!$uuid) {
+            return null;
+        }
+
+        return $this->query()
+            ->where('s.slug = :slug')
+            ->orderBy('f.id', 'DESC')
+            ->setParameter('slug', $uuid, 'uuid')
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
+    }
+
+
 
     public function findCommunauteByBranche(int $profil, int $instance, string $branche, string $annee, string $statut = 'JEUNE')
     {
@@ -94,7 +117,7 @@ class FonctionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('f')
             ->addSelect('s', 'i')
-            ->leftJoin('f.scout', 's')
+            ->innerJoin('f.scout', 's')
             ->leftJoin('f.instance', 'i');
     }
 

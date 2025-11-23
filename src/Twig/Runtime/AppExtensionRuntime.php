@@ -14,8 +14,8 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private readonly FonctionRepository $fonctionRepository,
-        private readonly UtilityService $utilityService,
-        private readonly RequestStack $requestStack,
+        private readonly UtilityService     $utilityService,
+        private readonly RequestStack       $requestStack, private readonly ScoutRepository $scoutRepository,
     )
     {
         // Inject dependencies if needed
@@ -40,5 +40,12 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
     public function historiqueNavigation(): ?string
     {
         return $this->requestStack->getCurrentRequest()?->headers->get('referer');
+    }
+
+    public function getAvatar($value): string
+    {
+        $scout = $this->scoutRepository->findOneBy(['slug' => $value]);
+
+        return $this->utilityService->getAvatarFile($scout->getDateNaissance(), $scout->getSexe());
     }
 }

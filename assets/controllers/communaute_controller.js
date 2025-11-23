@@ -190,6 +190,7 @@ export default class extends Controller {
         if (elValidation) elValidation.textContent = scout.validation || '';
 
 
+        // Avatar du membre
         const avatarContainer = clone.querySelector('[data-controller="image-loader"]');
 
         if (avatarContainer && scout.avatar) {
@@ -199,6 +200,12 @@ export default class extends Controller {
 
             // Gestion native si besoin
             avatarContainer.setAttribute('data-image-loader-native-src-value', `asset://${avatarPath}`);
+        }
+
+        //Lien profil membre
+        const urlContainer = clone.querySelector('.url-membre')
+        if (urlContainer && scout.url){
+            urlContainer.setAttribute('href', scout.url);
         }
 
         this.listTarget.appendChild(clone);

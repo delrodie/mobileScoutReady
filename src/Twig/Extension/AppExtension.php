@@ -16,6 +16,7 @@ class AppExtension extends AbstractExtension
             // parameter: ['is_safe' => ['html']]
             // Reference: https://twig.symfony.com/doc/3.x/advanced.html#automatic-escaping
             new TwigFilter('fonction_scoute', [AppExtensionRuntime::class, 'fonctionScoute']),
+            new TwigFilter('avatar', [AppExtensionRuntime::class, 'getAvatar']),
         ];
     }
 

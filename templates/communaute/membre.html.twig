@@ -1,0 +1,328 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ path('app_communaute_list') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Profil membre</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm mx-auto mt-3 mb-5">
+                <section class="avatar d-flex flex-column justify-content-center align-items-center mt-5 mb-5">
+                    <img src="{{ asset(membre.scout.photo ? '/uploads/profil' ~ membre.scout.photo : membre.scout.slug|avatar) }}" alt="" class="img img-fluid rounded-circle bg-main-30"
+                         style="width: 110px;">
+                    <h5 class="fs-5 mt-3 mb-1 fw-semibold">{{ membre.scout.nom|upper }} {{ membre.scout.prenom|title }}</h5>
+                    <span class="text-color-main fw-semibold">{{ membre.scout.code }}</span>
+                    <div class="row px-3 mt-4">
+                        <div class="col">
+                            <div class="text-decoration-none text-center d-flex justify-content-center align-items-center">
+                                <div class="card h-100 bg-main-30 shadow-sm border border-0">
+                                    <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
+                                         style="width: 150px;">
+                                        <span class="fs-1 text-color-main fw-bold">25</span>
+                                        <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Badge</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="text-decoration-none text-center d-flex justify-content-center align-items-center">
+                                <div class="card h-100 bg-main-30 shadow-sm border border-0">
+                                    <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
+                                         style="width: 150px;">
+                                        <span class="fs-1 text-color-main fw-bold">25</span>
+                                        <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Réunions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </section>
+
+
+                <section class="infos mt-5 px-4">
+                    <div class="accordion accordion-flush mb-5" id="accordionFlushExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header fw-bold">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                    <span class="fw-bold">Informations de base </span>
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
+                                <div class="accordion-body px-2 pb-5 pt-0 m-0 border">
+
+                                <ul class="list-group list-group-flush">
+                                    <li
+                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1 mt-3">
+                                        <div class="text-muted fsize-13">Nom: </div>
+                                        <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.nom }}</div>
+                                    </li>
+
+                                    <li
+                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                        <div class="text-muted fsize-13">Prénoms: </div>
+                                        <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.prenom }}</div>
+                                    </li>
+
+                                    <li
+                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                        <div class="text-muted fsize-13">Fonction/branche: </div>
+                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                            {{ membre.detailPoste ?? membre.branche }}
+                                        </div>
+                                    </li>
+
+                                    {% if membre.poste == 'REGIONAL' %}
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">Région: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                        </li>
+
+                                    {% elseif membre.poste == 'DISTRICT' %}
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">Région: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                        </li>
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">District: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                        </li>
+
+                                    {% elseif membre.poste == 'GROUPE' or membre.poste == 'UNITE' %}
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">District: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                        </li>
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">Groupe: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                        </li>
+
+                                    {% else %}
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">District: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                        </li>
+                                        <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                            <div class="text-muted fsize-13">Groupe: </div>
+                                            <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                        </li>
+                                    {% endif %}
+
+                                    <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                        <div class="text-muted fsize-13">Statut: </div>
+                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                            {% if membre.validation %}
+                                                <span class="badge bg-success">Fonction validée</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Fonction non validée</span>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+
+                                </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% if membre.scout.statut.value == 'ADULTE' %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                                        <span class="fw-bold">Informations complémentaires</span>
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body px-2 pb-5 pt-0 m-0 border">
+
+                                        <ul class="list-group list-group-flush">
+                                            <li
+                                                class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1 mt-3">
+                                                <div class="text-muted fsize-13">Nom: </div>
+                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.nom }}</div>
+                                            </li>
+
+                                            <li
+                                                class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                <div class="text-muted fsize-13">Prénoms: </div>
+                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.prenom }}</div>
+                                            </li>
+
+                                            <li
+                                                class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                <div class="text-muted fsize-13">Fonction/branche: </div>
+                                                <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                    {{ membre.detailPoste ?? membre.branche }}
+                                                </div>
+                                            </li>
+
+                                            {% if membre.poste == 'REGIONAL' %}
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">Région: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                                </li>
+
+                                            {% elseif membre.poste == 'DISTRICT' %}
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">Région: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                                </li>
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">District: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                                </li>
+
+                                            {% elseif membre.poste == 'GROUPE' or membre.poste == 'UNITE' %}
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">District: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                                </li>
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">Groupe: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                                </li>
+
+                                            {% else %}
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">District: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
+                                                </li>
+                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                    <div class="text-muted fsize-13">Groupe: </div>
+                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
+                                                </li>
+                                            {% endif %}
+
+                                        </ul>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="accordion-item mb-5">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                                        <span class="fw-bold">Parcours / Progression</span>
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body px-2 pb-5 pt-0 m-0 border">
+
+                                        <div class="row row-cols-1 g-2">
+                                            <div class="col mt-3">
+                                                <div class="card h-100 shadow-sm border-0">
+                                                    <a href="#" class="text-decoration-none text-body-secondary">
+                                                        <div class="card-body py-2">
+                                                            <div class="row d-flex align-items-center">
+                                                                <div class="col-3">
+                                                                    <img src="{{ asset('img/champs/01-technique-scout.png') }}" alt="" class="img-fluid"
+                                                                         loading="lazy">
+                                                                </div>
+                                                                <div class="col-9">
+                                                                    <h5 class="fsize-13 mb-0 pb-0">Techniques scoutes et habileté manuelle</h5>
+                                                                    <small class="text-muted fzize-12">Durée: 10min</small>
+                                                                    <div class="progress" role="progressbar" aria-label="techniques scoutes"
+                                                                         aria-valuemin="0" aria-valuenow="50" aria-valuemax="100">
+                                                                        <div class="progress-bar" style="width: 50%;">50%</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="col mt-3">
+                                                <div class="card h-100 shadow-sm border-0">
+                                                    <a href="#" class="text-decoration-none text-body-secondary">
+                                                        <div class="card-body py-2">
+                                                            <div class="row d-flex align-items-center">
+                                                                <div class="col-3">
+                                                                    <img src="{{ asset('img/champs/02_civisme.png') }}" alt="" class="img-fluid"
+                                                                         loading="lazy">
+                                                                </div>
+                                                                <div class="col-9">
+                                                                    <h5 class="fsize-13 mb-0 pb-0">Civisme</h5>
+                                                                    <small class="text-muted fzize-12">Durée: 30min</small>
+                                                                    <div class="progress" role="progressbar" aria-label="techniques scoutes"
+                                                                         aria-valuemin="0" aria-valuenow="10" aria-valuemax="100">
+                                                                        <div class="progress-bar" style="width: 10%;">10%</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="col mt-4">
+                                                <div class="card h-100 shadow-sm border-0">
+                                                    <a href="#" class="text-decoration-none text-body-secondary">
+                                                        <div class="card-body py-2">
+                                                            <div class="row d-flex align-items-center">
+                                                                <div class="col-3">
+                                                                    <img src="{{ asset('img/champs/03-sante.png') }}" alt="" class="img-fluid"
+                                                                         loading="lazy">
+                                                                </div>
+                                                                <div class="col-9">
+                                                                    <h5 class="fsize-13 mb-0 pb-0">Santé</h5>
+                                                                    <small class="text-muted fzize-12">Durée: 3min</small>
+                                                                    <div class="progress" role="progressbar" aria-label="techniques scoutes"
+                                                                         aria-valuemin="0" aria-valuenow="80" aria-valuemax="100">
+                                                                        <div class="progress-bar" style="width: 80%;">80%</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </section>
+
+                {% if membre.scout.statut.value == 'ADULTE' %}
+                    <section class="action my-5 px-4">
+                        <ul class="list-group list-group-flush">
+                            <a href="#"
+                               class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                                <span class="text-color-main">Evaluation COREFOR</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+
+                            <a href="#"
+                               class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-between align-items-start shadow-sm py-3">
+                                <span class="text-color-main">Suivi COREFOR</span>
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </ul>
+                    </section>
+                {% endif %}
+
+
+                <div class="my-5 text-muted" style="margin-bottom: 150px;">.</div>
+
+            </main>
+        {% endblock %}
+    </turbo-frame>
+{% endblock %}
+

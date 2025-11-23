@@ -17,6 +17,7 @@ export default class extends Controller {
 
             if (!profilData.length) {
                 console.warn("Aucune donnée profil trouvée en local");
+                Turbo.visit('/intro')
                 return;
             }
 
