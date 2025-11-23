@@ -78,6 +78,8 @@ export default class extends Controller {
                     db.createObjectStore("profil_fonction", { keyPath: "id" });
                 if (!db.objectStoreNames.contains("profil_instance"))
                     db.createObjectStore("profil_instance", { keyPath: "id" });
+                if (!db.objectStoreNames.contains("champs_activite"))
+                    db.createObjectStore("champs_activite", { keyPath: "id" });
             };
 
             request.onsuccess = (event) => {
@@ -106,6 +108,8 @@ export default class extends Controller {
                     db.createObjectStore("profil_fonction", { keyPath: "id" });
                 if (!db.objectStoreNames.contains("profil_instance"))
                     db.createObjectStore("profil_instance", { keyPath: "id" });
+                if (!db.objectStoreNames.contains("champs_activite"))
+                    db.createObjectStore("champs_activite", { keyPath: "id" });
             };
 
             request.onsuccess = (event) => resolve(event.target.result);
@@ -144,25 +148,48 @@ export default class extends Controller {
                 if (!db.objectStoreNames.contains('profil_instance')) {
                     db.createObjectStore('profil_instance', { keyPath: 'id' });
                 }
+                if (!db.objectStoreNames.contains('champs_activite')) {
+                    db.createObjectStore('champs_activite', {keyPath: 'id'});
+                }
             };
 
             request.onsuccess = async (event) => {
                 const db = event.target.result;
-                const tx = db.transaction(['profil', 'profil_fonction', 'profil_instance'], 'readwrite');
+                const tx = db.transaction(['profil', 'profil_fonction', 'profil_instance', 'champs_activite'], 'readwrite');
 
                 const profilStore = tx.objectStore('profil');
                 const fonctionStore = tx.objectStore('profil_fonction');
                 const instanceStore = tx.objectStore('profil_instance');
+                const champsStore = tx.objectStore('champs_activite');
 
-                // Nettoyage avant réinsertion
-                profilStore.clear();
-                fonctionStore.clear();
-                instanceStore.clear();
+                // --- PROFIL & FONCTIONS ---
+                if (data.profil) {
+                    profilStore.clear();
+                    profilStore.put(data.profil);
+                }
+                if (data.profil_fonction) {
+                    fonctionStore.clear();
+                    fonctionStore.put(data.profil_fonction);
+                }
+                if (data.profil_instance) {
+                    instanceStore.clear();
+                    instanceStore.put(data.profil_instance);
+                }
 
-                // Insertion des données
-                profilStore.put(data.profil);
-                fonctionStore.put(data.profil_fonction);
-                instanceStore.put(data.profil_instance);
+                // --- CHAMPS D'ACTIVITÉ ---
+                // On vérifie si on a bien reçu les champs (objet DTO avec propriété 'champs')
+                if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
+                    champsStore.clear(); // On vide avant de remettre à jour
+
+                    data.champs_activite.champs.forEach(champ => {
+                        // IMPORTANT: Le DTO renvoie parfois un '0' en premier élément pour les select,
+                        // ou null. On ne stocke que les vrais objets avec un ID.
+                        if (champ && typeof champ === 'object' && champ.id) {
+                            champsStore.put(champ);
+                        }
+                    });
+                    console.log(`💾 ${data.champs_activite.champs.length} champs traités.`);
+                }
 
                 tx.oncomplete = async () => {
                     console.log("💾 Données principales sauvegardées avec succès dans IndexedDB");
@@ -170,6 +197,15 @@ export default class extends Controller {
                     try {
                         // ⚡ Téléchargement et stockage du QR code APRÈS la transaction
                         await this.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
+
+                        if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
+                            for (const champ of data.champs_activite.champs) {
+                                if (champ && typeof champ === 'object' && champ.id) {
+                                    await this.fetchAndStoreChampActivite(champ.media, champ.id);
+                                }
+                            }
+                            console.log(`💾 ${data.champs_activite.champs.length} champs traités.`);
+                        }
                     } catch (e) {
                         console.warn("⚠️ Échec téléchargement QR Code :", e);
                     }
@@ -222,5 +258,42 @@ export default class extends Controller {
         }
     }
 
+    static async fetchAndStoreChampActivite(url, id) {
+        if (!url) return console.warn("⚠️ Aucune illustration à télécharger");
+
+        const absoluteUrl = url.startsWith('http')
+            ? url
+            : `${window.location.origin}/${url.replace(/^\/+/, '')}`;
+
+        console.log("📡 Téléchargement de l'illustration de l'activité depuis :", absoluteUrl);
+
+        try {
+            const response = await fetch(absoluteUrl);
+            if (!response.ok) throw new Error(`Erreur téléchargement (${response.status})`);
+
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            // On sauvegarde le blob dans une transaction séparée
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const tx = db.transaction(['champs_activite'], 'readwrite');
+                const store = tx.objectStore('champs_activite');
+
+                const getReq = store.get(id);
+                getReq.onsuccess = () => {
+                    const champs = getReq.result;
+                    if (champs) {
+                        champs.champActiviteBlob = blobUrl;
+                        store.put(champs);
+                        console.log("📸 Illustration champs d'activité sauvegardé localement !");
+                    }
+                };
+            };
+        } catch (e) {
+            console.error("⚠️ Échec du téléchargement du champs d'activité :", e);
+        }
+    }
 
 }

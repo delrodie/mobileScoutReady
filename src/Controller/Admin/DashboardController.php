@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ChampActivite;
 use App\Entity\Instance;
 use App\Entity\Scout;
 use App\Entity\User;
@@ -52,12 +53,17 @@ class DashboardController extends AbstractDashboardController
              MenuItem::linkToCrud('Ajouter un scout', 'fas fa-plus', Scout::class)->setAction(Crud::PAGE_NEW)
          ]);
 
-         yield MenuItem::section();
+         yield MenuItem::section('Gestion');
+         yield MenuItem::linkToCrud("Champs d'activités", 'fa-solid fa-signs-post', ChampActivite::class);
+         yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
+             MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
+             MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
+         ]);
+
+         yield MenuItem::section('Sécurité');
          yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class);
 
-         yield MenuItem::section();
-        yield MenuItem::linkToCrud('Instances', 'fas fa-layer-group', Instance::class);
-        yield MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances');
+         yield MenuItem::section('Paramètres');
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu

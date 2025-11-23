@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\ChampsDTO;
 use App\DTO\ProfilDTO;
+use App\Repository\ChampActiviteRepository;
 use App\Repository\FonctionRepository;
 use App\Repository\ScoutRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +18,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/intro')]
 class IntroController extends AbstractController
 {
-    public function __construct(private readonly FonctionRepository $fonctionRepository)
+    public function __construct(
+        private readonly FonctionRepository $fonctionRepository,
+        private readonly ChampActiviteRepository $champActiviteRepository
+    )
     {
     }
 
@@ -67,12 +72,14 @@ class IntroController extends AbstractController
                 $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
                 $profilDTO = ProfilDTO::fromScout($fonctions);
 
-//                dump($profilDTO);
+                $champs = $this->champActiviteRepository->findAll();
+                //dump(ChampsDTO::listChamps($champs));
 
                 return $this->json([
                     'profil' => $profilDTO->profil,
                     'profil_fonction' => $profilDTO->profil_fonction,
                     'profil_instance' => $profilDTO->profil_instance,
+                    'champs_activite' => ChampsDTO::listChamps($champs)
                 ]);
             }
 
@@ -115,10 +122,13 @@ class IntroController extends AbstractController
             $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
             $profilDTO = ProfilDTO::fromScout($fonctions);
 
+            $champs = $this->champActiviteRepository->findAll();
+
             return $this->json([
                 'profil' => $profilDTO->profil,
                 'profil_fonction' => $profilDTO->profil_fonction,
                 'profil_instance' => $profilDTO->profil_instance,
+                'champs_activite' => ChampsDTO::listChamps($champs)
             ]);
         }
 
