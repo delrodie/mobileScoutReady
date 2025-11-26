@@ -88,14 +88,15 @@ export default class extends Controller {
             const cardHtml = `
                 <div class="col">
                     <div class="card h-100 border-0">
-                        <a href="#" class="text-decoration-none text-secondary">
+                        <a href="${champ.urlDetail}" class="text-decoration-none text-secondary">
                             <div class="card-body d-flex flex-column justify-content-center align-items-center text-center py-0">
                                 <div class="mb-2">
                                     <img src="${imageSrc}"
                                          alt="${champ.titre}"
                                          class="img-fluid rounded-pill p-1 bg-main-30"
                                          style="max-height: 80px; object-fit: cover;"
-                                         onerror="this.src='/img/fallback.png'">
+                                         >
+                                         <!--onerror="this.src='/img/fallback.png'"-->
                                 </div>
                                 <h5 class="fsize-13 py-1">${champ.titre}</h5>
                             </div>

@@ -21,6 +21,7 @@ class ChampsDTO
                 'titre' => $champ->getTitre(),
                 'description' => $champ->getDescription(),
                 'media' => "/uploads/champs/{$champ->getMedia()}",
+                'urlDetail' => "/champs/{$champ->getId()}",
             ];
         }
 
