@@ -43,8 +43,8 @@ class Activite
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTime $heureFin = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $cible = null;
+    #[ORM\Column(nullable: true)]
+    private ?array $cible = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $affiche = null;
@@ -189,12 +189,12 @@ class Activite
         return $this;
     }
 
-    public function getCible(): ?string
+    public function getCible(): ?array
     {
         return $this->cible;
     }
 
-    public function setCible(?string $cible): static
+    public function setCible(?array $cible): static
     {
         $this->cible = $cible;
 

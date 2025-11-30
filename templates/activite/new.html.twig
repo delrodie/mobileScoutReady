@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+
+                        <a href="{{ path('app_activite_index') }}"
+                           data-turbo-frame="_top"
+                           class="retour"
+                        >
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Nouvelle activité</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
+                <section class="form mt-5 px-4" data-controller="activite">
+                    {{ form_start(form, {"attr":{'data-turbo': 'false'}}) }}
+                    <div class="row form-group">
+                        <div class="col-12 mt-3">{{ form_row(form.affiche) }}</div>
+                        <div class="col-12 mt-5">{{ form_row(form.titre) }}</div>
+                        <div class="col-12 mt-3">{{ form_row(form.theme) }}</div>
+                        <div class="col-12 mt-3">{{ form_row(form.lieu) }}</div>
+                        <div class="col-6 mt-3">{{ form_row(form.dateDebutAt) }}</div>
+                        <div class="col-6 mt-3">{{ form_row(form.heureDebut) }}</div>
+                        <div class="col-6 mt-3">{{ form_row(form.dateFinAt) }}</div>
+                        <div class="col-6 mt-3">{{ form_row(form.heureFin) }}</div>
+                        <div class="col-12 mt-3">{{ form_row(form.description) }}</div>
+                        <div class="col-12 mt-3">{{ form_row(form.cible) }}</div>
+                        <div class="col-12 mt-3">{{ form_row(form.tdr) }}</div>
+                        <div class="col-12 mt-4">{{ form_row(form.autorisations) }}</div>
+                    </div>
+                    <div class="row mt-5">
+                        <input type="hidden"
+                               name="_slug"
+                               value=""
+                               data-activite-target="scoutSlug"
+                        >
+                        <input type="hidden"
+                               name="_instance"
+                               data-activite-target="scoutInstance"
+                        >
+                        <div class="col d-grid gap-2">
+                            <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill">Annuler</a>
+                        </div>
+                        <div class="col d-grid gap-2">
+                            <button type="submit" class="btn btn-main rounded-pill">Enregistrer</button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </section>
+
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}

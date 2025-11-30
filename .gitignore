@@ -25,4 +25,7 @@
 !/public/qrcode/.gitkeep
 !/public/qrcode/qr-code.png
 !/public/uploads/champs/.gitkeep
+/public/uploads/activites/
+/public/upload/activites/
+/public/vendor
 

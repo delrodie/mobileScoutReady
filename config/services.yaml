@@ -23,3 +23,9 @@ services:
     App\Services\GestionQrCode:
         arguments:
             $qrCodeDirectory: '%kernel.project_dir%/public/qrcode'
+
+    App\Services\GestionAffiche:
+        arguments:
+            $afficheDirectory: '%kernel.project_dir%/public/uploads/activites/affiche'
+#            $tdrDirectory: '%kernel.project_dir%/public/upload/activites/tdr'
+

@@ -94,33 +94,30 @@
                 </section>
 
 
+                <div class="floating-action-menu" id="fabMenu">
+                    <div class="floating-menu-items">
+                        <a href="{{ path('app_activite_new') }}"
+                           class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
+                           title="Nouvelle activité"
+                           data-turbo="false"
+                        >
+                            <i class="bi bi-calendar-event fs-5"></i>
+                        </a>
+                        <a href="#" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5" title="Nouvelle réunion">
+                            <i class="bi bi-people-fill fs-5"></i>
+                        </a>
+                    </div>
 
-            </main>
-
-            <div class="floating-action-menu" id="fabMenu">
-                <div class="floating-menu-items">
-                    <a href="#"
-                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
-                       title="Nouvelle activité"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       data-bs-title="This top tooltip is themed via CSS variables."
-                    >
-                        <i class="bi bi-calendar-event fs-5"></i>
-                    </a>
-                    <a href="#" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5" title="Nouvelle réunion">
-                        <i class="bi bi-people-fill fs-5"></i>
-                    </a>
-                </div>
-
-                <div class="btn-flottant" onclick="function toggleFAB() {
+                    <div class="btn-flottant" onclick="function toggleFAB() {
                 document.getElementById('fabMenu').classList.toggle('active');
                 }
                 toggleFAB()">
-                    <i class="bi bi-plus fs-2"></i>
+                        <i class="bi bi-plus fs-2"></i>
+                    </div>
                 </div>
-            </div>
 
+
+            </main>
 
             {{ include('default/_nav.html.twig')}}
         {% endblock %}
