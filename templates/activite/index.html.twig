@@ -97,22 +97,42 @@
 
             </main>
 
-            <div class="max-w-sm me-auto">
-                <a href="#"
-                   class="btn-flottant d-flex justify-content-center align-items-center shadow text-white">
+            <div class="floating-action-menu" id="fabMenu">
+                <div class="floating-menu-items">
+                    <a href="#"
+                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
+                       title="Nouvelle activité"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="This top tooltip is themed via CSS variables."
+                    >
+                        <i class="bi bi-calendar-event fs-5"></i>
+                    </a>
+                    <a href="#" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5" title="Nouvelle réunion">
+                        <i class="bi bi-people-fill fs-5"></i>
+                    </a>
+                </div>
+
+                <div class="btn-flottant" onclick="function toggleFAB() {
+                document.getElementById('fabMenu').classList.toggle('active');
+                }
+                toggleFAB()">
                     <i class="bi bi-plus fs-2"></i>
-                </a>
+                </div>
             </div>
+
 
             {{ include('default/_nav.html.twig')}}
         {% endblock %}
         {% block extra_stylesheets %}
+            {{ parent() }}
             <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
                   crossorigin="anonymous">
         {% endblock %}
         {% block extra_javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous"
                     defer></script>
+
         {% endblock %}
     </turbo-frame>
 

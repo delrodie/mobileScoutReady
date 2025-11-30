@@ -136,18 +136,86 @@ header{
 .app-bottom-nav {
     box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
 }
-
+/* Bouton flottant principal */
 .btn-flottant {
     position: fixed;
-    bottom: 90px;
-    /* juste au-dessus du footer */
+    bottom: 120px;
     right: 20px;
     width: 55px;
     height: 55px;
     border-radius: 50%;
     background-color: var(--color-blue-main);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
     z-index: 9999;
+    transition: transform 0.3s ease;
 }
+
+/* Conteneur principal du menu */
+.floating-action-menu {
+    position: fixed;
+    bottom: 120px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Conteneur des boutons secondaires */
+.floating-menu-items {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+/* Affichage des items lorsque le menu est actif */
+.floating-action-menu.active .floating-menu-items {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.btn-flottant-secondaire {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--color-blue-main);
+    font-size: 1rem;
+    transition: transform 0.2s ease;}
+
+/* Boutons secondaires */
+.floating-menu-items button {
+    margin: 5px 0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: var(--color-blue-main);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.floating-menu-items button:hover,
+.btn-flottant-secondaire:hover{
+    transform: scale(1.1);
+}
+
+/* Rotation du bouton principal quand il est ouvert */
+.floating-action-menu.active .btn-flottant {
+    transform: rotate(45deg);
+}
+
 
 .fade-out{
     transition: opacity 0.3s ease-out;

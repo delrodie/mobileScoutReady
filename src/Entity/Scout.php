@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Enum\ScoutStatut;
 use App\Repository\ScoutRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -66,10 +68,17 @@ class Scout
     #[ORM\Column(nullable: true)]
     private ?bool $phoneParent = null;
 
+    /**
+     * @var Collection<int, AutorisationPointageActivite>
+     */
+    #[ORM\ManyToMany(targetEntity: AutorisationPointageActivite::class, mappedBy: 'scout')]
+    private Collection $autorisationPointage;
+
     public function __construct()
     {
         $this->slug = Uuid::v4();
         $this->qrCodeToken = Uuid::v4();
+        $this->autorisationPointage = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -275,6 +284,33 @@ class Scout
     public function setPhoneParent(?bool $phoneParent): static
     {
         $this->phoneParent = $phoneParent;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AutorisationPointageActivite>
+     */
+    public function getAutorisationPointage(): Collection
+    {
+        return $this->autorisationPointage;
+    }
+
+    public function addAutorisationPointage(AutorisationPointageActivite $autorisationPointage): static
+    {
+        if (!$this->autorisationPointage->contains($autorisationPointage)) {
+            $this->autorisationPointage->add($autorisationPointage);
+            $autorisationPointage->addScout($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAutorisationPointage(AutorisationPointageActivite $autorisationPointage): static
+    {
+        if ($this->autorisationPointage->removeElement($autorisationPointage)) {
+            $autorisationPointage->removeScout($this);
+        }
 
         return $this;
     }
