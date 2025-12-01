@@ -21,8 +21,114 @@
             </header>
 
             <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
-                <section class="form mt-5 px-4" data-controller="activite">
+                <section class="form mt-1 px-4" data-controller="activite">
+                    <div class="p-0 m-0 rounded-2">
+                        <figure class="overflow-hidden position-relative rounded-2">
+                            <img src="{{ asset('uploads/activites/affiche/' ~ activite.affiche) }}" alt="{{ activite.titre }}" class="img-fluid rounded-2" style="width: 100%; height: 190px; object-fit: cover">
+                            <figcaption class="position-absolute px-3 py-2 d-flex justify-content-between" style="font-size: .85rem;">
+                                <span style="font-size: .7rem; font-weight: bold;"><i class="bi bi-people me-1 fs-6"></i> 253</span>
+                                <span style="font-size: .7rem; font-weight: bold;"><i class="bi bi-calendar me-1 fs-6"></i> {{ activite.dateDebutAt|date('d/m/Y') }} - {{ activite.dateFinAt|date('d/m/Y') }}</span>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <div class="d-flex justify-content-center align-content-center align-items-center mt-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body d-flex flex-column text-center px-5 py-2">
+                                    <i class="bi bi-qr-code-scan text-color-main py-0 my-0" style="font-size: 3.5rem;"></i>
+                                    <h6 class="fw-medium py-0 my-0">Scannez</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="d-flex justify-content-around align-content-center mt-5">
+                        <div class="d-flex flex-column text-center pe-5 border-end">
+                            <h3 class="text-color-main fw-semibold">25</h3>
+                            <span class="text-muted">Participants</span>
+                        </div>
+                        <div class="d-flex flex-column text-center ps-1">
+                            <h3 class="text-color-main fw-semibold">11/20</h3>
+                            <span class="text-muted">Notes</span>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <h6 class="text-muted">Details</h6>
+                        <div class="row row-cols-1 g-2">
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Titre: </small>
+                                <div class="fsize-15 text-end">{{ activite.titre }}</div>
+                            </div>
 
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Thème: </small>
+                                <div class="fsize-15 text-end">{{ activite.theme }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Description: </small>
+                                <div class="fsize-15 text-end">{{ activite.description }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">lieu: </small>
+                                <div class="fsize-15 text-end">{{ activite.lieu }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Période: </small>
+                                <div class="fsize-15 text-end">{{ activite.dateDebutAt|date('d/m/Y') }} - {{ activite.dateFinAt|date('d/m/Y') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Heures: </small>
+                                <div class="fsize-15 text-end">{{ activite.heureDebut|date('H:i') }} - {{ activite.heureFin|date('H:i') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Cibles: </small>
+                                <div class="fsize-15 text-end">{% for cible in activite.cible %}
+                                    {{ cible }} -
+                                    {% endfor %}</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h6 class="text-muted">Personnes autorisées</h6>
+                        <div class="row row-cols-1">
+                            {% for autorisation in activite.autorisations %}
+                                <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">
+                                    {% for scout in autorisation.scout %}
+                                        <a href="{{ path('app_communaute_membre', {'slug': scout.slug}) }}" class="text-decoration-none text-secondary url-membre">
+                                            <div class="row g-2 d-flex align-items-center">
+                                                <div class="col-3">
+                                                    <div
+                                                        data-controller="image-loader"
+                                                        data-image-loader-src-value="{{ scout.slug|avatar }}"
+{#                                                        data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
+                                                        {#                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"#}
+                                                        data-image-loader-preload-value="true"
+                                                        data-communaute-target="avatarLoader"
+                                                    >
+                                                        <img alt="" class="img-fluid">
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-9">
+                                                    <h5 class="fsize-13 text-body mb-0 pb-0">{{ scout.nom }} {{ scout.prenom }}</h5>
+                                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">{{ scout.id|fonction_scoute|raw }}</div>
+                                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">{{ scout.id|instance_scoute|raw }}</div>
+                                                    <span class="badge bg-danger"style="font-size: .55rem;">{{ autorisation.role }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
                 </section>
 
             </main>

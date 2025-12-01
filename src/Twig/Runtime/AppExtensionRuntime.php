@@ -37,6 +37,16 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
 
     }
 
+    public function instanceScoute($value)
+    {
+        $fonction = $this->fonctionRepository->findOneBy([
+            'scout' => $value,
+            'annee' => $this->utilityService->annee()
+        ]);
+
+        return $fonction->getInstance()->getNom();
+    }
+
     public function historiqueNavigation(): ?string
     {
         return $this->requestStack->getCurrentRequest()?->headers->get('referer');
