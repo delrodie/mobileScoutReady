@@ -16,6 +16,21 @@ class ActiviteRepository extends ServiceEntityRepository
         parent::__construct($registry, Activite::class);
     }
 
+    public function findActivitesAvenirForInstances(array $instanceIds)
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('i')
+            ->leftJoin('a.instance', 'i')
+            ->where('i.id IN (:ids)')
+            ->andWhere('(a.dateDebutAt <= :today AND a.dateFinAt >= :today) OR (a.dateDebutAt >= :today)')
+            ->orderBy('a.dateDebutAt', 'ASC')
+            ->setParameter('ids', $instanceIds)
+            ->setParameter('today', date('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+    }
+
+
 //    /**
 //     * @return Activite[] Returns an array of Activite objects
 //     */

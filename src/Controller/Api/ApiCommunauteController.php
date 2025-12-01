@@ -40,7 +40,7 @@ class ApiCommunauteController extends AbstractController
             return $this->json(['error' => 'Paramètres manquants'], Response::HTTP_BAD_REQUEST);
         }
 
-        $scoutConnecte = $this->scoutRepository->findOneBy(['slug' => $slug]); dump($scoutConnecte);
+        $scoutConnecte = $this->scoutRepository->findOneBy(['slug' => $slug]); //dump($scoutConnecte);
         if (!$scoutConnecte){
             return $this->json(['error' => 'Profil introuvable'], Response::HTTP_NOT_FOUND);
         }
@@ -83,7 +83,7 @@ class ApiCommunauteController extends AbstractController
                     $this->utilityService->annee()
                 );
 
-                dump($fonctions);
+                //dump($fonctions);
             }
 
             // Les resultats

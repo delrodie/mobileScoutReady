@@ -107,6 +107,8 @@ class ActiviteType extends AbstractType
                     "Tous les chefs d'unités" => "Tous les chefs d'unités",
                     "Equipe régionale" => "Equipe régionale",
                     "CD" => "CD",
+                    "Equipe de district" => "Equipe de district",
+                    "CG" => "CG",
                     "Maîtrise de groupe" => "Maître de groupe",
                     "Chefs des oisillons" => "Chefs des oisillons",
                     "Chefs de meute" => "Chefs de meute",

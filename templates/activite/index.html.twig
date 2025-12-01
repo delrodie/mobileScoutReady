@@ -5,67 +5,42 @@
         {% block body %}
             {{ render(url('app_main_header'))}}
 
-            <main class="max-w-sm mx-auto mt-3 mb-5">
-                <section class="carousel px-3 border-rou">
+            <main class="max-w-sm mx-auto mt-3 mb-5"
+                  data-controller="activite"
+                  data-activite-api-url-list-value="{{ path('api_activite_list') }}"
+            >
+                <section class="carousel px-3"
+                         data-activite-target="carouselSection"
+                >
                     <div class="swiffy-slider slider-item-show2-sm slider-item-ratio slider-nav-arrow slider-nav-visible slider-nav-autohide slider-nav-autoplay  slider-nav-autopause slider-indicators-round slider-indicators-dark slider-indicators-outside slider-indicators-sm slider-nav-animation slider-nav-animation-appear slider-nav-animation-slow slider-nav-mousedrag"
                          data-slider-nav-autoplay-interval="7000">
-                        <ul class="slider-container" style="">
-                            <li class="slide-visible">
-                                <div id="slide1">
-                                    <a href="#">
-                                        <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid rounded">
-                                    </a>
-                                </div>
-                            </li>
-                            <li class="slide-visible">
-                                <div id="slide2">
-                                    <a href="#">
-                                        <img src="{{ asset('img/activites/jambognan.png') }}" alt="" class="img-fluid rounded">
-                                    </a>
-                                </div>
-                            </li>
+                        <ul class="slider-container"
+                            data-activite-target="listCarousel"
+                        >
+
 
                         </ul>
 
 
-                        <ul class="slider-indicators">
+                        <ul class="slider-indicators"
+                            data-activite-target="indicator"
+                        >
                             <li class="active"></li>
                             <li class=""></li>
                         </ul>
                     </div>
                 </section>
 
-                <section class="activites px-3 mt-5">
+                <section class="activites px-3 mt-5"
+                         data-activite-target="listSection"
+                >
                     <h5 class="fs-6 text-color-main fw-semibold mb-3">Liste des activités</h5>
-                    <div class="row row-cols-1 g-2">
-                        <div class="col mb-3">
-                            <a href="#" class="text-decoration-none">
-                                <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
-                                    <div class="card-body py-3 px-2">
-                                        <div class="row">
-                                            <div class="col-8">
-                                                <div class="fsize-12 fw-semibold text-color-main">Abidjan (Les Requins)</div>
-                                                <h5 class="fs-6 py-1">Retrouvailles des anciens chefs du groupe</h5>
+                    <div class="row row-cols-1 g-2"
+                         data-activite-target="listActivite"
+                    >
 
-                                            </div>
-                                            <div class="col-4">
-                                                <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex justify-content-start align-items-center">
-                                    <span class="text-color-main fw-medium fsize-12">
-                                        <i class="bi bi-people-fill text-body"></i> 255
-                                    </span>
-                                            <span class="text-color-main fw-medium fsize-12 ms-3">
-                                        <i class="bi bi-calendar-event text-body"></i> 25/10/2025 - 01/11/2025
-                                    </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        <div class="col mb-3">
+                        {#<div class="col mb-3">
                             <a href="#" class="text-decoration-none">
                                 <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
                                     <div class="card-body py-3 px-2">
@@ -88,36 +63,88 @@
                                     </div>
                                 </div>
                             </a>
-                        </div>
+                        </div>#}
 
                     </div>
                 </section>
 
+                <section class="liste-vide d-flex justify-content-center align-content-center align-items-center px-3 mt-5 d-none"
+                         data-activite-target="emptySection"
+                         style="height: 50vh;"
+                >
+                    <div class="text-center fst-italic text-color-main">
+                        <h3 class="">Oupss!!!!</h3>
+                        Aucune activité programmée!
+                    </div>
+                </section>
 
-                <div class="floating-action-menu" id="fabMenu">
-                    <div class="floating-menu-items">
-                        <a href="{{ path('app_activite_new') }}"
-                           class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
-                           title="Nouvelle activité"
-                           data-turbo="false"
-                        >
-                            <i class="bi bi-calendar-event fs-5"></i>
-                        </a>
-                        <a href="#" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5" title="Nouvelle réunion">
-                            <i class="bi bi-people-fill fs-5"></i>
+                {#  Liste des activités   #}
+                <template data-activite-target="template">
+                    <div class="col mb-3">
+                        <a href="#" class="text-decoration-none activite-details-url">
+                            <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
+                                <div class="card-body py-3 px-2">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="fsize-12 fw-semibold text-color-main activite-instance"></div>
+                                            <h5 class="fs-6 py-1 activite-titre">Retrouvailles des anciens chefs du groupe</h5>
+
+                                        </div>
+                                        <div class="col-4">
+                                            <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid activite-img" style="width: 100%; height: 80px; object-fit: cover">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                    <span class="text-color-main fw-medium fsize-12">
+                                        <i class="bi bi-people-fill text-body"></i> 255
+                                    </span>
+                                        <span class="text-color-main fw-medium fsize-12 ms-3 activite-periode">
+                                        <i class="bi bi-calendar-event text-body"></i> periode
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
                         </a>
                     </div>
+                </template>
 
-                    <div class="btn-flottant" onclick="function toggleFAB() {
+                {#  Carousel #}
+                <template data-activite-target="carouselTemplate">
+                    <li class="slide-visible">
+                        <div id="slide1">
+                            <a href="#" class="carousel-link">
+                                <img src="{{ asset('img/activites/jambognan2.png') }}"
+                                     alt=""
+                                     class="img-fluid rounded-2 img-carousel"
+                                     style="width: 100%; height: 190px; object-fit: cover"
+                                >
+                            </a>
+                        </div>
+                    </li>
+                </template>
+            </main>
+
+            <div class="floating-action-menu" id="fabMenu">
+                <div class="floating-menu-items">
+                    <a href="{{ path('app_activite_new') }}"
+                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
+                       title="Nouvelle activité"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-calendar-event fs-5"></i>
+                    </a>
+                    <a href="#" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5" title="Nouvelle réunion">
+                        <i class="bi bi-people-fill fs-5"></i>
+                    </a>
+                </div>
+
+                <div class="btn-flottant" onclick="function toggleFAB() {
                 document.getElementById('fabMenu').classList.toggle('active');
                 }
                 toggleFAB()">
-                        <i class="bi bi-plus fs-2"></i>
-                    </div>
+                    <i class="bi bi-plus fs-2"></i>
                 </div>
-
-
-            </main>
+            </div>
 
             {{ include('default/_nav.html.twig')}}
         {% endblock %}

@@ -16,6 +16,8 @@ class AutorisationPointageActiviteRepository extends ServiceEntityRepository
         parent::__construct($registry, AutorisationPointageActivite::class);
     }
 
+
+
     //    /**
     //     * @return AutorisationPointageActivite[] Returns an array of AutorisationPointageActivite objects
     //     */

@@ -25,7 +25,8 @@ class ActiviteController extends AbstractController
         private readonly ScoutRepository    $scoutRepository,
         private readonly InstanceRepository $instanceRepository,
         private readonly ActiviteRepository $activiteRepository,
-        private readonly GestionAffiche     $gestionAffiche, private readonly EntityManagerInterface $entityManager
+        private readonly GestionAffiche     $gestionAffiche,
+        private readonly EntityManagerInterface $entityManager
     )
     {
     }
@@ -84,6 +85,14 @@ class ActiviteController extends AbstractController
         return $this->render('activite/new.html.twig',[
             'activite' => $activite,
             'form' => $form
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_activite_show', methods: ['GET'])]
+    public function show(Activite $activite)
+    {
+        return $this->render('activite/show.html.twig', [
+            'activite' => $activite,
         ]);
     }
 

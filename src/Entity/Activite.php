@@ -70,6 +70,9 @@ class Activite
     #[ORM\OneToMany(targetEntity: Participer::class, mappedBy: 'activite')]
     private Collection $participants;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $promotion = null;
+
     public function __construct()
     {
         $this->autorisations = new ArrayCollection();
@@ -302,6 +305,18 @@ class Activite
                 $participant->setActivite(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isPromotion(): ?bool
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?bool $promotion): static
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }
