@@ -16,14 +16,14 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    '@hotwired/stimulus' => [
-        'version' => '3.2.2',
-    ],
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
     '@hotwired/turbo' => [
-        'version' => '7.3.0',
+        'version' => '8.0.20',
     ],
     'tom-select' => [
         'version' => '2.4.3',
@@ -49,5 +49,17 @@ return [
     'tom-select/dist/css/tom-select.bootstrap5.css' => [
         'version' => '2.4.3',
         'type' => 'css',
+    ],
+    '@capacitor/core' => [
+        'version' => '7.4.4',
+    ],
+    '@capacitor-community/barcode-scanner' => [
+        'version' => '4.0.1',
+    ],
+    'html5-qrcode' => [
+        'version' => '2.3.8',
+    ],
+    '@flasher/flasher' => [
+        'version' => '2.2.0',
     ],
 ];
