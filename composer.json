@@ -13,6 +13,7 @@
         "doctrine/orm": "^3.5",
         "easycorp/easyadmin-bundle": "^4.26",
         "endroid/qr-code": "^6.0",
+        "php-flasher/flasher-notyf-symfony": "^2.2",
         "php-flasher/flasher-symfony": "*",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpoffice/phpspreadsheet": "^5.1",

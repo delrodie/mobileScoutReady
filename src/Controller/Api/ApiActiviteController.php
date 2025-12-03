@@ -10,6 +10,7 @@ use App\Repository\ActiviteRepository;
 use App\Repository\AutorisationPointageActiviteRepository;
 use App\Repository\InstanceRepository;
 use App\Repository\ScoutRepository;
+use App\Services\GestionInstance;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/activite')]
 class ApiActiviteController extends AbstractController
 {
-    public function __construct(private readonly ScoutRepository $scoutRepository, private readonly InstanceRepository $instanceRepository, private readonly ActiviteRepository $activiteRepository, private readonly ActiviteMapper $activiteMapper, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository)
+    public function __construct(private readonly ScoutRepository $scoutRepository, private readonly InstanceRepository $instanceRepository, private readonly ActiviteRepository $activiteRepository, private readonly ActiviteMapper $activiteMapper, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly GestionInstance $gestionInstance)
     {
     }
 
@@ -56,7 +57,7 @@ class ApiActiviteController extends AbstractController
         $activites = $this->getActivitesByGroupe($instance);
 
         $data = array_map(fn($a) => $this->activiteMapper->toDto($a), $activites);
-        dump($data);
+        //dump($data);
         return $this->json([
             'data' => $data
         ]);
@@ -67,7 +68,7 @@ class ApiActiviteController extends AbstractController
     protected function getActivitesByGroupe($instance)
     {
         // 1. On récupère tous les IDs utiles
-        $ids = $this->resolveInstanceIds($instance);
+        $ids = $this->gestionInstance->resolveInstanceIds($instance);
 
         // 2. Une seule requête pour tout récupérer
         $activites = $this->activiteRepository->findActivitesAvenirForInstances($ids);
@@ -75,30 +76,5 @@ class ApiActiviteController extends AbstractController
         // 3. Plus besoin de fusionner ou dé-doublonner si la BDD est propre
         return $activites;
     }
-
-
-    private function resolveInstanceIds($instance): array
-    {
-        $ids = [];
-
-        // Ajouter l'instance actuelle
-        $ids[] = $instance->getId();
-
-        // Parents
-        $parent = $instance->getInstanceParent();
-        while ($parent !== null) {
-            $ids[] = $parent->getId();
-            $parent = $parent->getInstanceParent();
-        }
-
-        // Enfants
-        $enfants = $instance->getInstanceEnfants();
-        foreach ($enfants as $child) {
-            $ids[] = $child->getId();
-        }
-
-        return array_unique($ids);
-    }
-
 
 }

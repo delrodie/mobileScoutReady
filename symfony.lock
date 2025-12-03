@@ -47,6 +47,9 @@
             "config/routes/easyadmin.yaml"
         ]
     },
+    "php-flasher/flasher-notyf-symfony": {
+        "version": "v2.2.1"
+    },
     "php-flasher/flasher-symfony": {
         "version": "v2.2.1"
     },

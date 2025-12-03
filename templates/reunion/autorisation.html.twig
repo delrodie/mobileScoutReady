@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+
+                        <a href="{{ path('app_activite_index') }}"
+                           data-turbo-frame="_top"
+                           class="retour"
+                        >
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Réunion</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
+                <section class="form px-4 mt-1" data-controller="reunion">
+                    <div class="p-0 m-0 rounded-2">
+                        <figure class="overflow-hidden position-relative rounded-2">
+                            <h1 class="text-center text-color-main">{{ reunion.code ?? null }}</h1>
+
+                        </figure>
+                    </div>
+
+                    <div class="my-5">
+                        {{ form_start(form, {"attr":{'data-turbo': 'false'}}) }}
+                        <div class=""> {{ form_row(form.pointeurs) }}</div>
+                        <div class="row mt-4">
+                            <div class="col d-grid gap-2">
+                                <a href="{{ path('app_reunion_show', {'id': reunion.id}) }}" class="btn btn-outline-secondary rounded-pill">Annuler</a>
+                            </div>
+                            <div class="col d-grid gap-2">
+                                <button type="submit" class="btn btn-main rounded-pill">{{ button_label|default('Enregistrer') }}</button>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+
+                    <div class="mt-5">
+                        <h6 class="text-muted">Details</h6>
+                        <div class="row row-cols-1 g-2">
+                            {% if reunion.champs %}
+                                <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                    <small class="text-muted fsize-13 me-1">Champs d'activité: </small>
+                                    <div class="fsize-15 text-end">{{ reunion.champs }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if reunion.branche %}
+                                <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                    <small class="text-muted fsize-13 me-1">Branche concernée: </small>
+                                    <div class="fsize-15 text-end">{{ reunion.branche }}</div>
+                                </div>
+                            {% endif %}
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Titre: </small>
+                                <div class="fsize-15 text-end">{{ reunion.titre }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Objectif: </small>
+                                <div class="fsize-15 text-end">{{ reunion.objectif }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Description: </small>
+                                <div class="fsize-15 text-end">{{ reunion.description }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Résultats attendus: </small>
+                                <div class="fsize-15 text-end">{{ reunion.attente }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">lieu: </small>
+                                <div class="fsize-15 text-end">{{ reunion.lieu }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Date: </small>
+                                <div class="fsize-15 text-end">{{ reunion.dateAt|date('d/m/Y') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Heures: </small>
+                                <div class="fsize-15 text-end">{{ reunion.heureDebut|date('H:i') }} - {{ reunion.heureFin|date('H:i') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Cibles: </small>
+                                <div class="fsize-15 text-end">{% for cible in reunion.cible %}
+                                        {{ cible }} -
+                                    {% endfor %}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Auteur: </small>
+                                <div class="fsize-15 text-end d-flex flex-column">
+                                    <span class="fsize-12">{{ auteur_nom|raw }}</span>
+                                    <span class="text-color-main fst-italic fsize-12">{{ auteur_poste|raw }}</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}

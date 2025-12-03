@@ -35,9 +35,9 @@ class ActiviteMapper
         $dto->promotion = $a->isPromotion();
 
         $dto->instance = [
-            'id' => $a->getInstance()->getId(),
-            'nom' => $a->getInstance()->getNom(),
-            'type' => $a->getInstance()->getType()->value,
+            'id' => $a->getInstance()?->getId(),
+            'nom' => $a->getInstance()?->getNom(),
+            'type' => $a->getInstance()?->getType()->value,
         ];
 
         // Autorisation

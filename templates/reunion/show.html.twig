@@ -1,0 +1,195 @@
+{% extends 'base.html.twig' %}
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+
+                        <a href="{{ path('app_activite_index') }}"
+                           data-turbo-frame="_top"
+                           class="retour"
+                        >
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Réunion</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
+                <section class="form mt-1 px-4" data-controller="reunion">
+                    <div class="p-0 m-0 rounded-2">
+                        <figure class="overflow-hidden position-relative rounded-2">
+                            <h1 class="text-center text-color-main">{{ reunion.code ?? null }}</h1>
+
+                        </figure>
+                    </div>
+                    {% if autorisation %}
+                        <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
+                             data-controller="scanner-reunion"
+                             data-scanner-reunion-reunion-id-value="{{ reunion.code }}"
+                        >
+                            <button  class="btn btn-light"
+                                     data-action="scanner-reunion#startScan"
+                            >
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body d-flex flex-column text-center px-5 py-2">
+                                        <i class="bi bi-qr-code-scan text-color-main py-0 my-0" style="font-size: 3.5rem;"></i>
+                                        <h6 class="fw-medium py-0 my-0">Scannez</h6>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <!-- Zone pour le scan web -->
+                            <div id="qr-reader" class="mt-3" style="width: 200px;"></div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-around align-content-center mt-5">
+                        <div class="d-flex flex-column text-center pe-5 border-end">
+                            <h3 class="text-color-main fw-semibold">25</h3>
+                            <span class="text-muted">Participants</span>
+                        </div>
+                        <div class="d-flex flex-column text-center ps-1">
+                            <h3 class="text-color-main fw-semibold">11/20</h3>
+                            <span class="text-muted">Notes</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-content-center align-items-center my-5">
+                        <a href="{{ path('app_reunion_edit', {'id': reunion.id}) }}" class="h4 mx-2 text-decoration-none" title="Modifier" data-turbo="false">
+                            <div class="card h-100">
+                                <div class="card-body text-color-main">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                            </div>
+
+                        </a>
+                        <a href="{{ path('app_autorisation_reunion_ajouter',{'id': reunion.id}) }}" class="h4 mx-2 text-decoration-none" data-turbo="false">
+                            <div class="card h-100">
+                                <div class="card-body text-color-dark">
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                            </div>
+
+                        </a>
+                    </div>
+
+                    <div class="mt-5">
+                        <h6 class="text-muted">Details</h6>
+                        <div class="row row-cols-1 g-2">
+                            {% if reunion.champs %}
+                                <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                    <small class="text-muted fsize-13 me-1">Champs d'activité: </small>
+                                    <div class="fsize-15 text-end">{{ reunion.champs }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if reunion.branche %}
+                                <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                    <small class="text-muted fsize-13 me-1">Branche concernée: </small>
+                                    <div class="fsize-15 text-end">{{ reunion.branche }}</div>
+                                </div>
+                            {% endif %}
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Titre: </small>
+                                <div class="fsize-15 text-end">{{ reunion.titre }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Objectif: </small>
+                                <div class="fsize-15 text-end">{{ reunion.objectif }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Description: </small>
+                                <div class="fsize-15 text-end">{{ reunion.description }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Résultats attendus: </small>
+                                <div class="fsize-15 text-end">{{ reunion.attente }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">lieu: </small>
+                                <div class="fsize-15 text-end">{{ reunion.lieu }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Date: </small>
+                                <div class="fsize-15 text-end">{{ reunion.dateAt|date('d/m/Y') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between  border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Heures: </small>
+                                <div class="fsize-15 text-end">{{ reunion.heureDebut|date('H:i') }} - {{ reunion.heureFin|date('H:i') }}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Cibles: </small>
+                                <div class="fsize-15 text-end">{% for cible in reunion.cible %}
+                                        {{ cible }} -
+                                    {% endfor %}</div>
+                            </div>
+
+                            <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
+                                <small class="text-muted fsize-13 me-1">Auteur: </small>
+                                <div class="fsize-15 text-end d-flex flex-column">
+                                    <span class="fsize-12">{{ auteur_nom|raw }}</span>
+                                    <span class="text-color-main fst-italic fsize-12">{{ auteur_poste|raw }}</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5">
+                        <h6 class="text-muted">Personnes autorisées</h6>
+                        <div class="row row-cols-1">
+                            {% for pointeur in pointeurs %}
+                                <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">
+{#                                    {% for scout in autorisation.scout %}#}
+                                        <a href="{{ path('app_communaute_membre', {'slug': pointeur.scout.slug}) }}" class="text-decoration-none text-secondary url-membre">
+                                            <div class="row g-2 d-flex align-items-center">
+                                                <div class="col-3">
+                                                    <div
+                                                        data-controller="image-loader"
+                                                        data-image-loader-src-value="{{ pointeur.scout.slug|avatar }}"
+                                                        {#                                                        data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
+                                                        {#                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"#}
+                                                        data-image-loader-preload-value="true"
+                                                        data-communaute-target="avatarLoader"
+                                                    >
+                                                        <img alt="" class="img-fluid">
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-9">
+                                                    <h5 class="fsize-13 text-body mb-0 pb-0">  {{ pointeur.scout.nom }} {{ pointeur.scout.prenom }}</h5>
+                                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">  {{ pointeur.scout.id|fonction_scoute|raw }}</div>
+                                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">  {{ pointeur.scout.id|instance_scoute|raw }}</div>
+                                                    <span class="badge bg-danger"style="font-size: .55rem;"> {{ pointeur.role }} </span>
+                                                </div>
+                                            </div>
+                                        </a>
+{# {% endfor %} #}
+                                </div>
+                           {% endfor %}
+
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}

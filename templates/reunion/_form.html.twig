@@ -1,0 +1,32 @@
+{{ form_start(form, {"attr":{'data-turbo': 'false'}}) }}
+<div class="row form-group">
+    <div class="col-12 mt-5">{{ form_row(form.champs) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.branche) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.titre) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.objectif) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.description) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.attente) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.lieu) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.dateAt) }}</div>
+    <div class="col-6 mt-3">{{ form_row(form.heureDebut) }}</div>
+    <div class="col-6 mt-3">{{ form_row(form.heureFin) }}</div>
+    <div class="col-12 mt-3">{{ form_row(form.cible) }}</div>
+</div>
+<div class="row mt-5">
+    <input type="hidden"
+           name="_slug"
+           value=""
+           data-reunion-target="scoutSlug"
+    >
+    <input type="hidden"
+           name="_instance"
+           data-reunion-target="scoutInstance"
+    >
+    <div class="col d-grid gap-2">
+        <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill">Annuler</a>
+    </div>
+    <div class="col d-grid gap-2">
+        <button type="submit" class="btn btn-main rounded-pill">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+</div>
+{{ form_end(form) }}

@@ -113,6 +113,15 @@ class FonctionRepository extends ServiceEntityRepository
             ;
     }
 
+    public function findOneByScoutCode(string $code)
+    {
+        return $this->query()
+            ->where('s.code = :code')
+            ->setParameter('code', $code)
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
+    }
+
     public function query()
     {
         return $this->createQueryBuilder('f')

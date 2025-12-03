@@ -13,6 +13,7 @@ export default class extends Controller {
     connect() {
         this.remplirChamps();
         this.loadActivites();
+        this.bootstrapTabs();
     }
 
     async remplirChamps() {
@@ -26,8 +27,8 @@ export default class extends Controller {
                 Turbo.visit('/intro')
                 return;
             }
-            console.log('Activité en charge....')
-            console.log(profil[0].slug)
+            // console.log('Activité en charge....')
+            // console.log(profil[0].slug)
 
             if (this.hasScoutSlugTarget){
                 this.scoutSlugTarget.value = profil[0].slug;
@@ -139,5 +140,21 @@ export default class extends Controller {
 
         this.listCarouselTarget.appendChild(clone);
 
+    }
+
+    bootstrapTabs() {
+        console.log('tabs ouvert')
+        // 1. Sélectionner tous les déclencheurs d'onglets (buttons avec data-bs-toggle="tab")
+        const triggerTabList = this.element.querySelectorAll('[data-bs-toggle="tab"]');
+
+        // 2. Parcourir la liste pour créer une instance Bootstrap.Tab pour chacun
+        triggerTabList.forEach(triggerEl => {
+            // S'assurer que l'instance n'a pas déjà été créée pour éviter les erreurs
+            // C'est particulièrement utile si le contenu n'est PAS un turbo-frame.
+            if (!bootstrap.Tab.getInstance(triggerEl)) {
+                // Initialise l'onglet Bootstrap
+                new bootstrap.Tab(triggerEl);
+            }
+        });
     }
 }

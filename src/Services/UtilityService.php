@@ -3,10 +3,16 @@
 namespace App\Services;
 
 use App\Enum\ScoutStatut;
+use App\Repository\ActiviteRepository;
+use App\Repository\ReunionRepository;
 use Symfony\Component\Uid\Uuid;
 
 class UtilityService
 {
+    public function __construct(private readonly ReunionRepository $reunionRepository, private readonly ActiviteRepository $activiteRepository)
+    {
+    }
+
     public function calculAge(string|\DateTimeInterface $dateNaissance): ?int
     {
 
@@ -87,5 +93,34 @@ class UtilityService
             return Uuid::fromString($slug);
         }
         return null;
+    }
+
+    /**
+     * Generation de code pour l'agenda reunion & activité
+     * @param string $type
+     * @return string
+     */
+    public function generationCode(string $type = 'R'): string
+    {
+        $aujourdhui = new \DateTimeImmutable();
+        $annee = (int) $aujourdhui->format('Y');
+        $mois = (int) $aujourdhui->format('n');
+
+        // Determinons l'année accademique
+        $accademique = $mois >= 9
+            ? substr((string)$annee, -2) . substr((string)($annee + 1), - 2)
+            : substr((string) ($annee - 1), -2) . substr((string) $annee, - 2);
+
+        $entity = $type === 'R'
+            ? $this->reunionRepository->findLast($accademique)
+            : $this->activiteRepository->findOneBy([],['id' => 'DESC']);
+
+        $incrementation = 1;
+        if ($entity) {
+            $parts = explode('-', $entity->getCode());
+            $incrementation = (int) $parts[2] + 1;
+        }
+
+        return sprintf('%s-%s-%05d', $type, $accademique, $incrementation);
     }
 }

@@ -14,6 +14,38 @@
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/service-worker.js')
+                            .then(reg => console.log('✅ Service Worker enregistré avec succès', reg))
+                            .catch(err => console.warn('❌ Erreur SW', err));
+                    });
+                }
+
+                // Expose tes chemins d’assets principaux pour ton JS
+                window.APP_ASSETS = {
+                    css: "{{ asset('app.css') }}",
+                    js: "{{ asset('app.js') }}",
+                    logo: "{{ asset('img/logo-scoutready.png') }}",
+                    avatar_homme: "{{ asset('avatar/avatar_homme.png') }}",
+                    avatar_femme: "{{ asset('avatar/avatar_femme.png') }}",
+                    avatar_garcon: "{{ asset('avatar/garcon.png') }}",
+                    avatar_fille: "{{ asset('avatar/fille.png') }}",
+                    champs_technique: "{{ asset('champs/01-technique-scout.png') }}",
+                    champs_civisme: "{{ asset('champs/02_civisme.png') }}",
+                    champs_sante: "{{ asset('champs/03-sante.png') }}",
+                    champs_technologie: "{{ asset('champs/04-technologie.png') }}",
+                    champs_environnement: "{{ asset('champs/05-environnement.png') }}",
+                    champs_familiale: "{{ asset('champs/06-education-familliale.png') }}",
+                    champs_vieetfoi: "{{ asset('champs/07-vieetfoi.png') }}",
+                    champs_culture: "{{ asset('champs/08-culture.png') }}",
+                    champs_paix: "{{ asset('champs/09-education-paix.png') }}",
+                    champs_sexuelle: "{{ asset('champs/10-education-sexuelle.png') }}",
+                    champs_agropastorale: "{{ asset('champs/11-agropastoral.png') }}",
+                };
+            </script>
         {% endblock %}
 
     </head>
@@ -23,38 +55,7 @@
         {% endblock %}
 
     {% block extra_javascripts %}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(reg => console.log('✅ Service Worker enregistré avec succès', reg))
-                        .catch(err => console.warn('❌ Erreur SW', err));
-                });
-            }
 
-            // Expose tes chemins d’assets principaux pour ton JS
-            window.APP_ASSETS = {
-                css: "{{ asset('app.css') }}",
-                js: "{{ asset('app.js') }}",
-                logo: "{{ asset('img/logo-scoutready.png') }}",
-                avatar_homme: "{{ asset('avatar/avatar_homme.png') }}",
-                avatar_femme: "{{ asset('avatar/avatar_femme.png') }}",
-                avatar_garcon: "{{ asset('avatar/garcon.png') }}",
-                avatar_fille: "{{ asset('avatar/fille.png') }}",
-                champs_technique: "{{ asset('champs/01-technique-scout.png') }}",
-                champs_civisme: "{{ asset('champs/02_civisme.png') }}",
-                champs_sante: "{{ asset('champs/03-sante.png') }}",
-                champs_technologie: "{{ asset('champs/04-technologie.png') }}",
-                champs_environnement: "{{ asset('champs/05-environnement.png') }}",
-                champs_familiale: "{{ asset('champs/06-education-familliale.png') }}",
-                champs_vieetfoi: "{{ asset('champs/07-vieetfoi.png') }}",
-                champs_culture: "{{ asset('champs/08-culture.png') }}",
-                champs_paix: "{{ asset('champs/09-education-paix.png') }}",
-                champs_sexuelle: "{{ asset('champs/10-education-sexuelle.png') }}",
-                champs_agropastorale: "{{ asset('champs/11-agropastoral.png') }}",
-            };
-        </script>
     {% endblock %}
 
     </body>
