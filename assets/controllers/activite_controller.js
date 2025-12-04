@@ -8,7 +8,6 @@ export default class extends Controller {
     ];
     static values = {
         apiUrlList : String,
-        activite
     }
 
     connect() {
