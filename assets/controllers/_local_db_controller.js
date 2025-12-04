@@ -167,8 +167,6 @@ export default class extends Controller {
                 // --- PROFIL & FONCTIONS ---
                 if (data.profil) {
                     profilStore.clear();
-                    // ✅ Nettoyage des champs Blob inutiles
-                    delete data.profil.qrCodeBlob;
                     profilStore.put(data.profil);
                 }
                 if (data.profil_fonction) {
@@ -186,8 +184,6 @@ export default class extends Controller {
 
                     data.champs_activite.champs.forEach(champ => {
                         if (champ && typeof champ === 'object' && champ.id) {
-                            // ✅ Nettoyage des champs Blob inutiles
-                            delete champ.champActiviteBlob;
                             champsStore.put(champ);
                         }
                     });
@@ -195,12 +191,41 @@ export default class extends Controller {
                 }
 
                 tx.oncomplete = async () => {
-                    // ✅ Logique de téléchargement de média retirée
-                    console.log("✅ Données texte sauvegardées. Le Service Worker gère le cache des médias.");
+                    console.log("💾 Données texte sauvegardées. Lancement du téléchargement des médias...");
 
-                    // 2a. CACHER LE LOADER (Succès)
-                    this.hideLoader();
-                    resolve();
+                    const tasks = [];
+
+                    // A. Tâche QR Code
+                    if (data.profil && data.profil.qrCodeFile) {
+                        tasks.push(this.processQrCode(data.profil.qrCodeFile, data.profil.slug));
+                    }
+
+                    // B. Tâche Images Activités (Parallélisation)
+                    if (data.champs_activite && Array.isArray(data.champs_activite.champs)) {
+                        data.champs_activite.champs.forEach(champ => {
+                            if (champ && champ.id && champ.media) {
+                                tasks.push(this.processChampImage(champ.media, champ.id));
+                            }
+                        });
+                    }
+
+                    // On attend que TOUT soit téléchargé
+                    try {
+                        const results = await Promise.all(tasks);
+
+                        // Si on a des résultats (images téléchargées), on sauvegarde tout en un bloc
+                        if (results.length > 0) {
+                            await this.batchSaveImages(results);
+                        }
+
+                        console.log("✅ Tous les médias ont été téléchargés et sauvegardés.");
+                    } catch (err) {
+                        console.warn("⚠️ Erreur lors du téléchargement des médias (mode offline partiel) :", err);
+                    } finally {
+                        // 2a. CACHER LE LOADER (Succès ou Erreur partielle)
+                        this.hideLoader();
+                        resolve();
+                    }
                 };
 
                 tx.onerror = (e) => {
@@ -218,7 +243,65 @@ export default class extends Controller {
         });
     }
 
-    // --- Les méthodes processQrCode, processChampImage, fetchBlobUrl, batchSaveImages sont supprimées ---
+    static async processQrCode(url, slug) {
+        try {
+            const blobUrl = await this.fetchBlobUrl(url);
+            return { type: 'profil', key: slug, field: 'qrCodeBlob', value: blobUrl };
+        } catch (e) {
+            console.warn("Skip QR Code:", e);
+            return null;
+        }
+    }
+
+    static async processChampImage(url, id) {
+        try {
+            const blobUrl = await this.fetchBlobUrl(url);
+            return { type: 'champs_activite', key: id, field: 'champActiviteBlob', value: blobUrl };
+        } catch (e) {
+            console.warn(`Skip image ${id}:`, e);
+            return null;
+        }
+    }
+
+    static async fetchBlobUrl(url) {
+        if (!url) throw new Error("URL vide");
+        const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}/${url.replace(/^\/+/, '')}`;
+        const response = await fetch(absoluteUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    }
+
+    // --- Sauvegarde groupée (Batch) ---
+
+    static async batchSaveImages(items) {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const tx = db.transaction(['profil', 'champs_activite'], 'readwrite');
+
+                items.forEach(item => {
+                    if (!item) return; // Ignore les échecs
+
+                    const store = tx.objectStore(item.type);
+                    const getReq = store.get(item.key);
+
+                    getReq.onsuccess = () => {
+                        const record = getReq.result;
+                        if (record) {
+                            record[item.field] = item.value;
+                            store.put(record);
+                        }
+                    };
+                });
+
+                tx.oncomplete = () => resolve();
+                tx.onerror = (e) => reject(e);
+            };
+        });
+    }
 
     // --- UI HELPERS POUR LE LOADER ---
 
@@ -254,4 +337,5 @@ export default class extends Controller {
             }, 300);
         }
     }
+
 }

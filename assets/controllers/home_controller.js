@@ -84,6 +84,7 @@ export default class extends Controller {
             // mais on peut le laisser ici par sécurité si vous préférez.
 
             let imageSrc = champ.champActiviteBlob || champ.media;
+            // let imageSrc =  champ.media;
 
             const cardHtml = `
                 <div class="col">
