@@ -16,6 +16,36 @@ class AutorisationPointageActiviteRepository extends ServiceEntityRepository
         parent::__construct($registry, AutorisationPointageActivite::class);
     }
 
+    public function findPointeurs($activite)
+    {
+        return $this->query()
+            ->where('a.id = :id')
+            ->orderBy('u.role', 'ASC')
+            ->addOrderBy('s.nom', 'ASC')
+            ->addOrderBy('s.prenom', 'ASC')
+            ->setParameter('id', $activite)
+            ->getQuery()->getResult();
+    }
+
+    public function findAutorisation($scout, $activite)
+    {
+        return $this->query()
+            ->where('s.id = :scout')
+            ->andWhere('a.id = :activite')
+            ->setParameter('scout', $scout)
+            ->setParameter('activite', $activite)
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult();
+    }
+
+    public function query()
+    {
+        return $this->createQueryBuilder('u')
+            ->addSelect('a', 's')
+            ->leftJoin('u.activite', 'a')
+            ->leftJoin('u.scout', 's');
+    }
+
 
 
     //    /**

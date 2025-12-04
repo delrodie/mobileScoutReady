@@ -4,10 +4,11 @@ import LocalDbController from "./local_db_controller.js";
 export default class extends Controller {
     static targets = [
         'scoutSlug', 'scoutInstance', 'emptySection', 'listSection', 'carouselSection', "carouselSection",
-        'template', 'listActivite', 'listCarousel', 'carouselTemplate', 'indicator'
+        'template', 'listActivite', 'listCarousel', 'carouselTemplate', 'indicator', 'scan'
     ];
     static values = {
-        apiUrlList : String
+        apiUrlList : String,
+        activite
     }
 
     connect() {

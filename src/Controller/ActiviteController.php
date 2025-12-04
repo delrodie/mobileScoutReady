@@ -9,6 +9,7 @@ use App\Entity\AutorisationPointageActivite;
 use App\Entity\Scout;
 use App\Form\ActiviteType;
 use App\Repository\ActiviteRepository;
+use App\Repository\AutorisationPointageActiviteRepository;
 use App\Repository\InstanceRepository;
 use App\Repository\ScoutRepository;
 use App\Services\GestionAffiche;
@@ -22,11 +23,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ActiviteController extends AbstractController
 {
     public function __construct(
-        private readonly ScoutRepository    $scoutRepository,
-        private readonly InstanceRepository $instanceRepository,
-        private readonly ActiviteRepository $activiteRepository,
-        private readonly GestionAffiche     $gestionAffiche,
-        private readonly EntityManagerInterface $entityManager
+        private readonly ScoutRepository        $scoutRepository,
+        private readonly InstanceRepository     $instanceRepository,
+        private readonly ActiviteRepository     $activiteRepository,
+        private readonly GestionAffiche         $gestionAffiche,
+        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository
     )
     {
     }
@@ -89,10 +90,11 @@ class ActiviteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_activite_show', methods: ['GET'])]
-    public function show(Activite $activite)
+    public function show(Activite $activite): Response
     {
         return $this->render('activite/show.html.twig', [
             'activite' => $activite,
+            'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId())
         ]);
     }
 

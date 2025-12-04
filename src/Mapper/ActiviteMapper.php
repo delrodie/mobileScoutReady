@@ -41,23 +41,23 @@ class ActiviteMapper
         ];
 
         // Autorisation
-        $dto->autorisations = [];
-        foreach ($a->getAutorisations() as $autorisation) {
-            $autDto = new AutorisationDTO();
-            $autDto->id = $autorisation->getId();
-            $autDto->role = $autorisation->getRole();
-
-            array_map(function($scout) use ($autDto) {
-                 $autDto->scout = [
-                    'id' => $scout->getId(),
-                    'nom' => $scout->getNom(),
-                    'prenom' => $scout->getPrenom(),
-                ];
-            }, $autorisation->getScout()->toArray());
-
-
-            $dto->autorisations[] = $autDto;
-        }
+//        $dto->autorisations = [];
+//        foreach ($a->getAutorisations() as $autorisation) {
+//            $autDto = new AutorisationDTO();
+//            $autDto->id = $autorisation->getId();
+//            $autDto->role = $autorisation->getRole();
+//
+//            array_map(function($scout) use ($autDto) {
+//                 $autDto->scout = [
+//                    'id' => $scout->getId(),
+//                    'nom' => $scout->getNom(),
+//                    'prenom' => $scout->getPrenom(),
+//                ];
+//            }, $autorisation->getScout()->toArray());
+//
+//
+//            $dto->autorisations[] = $autDto;
+//        }
 
         return $dto;
 

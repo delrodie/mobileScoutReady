@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AutorisationPointageActiviteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AutorisationPointageActiviteRepository::class)]
@@ -26,6 +27,8 @@ class AutorisationPointageActivite
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
+
+    private ?ArrayCollection $pointeurs = null;
 
     public function __construct()
     {
@@ -80,6 +83,17 @@ class AutorisationPointageActivite
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function getPointeurs(): ?ArrayCollection
+    {
+        return $this->pointeurs;
+    }
+
+    public function setPointeurs(?ArrayCollection $pointeurs): static
+    {
+        $this->pointeurs = $pointeurs;
         return $this;
     }
 }

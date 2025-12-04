@@ -15,7 +15,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class CommunauteController extends AbstractController
 {
     public function __construct(
-        private FonctionRepository $fonctionRepository, private readonly ScoutRepository $scoutRepository, private readonly UtilityService $utilityService
+        private FonctionRepository $fonctionRepository,
+        private readonly ScoutRepository $scoutRepository,
+        private readonly UtilityService $utilityService
     )
     {
     }
