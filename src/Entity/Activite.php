@@ -61,7 +61,7 @@ class Activite
     /**
      * @var Collection<int, AutorisationPointageActivite>
      */
-    #[ORM\ManyToMany(targetEntity: AutorisationPointageActivite::class, mappedBy: 'activite')]
+    #[ORM\OneToMany(targetEntity: AutorisationPointageActivite::class, mappedBy: 'activite')]
     private Collection $autorisations;
 
     /**

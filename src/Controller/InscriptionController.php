@@ -140,6 +140,8 @@ class InscriptionController extends AbstractController
 
             $this->entityManager->flush();
 
+            notyf()->success("Votre inscription a été effectuée avec succès! Veuillez vous reconnecter pour la synchronisation des données.");
+
             $session->set('_phone_input', '');
             $session->set('inscription_civile', '');
             $session->set('_choix_region', '');

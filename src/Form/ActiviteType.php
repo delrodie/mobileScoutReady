@@ -87,7 +87,7 @@ class ActiviteType extends AbstractType
                 'required' => false
             ])
             ->add('affiche', DropzoneType::class,[
-                'attr' => ['class' => 'form-control', 'placeholder' => "Cliquez pour télécharger l'affiche "],
+                'attr' => ['class' => 'form-control', 'placeholder' => "Cliquez pour télécharger l'affiche (360 x 200 pixels) "],
                 'label' => "L'affiche de l'activité  <sup class='text-danger'>*</sup>",
                 'label_attr' => ['class' => 'text-muted fst-italic'] ,
                 'label_html' => true,
@@ -98,7 +98,7 @@ class ActiviteType extends AbstractType
 //                'class' => Instance::class,
 //                'choice_label' => 'id',
 //            ])
-            ->add('autorisations', AutorisationAutocompleteField::class)
+//            ->add('autorisations', AutorisationAutocompleteField::class)
             ->add('cible', ChoiceType::class,[
                 'choices' => [
                     '-- Selectionnez la cible -- ' => '',

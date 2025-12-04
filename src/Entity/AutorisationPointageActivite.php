@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\AutorisationPointageActiviteRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AutorisationPointageActiviteRepository::class)]
@@ -15,17 +13,13 @@ class AutorisationPointageActivite
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, Scout>
-     */
-    #[ORM\ManyToMany(targetEntity: Scout::class, inversedBy: 'autorisationPointage')]
-    private Collection $scout;
 
-    /**
-     * @var Collection<int, Activite>
-     */
-    #[ORM\ManyToMany(targetEntity: Activite::class, inversedBy: 'autorisations')]
-    private Collection $activite;
+    #[ORM\ManyToOne]
+    private ?Scout $scout = null;
+
+
+    #[ORM\ManyToOne(inversedBy: 'autorisations')]
+    private ?Activite $activite;
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $role = null;
@@ -35,8 +29,6 @@ class AutorisationPointageActivite
 
     public function __construct()
     {
-        $this->scout = new ArrayCollection();
-        $this->activite = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -44,51 +36,26 @@ class AutorisationPointageActivite
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Scout>
-     */
-    public function getScout(): Collection
+
+    public function getScout(): ?Scout
     {
         return $this->scout;
     }
 
-    public function addScout(Scout $scout): static
+    public function setScout(?Scout $scout): static
     {
-        if (!$this->scout->contains($scout)) {
-            $this->scout->add($scout);
-        }
-
+        $this->scout = $scout;
         return $this;
     }
 
-    public function removeScout(Scout $scout): static
-    {
-        $this->scout->removeElement($scout);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Activite>
-     */
-    public function getActivite(): Collection
+    public function getActivite(): ?Activite
     {
         return $this->activite;
     }
 
-    public function addActivite(Activite $activite): static
+    public function setActivite(?Activite $activite): static
     {
-        if (!$this->activite->contains($activite)) {
-            $this->activite->add($activite);
-        }
-
-        return $this;
-    }
-
-    public function removeActivite(Activite $activite): static
-    {
-        $this->activite->removeElement($activite);
-
+        $this->activite = $activite;
         return $this;
     }
 

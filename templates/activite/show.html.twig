@@ -26,7 +26,7 @@
                         <figure class="overflow-hidden position-relative rounded-2">
                             <img src="{{ asset('uploads/activites/affiche/' ~ activite.affiche) }}" alt="{{ activite.titre }}" class="img-fluid rounded-2" style="width: 100%; height: 190px; object-fit: cover">
                             <figcaption class="position-absolute px-3 py-2 d-flex justify-content-between" style="font-size: .85rem;">
-                                <span style="font-size: .7rem; font-weight: bold;"><i class="bi bi-people me-1 fs-6"></i> 253</span>
+                                <span style="font-size: .7rem; font-weight: bold;"><i class="bi bi-people me-1 fs-6"></i> ND</span>
                                 <span style="font-size: .7rem; font-weight: bold;"><i class="bi bi-calendar me-1 fs-6"></i> {{ activite.dateDebutAt|date('d/m/Y') }} - {{ activite.dateFinAt|date('d/m/Y') }}</span>
                             </figcaption>
                         </figure>
@@ -51,11 +51,11 @@
                     </div>
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <h3 class="text-color-main fw-semibold">25</h3>
+                            <h3 class="text-color-main fw-semibold">ND</h3>
                             <span class="text-muted">Participants</span>
                         </div>
                         <div class="d-flex flex-column text-center ps-1">
-                            <h3 class="text-color-main fw-semibold">11/20</h3>
+                            <h3 class="text-color-main fw-semibold">ND</h3>
                             <span class="text-muted">Notes</span>
                         </div>
                     </div>
@@ -105,35 +105,35 @@
                     <div class="mt-5">
                         <h6 class="text-muted">Personnes autorisées</h6>
                         <div class="row row-cols-1">
-                            {% for autorisation in activite.autorisations %}
-                                <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">
-                                    {% for scout in autorisation.scout %}
-                                        <a href="{{ path('app_communaute_membre', {'slug': scout.slug}) }}" class="text-decoration-none text-secondary url-membre">
-                                            <div class="row g-2 d-flex align-items-center">
-                                                <div class="col-3">
-                                                    <div
-                                                        data-controller="image-loader"
-                                                        data-image-loader-src-value="{{ scout.slug|avatar }}"
+{#                            {% for autorisation in activite.autorisations %}#}
+{#                                <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">#}
+{#                                    {% for scout in autorisation.scout %}#}
+{#                                        <a href="{{ path('app_communaute_membre', {'slug': scout.slug}) }}" class="text-decoration-none text-secondary url-membre">#}
+{#                                            <div class="row g-2 d-flex align-items-center">#}
+{#                                                <div class="col-3">#}
+{#                                                    <div#}
+{#                                                        data-controller="image-loader"#}
+{#                                                        data-image-loader-src-value="{{ scout.slug|avatar }}"#}
 {#                                                        data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
-                                                        {#                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"#}
-                                                        data-image-loader-preload-value="true"
-                                                        data-communaute-target="avatarLoader"
-                                                    >
-                                                        <img alt="" class="img-fluid">
-                                                    </div>
+{#                                                        #}{#                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"#}
+{#                                                        data-image-loader-preload-value="true"#}
+{#                                                        data-communaute-target="avatarLoader"#}
+{#                                                    >#}
+{#                                                        <img alt="" class="img-fluid">#}
+{#                                                    </div>#}
 
-                                                </div>
-                                                <div class="col-9">
-                                                    <h5 class="fsize-13 text-body mb-0 pb-0">{{ scout.nom }} {{ scout.prenom }}</h5>
-                                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">{{ scout.id|fonction_scoute|raw }}</div>
-                                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">{{ scout.id|instance_scoute|raw }}</div>
-                                                    <span class="badge bg-danger"style="font-size: .55rem;">{{ autorisation.role }}</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
+{#                                                </div>#}
+{#                                                <div class="col-9">#}
+{#                                                    <h5 class="fsize-13 text-body mb-0 pb-0">{{ scout.nom }} {{ scout.prenom }}</h5>#}
+{#                                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">{{ scout.id|fonction_scoute|raw }}</div>#}
+{#                                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">{{ scout.id|instance_scoute|raw }}</div>#}
+{#                                                    <span class="badge bg-danger"style="font-size: .55rem;">{{ autorisation.role }}</span>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </a>#}
+{#                                    {% endfor %}#}
+{#                                </div>#}
+{#                            {% endfor %}#}
 
                         </div>
                     </div>

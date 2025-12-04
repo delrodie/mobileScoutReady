@@ -50,13 +50,13 @@ class ActiviteController extends AbstractController
 
             $scout = $this->scoutRepository->findOneBy(['slug' => $reqSlug]);
             if (!$scout){
-                flash()->error("Aucun profil trouvé. Veuillez vous reconnecter!", [], "Echèc");
+                notyf()->error("Aucun profil trouvé. Veuillez vous reconnecter!", [], "Echèc");
                 return $this->redirectToRoute('app_search_phone');
             }
 
             $instance = $this->instanceRepository->findOneBy(['id' => (int) $reqInstance]);
             if (!$instance){
-                flash()->error("Votre profil n'est associé à aucune instance. Veuillez vous reconnecter!", [],'Echèc');
+                notyf()->error("Votre profil n'est associé à aucune instance. Veuillez vous reconnecter!");
             }
 
             // Gestion de l'affiche
@@ -64,22 +64,22 @@ class ActiviteController extends AbstractController
             $activite->setInstance($instance);
 
             // Ajout de l'operateur comme personne qui peut pointer
-            $personnesAutorisees = $activite->getAutorisations()->toArray();
-            $activite->getAutorisations()->clear();
-            $this->addAutorisation($activite, $scout, 'CREATEUR');
-
-            foreach ($personnesAutorisees as $personne) {
-                if ($personne instanceof Scout){
-                    $this->addAutorisation($activite, $personne, 'INVITE');
-                }
-            }
+//            $personnesAutorisees = $activite->getAutorisations()->toArray();
+//            $activite->getAutorisations()->clear();
+//            $this->addAutorisation($activite, $scout, 'CREATEUR');
+//
+//            foreach ($personnesAutorisees as $personne) {
+//                if ($personne instanceof Scout){
+//                    $this->addAutorisation($activite, $personne, 'INVITE');
+//                }
+//            }
 
             $this->entityManager->persist($activite);
             $this->entityManager->flush();
 
-            flash()->success("L'activité a été enregistrée avec succès!", [], "Succès");
+            notyf()->success("L'activité a été enregistrée avec succès!");
 
-            return $this->redirectToRoute('app_activite_index');
+            return $this->redirectToRoute('app_activite_show',['id' => $activite->getId()]);
         }
 
         return $this->render('activite/new.html.twig',[
@@ -106,8 +106,8 @@ class ActiviteController extends AbstractController
     private function addAutorisation(Activite $activite, Scout $scout, string $role): void
     {
         $autorisation = new AutorisationPointageActivite();
-        $autorisation->addScout($scout);
-        $autorisation->addActivite($activite);
+        $autorisation->setScout($scout);
+        $autorisation->setActivite($activite);
         $autorisation->setRole($role);
         $autorisation->setCreatedAt(new \DateTimeImmutable());
 
