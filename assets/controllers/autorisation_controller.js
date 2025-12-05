@@ -1,0 +1,69 @@
+import { Controller} from "@hotwired/stimulus";
+import LocalDbController from "./local_db_controller.js";
+
+export default class extends Controller {
+    static targets = [
+        'scan', 'btnAction'
+    ];
+    static values = {
+        activiteId: String,
+    }
+
+    connect() {
+        this.userAccess();
+    }
+
+    async userAccess() {
+        try{
+            const profil = await LocalDbController.getAllFromStore('profil');
+            const apiUrl = `/api/activite/autorisation`
+
+            // Si aucun profil alors rediriger vers l'authentification
+            if (!profil || profil.length === 0) {
+                console.warn("Aucun profil trouvé en local");
+                Turbo.visit('/intro')
+                return;
+            }
+
+            console.log('Activite ID: ', this.activiteIdValue)
+
+            const response = await fetch(apiUrl,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    slug: profil[0].slug,
+                    code: profil[0].code,
+                    activite: this.activiteIdValue
+                })
+            });
+
+            if (!response.ok) throw new Error('Erreur API');
+
+            const responseData = await response.json();
+
+            const autorisation = responseData.data || responseData;
+            console.log(autorisation)
+            console.log('Access: ', autorisation.access)
+
+            this.scanTarget.classList.add('d-none');
+            this.btnActionTarget.classList.add('d-none');
+
+            if (autorisation.access === true) { console.log("Vérifié true")
+                this.scanTarget.classList.remove('d-none');
+
+                // Désactivation des boutons d'actions
+                if (autorisation.role === "CREATEUR"){
+                    this.btnActionTarget.classList.remove('d-none');
+                }
+                return;
+            }
+
+        } catch (e) {
+            this.scanTarget.classList.add('d-none');
+            console.error('Erreur user access : ', e)
+        }
+    }
+}

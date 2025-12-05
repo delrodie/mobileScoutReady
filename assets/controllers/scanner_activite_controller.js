@@ -68,7 +68,7 @@ export default class extends Controller {
 
             const data = await response.json();
             if (data.status === 'success') {
-                flasher.success(data.message);
+                // flasher.success(data.message);
                 Turbo.visit('/activites/', activiteId);
                 return;
             }

@@ -4,10 +4,11 @@ import LocalDbController from "./local_db_controller.js";
 export default class extends Controller {
     static targets = [
         'scoutSlug', 'scoutInstance', 'emptySection', 'listSection', 'carouselSection', "carouselSection",
-        'template', 'listActivite', 'listCarousel', 'carouselTemplate', 'indicator', 'scan'
+        'template', 'listActivite', 'listCarousel', 'carouselTemplate', 'indicator'
     ];
     static values = {
         apiUrlList : String,
+        activiteId: String,
     }
 
     connect() {
@@ -15,6 +16,7 @@ export default class extends Controller {
         this.loadActivites();
         this.bootstrapTabs();
     }
+
 
     async remplirChamps() {
         try {

@@ -34,33 +34,36 @@ class PointageController extends AbstractController
         $pointeurCode = $request->get('pointeur');
         $code = $request->get('code');
 
-        $pointeur = $this->scoutRepository->findOneBy(['code' => $pointeurCode]);
+        $pointeur = $this->scoutRepository->findOneBy(['code' => $pointeurCode]); //dump($pointeur);
         if (!$pointeur) {
-            flash()->error("Votre profil est introuvable. Veuillez vous déconnecter puis reconnecter si l'erreur persiste.", ['position', 'bottom-right'], 'Échec');
-            return $this->json(['status' => 'error', 'message' => 'Profil introuvabel'], Response::HTTP_NOT_FOUND);
+            notyf()->error("Votre profil est introuvable. Veuillez vous déconnecter puis reconnecter si l'erreur persiste.");
+            return $this->json(['status' => 'error', 'message' => 'Profil introuvable'], Response::HTTP_NOT_FOUND);
         }
 
         $activite = $this->activiteRepository->findOneBy(['id' => (int) $activiteId]);
         if(!$activite) {
-            flash()->error("L'activité concernée n'a pas été trouvée!", [], 'Erreur');
+            notyf()->error("L'activité concernée n'a pas été trouvée!");
             return $this->json(['status' => 'error', 'message' => 'Activité introuvable'], Response::HTTP_NOT_FOUND);
         }
 
         $scout = $this->scoutRepository->findOneBy(['qrCodeToken' => $code]);
         if (!$scout) {
-            flash()->error("Le scout concerné n'a pas été trouvé.", ['position', 'bottom-right'], "Echec");
+            notyf()->error("Le scout concerné n'a pas été trouvé.");
             return $this->json(['error' => "Scout introuvable"], Response::HTTP_NOT_FOUND);
         }
 
-        // Vérification de l'autorisation de pointage
-//        $auth = $this->autorisationPointageActiviteRepository->findOneBy([
-//            'scout' => $pointeur,
-//            'activite' => $activite
-//        ]);
-//        if (!$auth){
-//            flash()->error("Vous n'avez pas l'autorisation de pointer à cette activité. Veuillez contacter l'organisateur principal ", [], "Opération refusée");
-//            return $this->json(['status' => "warning", 'message' => "Operation réfusée"], Response::HTTP_FORBIDDEN);
-//        }
+        // Verifier si le pointeur a l'autorisation de scanner
+        $verificationAutorisation = $this->autorisationPointageActiviteRepository->findOneBy([
+            'scout' => $pointeur,
+            'activite' => $activite
+        ]);
+
+        if (!$verificationAutorisation){
+            notyf()->error("Echèc! Vous n'êtes pas autorisé(e) à pointer à cette activité. ");
+            return $this->json(['error' => "Non autorisé"], Response::HTTP_BAD_REQUEST);
+        }
+        /// si oui faire la mise a jour de la table
+
 
         // Verification de non existence de pointage
         $dejaPointe = $this->participerRepository->findOneBy([
@@ -69,7 +72,8 @@ class PointageController extends AbstractController
         ]);
 
         if ($dejaPointe){
-            $this->json([
+            notyf()->warning("Attention, ce participant a déjà été scanné");
+            return $this->json([
                 'status' => 'warning',
                 'message' => 'Déjà pointé'
             ], Response::HTTP_CONFLICT);
@@ -84,7 +88,7 @@ class PointageController extends AbstractController
         $this->entityManager->persist($participation);
         $this->entityManager->flush();
 
-        flash()->success("Scout pointé avec succès!", ['position', 'bottom-right'], "Success");
+        notyf()->success("Scout pointé avec succès!");
         return $this->json(['status' => 'success'], Response::HTTP_OK);
 
     }

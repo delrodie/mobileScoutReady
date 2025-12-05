@@ -65,6 +65,49 @@ class ApiActiviteController extends AbstractController
 
     }
 
+    #[Route('/autorisation', name: 'api_activite_verification_autorisation', methods: ['POST'])]
+    public function autorisation(Request $request): Response
+    {
+        $requestData = json_decode($request->getContent(), true);
+        $slug = $requestData['slug'] ?? null;
+        $code = $requestData['code'] ?? null;
+        $activiteId = $requestData['activite'] ?? null;
+//        $activiteId = 1;
+
+        dump('********* Autorisation');
+        dump([$slug, $activiteId]);
+
+        if (!$slug || !$code || !$activiteId) {
+            return $this->json([
+                'error' => 'Paramètre manquants'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $profilConnecte = $this->scoutRepository->findOneBy(['slug' => $slug]);
+        if(!$profilConnecte){
+            return $this->json([
+                'error' => "Profil introuvable"
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $autorisation = $this->autorisationPointageActiviteRepository->findAutorisation($profilConnecte->getId(), (int)$activiteId);
+
+        dump($autorisation);
+        $data = [
+            'access' => false,
+        ];
+        if ($autorisation){
+            $data = [
+              'role' => $autorisation->getRole(),
+                'access' => true
+            ];
+        }
+
+        dump($data);
+
+        return $this->json($data, Response::HTTP_OK);
+    }
+
     protected function getActivitesByGroupe($instance)
     {
         // 1. On récupère tous les IDs utiles

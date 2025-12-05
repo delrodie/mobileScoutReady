@@ -21,7 +21,10 @@
             </header>
 
             <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
-                <section class="form mt-1 px-4" data-controller="activite">
+                <section class="form mt-1 px-4"
+                         data-controller="activite autorisation"
+                         data-autorisation-activite-id-value="{{ activite.id }}"
+                >
                     <div class="p-0 m-0 rounded-2">
                         <figure class="overflow-hidden position-relative rounded-2">
                             <img src="{{ asset('uploads/activites/affiche/' ~ activite.affiche) }}" alt="{{ activite.titre }}" class="img-fluid rounded-2" style="width: 100%; height: 190px; object-fit: cover">
@@ -35,7 +38,7 @@
                     <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
                          data-controller="scanner-activite"
                          data-scanner-activite-activite-id-value="{{ activite.id }}"
-                         data-activite-target="scan"
+                         data-autorisation-target="scan"
                     >
                         <button  class="btn btn-light"
                                  data-action="scanner-activite#startScan"
@@ -63,7 +66,10 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-center align-content-center align-items-center my-5">
+                    <div class="d-flex justify-content-center align-content-center align-items-center my-5"
+{#                         data-controller="autorisation"#}
+                         data-autorisation-target="btnAction"
+                    >
                         <a href="{{ path('app_reunion_edit', {'id': activite.id}) }}" class="h4 mx-2 text-decoration-none" title="Modifier" data-turbo="false">
                             <div class="card h-100">
                                 <div class="card-body text-color-main">
@@ -125,39 +131,41 @@
                         </div>
                     </div>
 
-                    <div class="mt-5">
-                        <h6 class="text-muted">Personnes autorisées</h6>
-                        <div class="row row-cols-1">
-                            {% for pointeur in pointeurs %}
-                                <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">
-                                    <a href="{{ path('app_communaute_membre', {'slug': pointeur.scout.slug}) }}" class="text-decoration-none text-secondary url-membre">
-                                        <div class="row g-2 d-flex align-items-center">
-                                            <div class="col-3">
-                                                <div
-                                                    data-controller="image-loader"
-                                                    data-image-loader-src-value="{{ pointeur.scout.slug|avatar }}"
-{#                                                    data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
-                                                    data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
-                                                    data-image-loader-preload-value="true"
-                                                    data-communaute-target="avatarLoader"
-                                                >
-                                                    <img alt="" class="img-fluid">
+                    {% if pointeurs %}
+                        <div class="mt-5">
+                            <h6 class="text-muted">Personnes autorisées</h6>
+                            <div class="row row-cols-1">
+                                {% for pointeur in pointeurs %}
+                                    <div class="col d-flex justify-content-start align-content-start shadow-sm py-2">
+                                        <a href="{{ path('app_communaute_membre', {'slug': pointeur.scout.slug}) }}" class="text-decoration-none text-secondary url-membre">
+                                            <div class="row g-2 d-flex align-items-center">
+                                                <div class="col-3">
+                                                    <div
+                                                        data-controller="image-loader"
+                                                        data-image-loader-src-value="{{ pointeur.scout.slug|avatar }}"
+                                                        {#                                                    data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
+                                                        data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
+                                                        data-image-loader-preload-value="true"
+                                                        data-communaute-target="avatarLoader"
+                                                    >
+                                                        <img alt="" class="img-fluid">
+                                                    </div>
+
                                                 </div>
-
+                                                <div class="col-9">
+                                                    <h5 class="fsize-13 text-body mb-0 pb-0">{{ pointeur.scout.nom }} {{ pointeur.scout.prenom }}</h5>
+                                                    <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">{{ pointeur.scout.id|fonction_scoute|raw }}</div>
+                                                    <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">{{ pointeur.scout.id|instance_scoute|raw }}</div>
+                                                    <span class="badge bg-danger"style="font-size: .55rem;">{{ pointeur.role }}</span>
+                                                </div>
                                             </div>
-                                            <div class="col-9">
-                                                <h5 class="fsize-13 text-body mb-0 pb-0">{{ pointeur.scout.nom }} {{ pointeur.scout.prenom }}</h5>
-                                                <div class="fsize-12 text-color-main mb-0 pb-0 js-fonction">{{ pointeur.scout.id|fonction_scoute|raw }}</div>
-                                                <div class="text-muted fsize-12 fst-italic mt-0 pt-0 js-instance">{{ pointeur.scout.id|instance_scoute|raw }}</div>
-                                                <span class="badge bg-danger"style="font-size: .55rem;">{{ pointeur.role }}</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
-                            {% endfor %}
+                                        </a>
+                                    </div>
+                                {% endfor %}
 
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </section>
 
             </main>
