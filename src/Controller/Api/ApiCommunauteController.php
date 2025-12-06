@@ -45,6 +45,8 @@ class ApiCommunauteController extends AbstractController
             return $this->json(['error' => 'Profil introuvable'], Response::HTTP_NOT_FOUND);
         }
 
+        dump($scoutConnecte);
+
         $statut = $scoutConnecte->getStatut();
         $fonction = $this->fonctionRepository->findOneByScout($scoutConnecte->getId());
 
@@ -94,7 +96,7 @@ class ApiCommunauteController extends AbstractController
 
         }
 
-//        dump($resultats);
+        dump($resultats);
 
         return $this->json($resultats);
     }
