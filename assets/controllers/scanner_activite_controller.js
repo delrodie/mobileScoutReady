@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { Camera, CameraPermissionState } from '@capacitor/camera';
+import { Camera } from '@capacitor/camera';
 import ScannerController from "../js/utils/ScannerController.js";
 import LocalDbController from "./local_db_controller.js";
 import flasher from "@flasher/flasher";
@@ -24,10 +24,10 @@ export default class extends Controller {
         try{
             const permission = await Camera.checkPermissions();
 
-            if (permission.camera !== CameraPermissionState.GRANTED) {
+            if (permission.camera !== 'granted') {
                 const requestResult = await Camera.requestPermissions({ permissions: ['camera'] });
 
-                if (requestResult.camera !== CameraPermissionState.GRANTED) {
+                if (requestResult.camera !== 'granted') {
                     // L'utilisateur a refusé. Affichez une alerte ou un message d'erreur.
                     flasher.error("Permission de la caméra refusée. Impossible de scanner.");
                     return; // Stoppe l'ouverture de la modale et du scanner

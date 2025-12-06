@@ -51,7 +51,7 @@ return [
         'type' => 'css',
     ],
     '@capacitor/core' => [
-        'version' => '7.4.4',
+        'version' => '7.4.2',
     ],
     '@capacitor-community/barcode-scanner' => [
         'version' => '4.0.1',
@@ -61,5 +61,8 @@ return [
     ],
     '@flasher/flasher' => [
         'version' => '2.2.0',
+    ],
+    '@capacitor/camera' => [
+        'version' => '7.0.2',
     ],
 ];
