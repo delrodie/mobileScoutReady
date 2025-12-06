@@ -98,7 +98,12 @@ export default class extends Controller {
 
             const data = await response.json();
             if (data.status === 'success') {
-                Turbo.visit(`/activites/${this.activiteIdValue}`);
+                // Correction de l'URL (si ce n'est pas déjà fait)
+                const targetUrl = `/activites/${this.activiteIdValue}`;
+
+                // SOLUTION: Forcer Turbo à utiliser la méthode GET
+                Turbo.visit(targetUrl, { action: 'replace', method: 'get' });
+
                 return;
             }
             else if (data.status === 'warning') flasher.warning(data.message);
