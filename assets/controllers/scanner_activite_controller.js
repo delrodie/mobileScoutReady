@@ -26,11 +26,17 @@ export default class extends Controller {
         // 2. Ajoute 'show' et 'd-flex' (classes nécessaires pour l'affichage forcé et le centrage)
         this.modalTarget.classList.add('show', 'd-flex');
 
-        // 3. Démarre le scanner
-        this.scanner.start();
-
         // OPTIONNEL : Si vous voulez que le body ne scroll pas
         document.body.classList.add('modal-open');
+
+        // 3. Démarre le scanner
+        // 2. AJOUTER UN DELAI (Timeout) POUR LA STABILISATION DU DOM
+        // Cela donne au WebView le temps de redimensionner l'élément modale
+        setTimeout(() => {
+            console.log("Démarrage du scanner après stabilisation du DOM.");
+            this.scanner.start(); // Démarre le scanner
+        }, 100);
+
     }
 
     // NOUVEAU : Nouvelle méthode pour fermer la modale et arrêter le scan
