@@ -84,8 +84,8 @@ class ApiActiviteController extends AbstractController
         $activiteId = $requestData['activite'] ?? null;
 //        $activiteId = 1;
 
-        dump('********* Autorisation');
-        dump([$slug, $activiteId]);
+        //dump('********* Autorisation');
+        //dump([$slug, $activiteId]);
 
         if (!$slug || !$code || !$activiteId) {
             return $this->json([
@@ -102,7 +102,7 @@ class ApiActiviteController extends AbstractController
 
         $autorisation = $this->autorisationPointageActiviteRepository->findAutorisation($profilConnecte->getId(), (int)$activiteId);
 
-        dump($autorisation);
+        //dump($autorisation);
         $data = [
             'access' => false,
         ];
@@ -113,7 +113,7 @@ class ApiActiviteController extends AbstractController
             ];
         }
 
-        dump($data);
+        //dump($data);
 
         return $this->json($data, Response::HTTP_OK);
     }
