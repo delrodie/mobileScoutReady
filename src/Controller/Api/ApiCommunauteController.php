@@ -50,7 +50,7 @@ class ApiCommunauteController extends AbstractController
         $statut = $scoutConnecte->getStatut();
         $fonction = $this->fonctionRepository->findOneByScout($scoutConnecte->getId());
 
-        if ($statut === ScoutStatut::JEUNE->value){ //dump($fonction->getInstance()->getInstanceParent()->getId());
+        if ($statut === ScoutStatut::JEUNE){ //dump($fonction->getInstance()->getInstanceParent()->getId());
             $fonctions = $this->fonctionRepository->findCommunauteByBranche(
                 $scoutConnecte->getId(),
                 $fonction->getInstance()->getInstanceParent()->getId(),
@@ -61,7 +61,7 @@ class ApiCommunauteController extends AbstractController
 
         }else{
             $poste = $fonction?->getPoste();
-            if ($poste === FonctionPoste::REGIONAL->value ){
+            if ($poste === FonctionPoste::REGIONAL ){
                 $districts = $this->instanceRepository->findBy(['instanceParent' => $fonction->getInstance()->getId()]);
 
                 $fonctions=[];
@@ -72,7 +72,7 @@ class ApiCommunauteController extends AbstractController
                         $this->utilityService->annee()
                     );
                 }
-            }elseif($poste === FonctionPoste::DISTRICT->value){
+            }elseif($poste === FonctionPoste::DISTRICT){
                 $fonctions[] = $this->fonctionRepository->findCommunauteByDistrict(
                     $scoutConnecte->getId(),
                     $fonction->getInstance()->getId(),
