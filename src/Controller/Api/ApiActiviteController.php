@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
+use App\Entity\Activite;
 use App\Enum\InstanceType;
 use App\Mapper\ActiviteMapper;
 use App\Repository\ActiviteRepository;
 use App\Repository\AutorisationPointageActiviteRepository;
 use App\Repository\InstanceRepository;
+use App\Repository\ParticiperRepository;
 use App\Repository\ScoutRepository;
 use App\Services\GestionInstance;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +21,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/activite')]
 class ApiActiviteController extends AbstractController
 {
-    public function __construct(private readonly ScoutRepository $scoutRepository, private readonly InstanceRepository $instanceRepository, private readonly ActiviteRepository $activiteRepository, private readonly ActiviteMapper $activiteMapper, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly GestionInstance $gestionInstance)
+    public function __construct(
+        private readonly ScoutRepository $scoutRepository,
+        private readonly InstanceRepository $instanceRepository,
+        private readonly ActiviteRepository $activiteRepository,
+        private readonly ActiviteMapper $activiteMapper,
+        private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository,
+        private readonly GestionInstance $gestionInstance,
+        private readonly ParticiperRepository $participerRepository
+    )
     {
     }
 
@@ -106,6 +116,16 @@ class ApiActiviteController extends AbstractController
         dump($data);
 
         return $this->json($data, Response::HTTP_OK);
+    }
+
+    #[ROute('/nombre/{id}', name: 'api_activite_nombre', methods: ['POST'])]
+    public function nombre(Activite $activite): Response
+    {
+        $present = $this->participerRepository->findBy(['activite' =>$activite->getId() ]);
+
+        return $this->json([
+            'participant' => count($present),
+        ], Response::HTTP_OK);
     }
 
     protected function getActivitesByGroupe($instance)

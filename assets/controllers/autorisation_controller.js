@@ -3,7 +3,7 @@ import LocalDbController from "./local_db_controller.js";
 
 export default class extends Controller {
     static targets = [
-        'scan', 'btnAction'
+        'scan', 'btnAction', 'statistiques', 'participantCount', 'noteMoyen'
     ];
     static values = {
         activiteId: String,
@@ -11,6 +11,7 @@ export default class extends Controller {
 
     connect() {
         this.userAccess();
+        this.interractionValues()
     }
 
     async userAccess() {
@@ -64,6 +65,44 @@ export default class extends Controller {
         } catch (e) {
             this.scanTarget.classList.add('d-none');
             console.error('Erreur user access : ', e)
+        }
+    }
+
+     async interractionValues(){
+        try{
+            const urlGetNombre = `/api/activite/nombre/${this.activiteIdValue}`;
+
+            const response = await fetch(urlGetNombre, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    activite: this.activiteIdValue
+                })
+            });
+            console.log('statistques', this.activiteIdValue)
+            console.log(response);
+
+            if (!response.ok) throw new Error('Erreur API');
+
+            const responseData =  response.json();
+           const nombre = responseData.data || responseData;
+
+            console.log('Nombre')
+            console.log(responseData)
+
+            if (this.hasParticipantCountTarget){
+                this.participantCountTarget.textContent = nombre.participant || 'ND';
+            }
+
+            if (this.hasnoteMoyenTarget){
+                this.noteMoyenTarget.textContent = nombre.note || 'ND' ;
+            }
+
+        }catch (e) {
+            console.error("Interraction: ", e)
         }
     }
 }

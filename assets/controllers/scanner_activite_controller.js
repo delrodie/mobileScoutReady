@@ -1,10 +1,12 @@
 import { Controller } from "@hotwired/stimulus";
 import ScannerController from "../js/utils/ScannerController.js";
 import LocalDbController from "./local_db_controller.js";
+import AutorisationController  from "./autorisation_controller.js";
 import flasher from "@flasher/flasher";
 
 export default class extends Controller {
     static values = {activiteId: String};
+    static targets = ["modal"];
 
     connect() {
         this.scanner = new ScannerController({
@@ -17,11 +19,24 @@ export default class extends Controller {
         this.scanner.stop();
     }
 
-    startScan() {
-        this.scanner.start();
+    // MODIFIÉ : Nouvelle méthode pour ouvrir la modale et démarrer le scan
+    openModal() {
+        this.modalTarget.classList.remove('d-none'); // Affiche la modale (Cache Bootstrap : d-none)
+        this.scanner.start(); // Démarre le scanner
     }
 
+    // NOUVEAU : Nouvelle méthode pour fermer la modale et arrêter le scan
+    closeModal() {
+        this.scanner.stop(); // Arrête le scanner (important pour libérer la caméra)
+        this.modalTarget.classList.add('d-none'); // Masque la modale
+    }
+
+    // startScan() {
+    //     this.scanner.start();
+    // }
+
     async scanSuccess(code){
+        this.closeModal();
         await this.sendPointage(code);
     }
 
@@ -68,7 +83,7 @@ export default class extends Controller {
 
             const data = await response.json();
             if (data.status === 'success') {
-                // flasher.success(data.message);
+                AutorisationController.interractionValues();
                 Turbo.visit('/activites/', activiteId);
                 return;
             }

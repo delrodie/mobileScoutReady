@@ -41,7 +41,7 @@
                          data-autorisation-target="scan"
                     >
                         <button  class="btn btn-light"
-                                 data-action="scanner-activite#startScan"
+                                 data-action="scanner-activite#openModal"
                         >
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body d-flex flex-column text-center px-5 py-2">
@@ -52,16 +52,47 @@
                         </button>
 
                     <!-- Zone pour le scan web -->
-                        <div id="qr-reader" class="mt-3" style="width: 200px;"></div>
+{#                        <div id="qr-reader" class="mt-3" style="width: 200px;"></div>#}
+
+                        {# Modal de scanne #}
+                        <div data-scanner-activite-target="modal"
+                             class="modal position-fixed top-0 start-0 w-100 h-100 d-none"
+                             style="background-color: rgba(0, 0, 0, 0.8); z-index: 1050;">
+
+                            <div class="modal-dialog modal-dialog-centered" style="max-width: 90%; margin: auto;">
+                                <div class="modal-content bg-transparent border-0 shadow-none">
+
+                                    <div class="modal-header border-0 pb-0">
+                                        <button type="button"
+                                                class="btn-close btn-close-white"
+                                                aria-label="Close"
+                                                data-action="scanner-activite#closeModal"
+                                        ></button>
+                                    </div>
+
+                                    <div class="modal-body d-flex justify-content-center align-items-center pt-0">
+                                        <div id="qr-reader" style="width: 300px; height: 300px; border: 2px solid white;">
+                                            {# La zone du scanner de ScannerController s'affichera ici #}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <h3 class="text-color-main fw-semibold">ND</h3>
+                            <h3 class="text-color-main fw-semibold"
+                                data-autorisation-target="participantCount"
+                            >ND</h3>
                             <span class="text-muted">Participants</span>
                         </div>
                         <div class="d-flex flex-column text-center ps-1">
-                            <h3 class="text-color-main fw-semibold">ND</h3>
+                            <h3 class="text-color-main fw-semibold"
+                                data-autorisation-target="noteMoyen"
+                            >ND</h3>
                             <span class="text-muted">Notes</span>
                         </div>
                     </div>
@@ -166,10 +197,15 @@
                             </div>
                         </div>
                     {% endif %}
+
+
+
                 </section>
 
             </main>
             <div class="" style="margin-top: 50px;">.</div>
+
+
 
         {% endblock %}
 
