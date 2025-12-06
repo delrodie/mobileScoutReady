@@ -1,7 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 import ScannerController from "../js/utils/ScannerController.js";
 import LocalDbController from "./local_db_controller.js";
-import AutorisationController  from "./autorisation_controller.js";
 import flasher from "@flasher/flasher";
 
 export default class extends Controller {
@@ -21,14 +20,30 @@ export default class extends Controller {
 
     // MODIFIÉ : Nouvelle méthode pour ouvrir la modale et démarrer le scan
     openModal() {
-        this.modalTarget.classList.remove('d-none'); // Affiche la modale (Cache Bootstrap : d-none)
-        this.scanner.start(); // Démarre le scanner
+        // 1. Retire d-none (le cache initial)
+        this.modalTarget.classList.remove('d-none');
+
+        // 2. Ajoute 'show' et 'd-flex' (classes nécessaires pour l'affichage forcé et le centrage)
+        this.modalTarget.classList.add('show', 'd-flex');
+
+        // 3. Démarre le scanner
+        this.scanner.start();
+
+        // OPTIONNEL : Si vous voulez que le body ne scroll pas
+        document.body.classList.add('modal-open');
     }
 
     // NOUVEAU : Nouvelle méthode pour fermer la modale et arrêter le scan
     closeModal() {
-        this.scanner.stop(); // Arrête le scanner (important pour libérer la caméra)
-        this.modalTarget.classList.add('d-none'); // Masque la modale
+        // 1. Arrête le scanner
+        this.scanner.stop();
+
+        // 2. Masque l'élément en ajoutant d-none et retirant show/d-flex
+        this.modalTarget.classList.add('d-none');
+        this.modalTarget.classList.remove('show', 'd-flex');
+
+        // OPTIONNEL : Si vous avez ajouté la classe 'modal-open'
+        document.body.classList.remove('modal-open');
     }
 
     // startScan() {
@@ -83,8 +98,7 @@ export default class extends Controller {
 
             const data = await response.json();
             if (data.status === 'success') {
-                AutorisationController.interractionValues();
-                Turbo.visit('/activites/', activiteId);
+                Turbo.visit(`/activites/${this.activiteIdValue}`);
                 return;
             }
             else if (data.status === 'warning') flasher.warning(data.message);
