@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Activite;
 use App\Entity\AutorisationPointageActivite;
 use App\Entity\Scout;
+use App\Enum\AutorisationPointeur;
 use App\Form\ActiviteType;
 use App\Repository\ActiviteRepository;
 use App\Repository\AutorisationPointageActiviteRepository;
@@ -65,16 +66,13 @@ class ActiviteController extends AbstractController
             $activite->setInstance($instance);
 
             // Ajout de l'operateur comme personne qui peut pointer
-//            $personnesAutorisees = $activite->getAutorisations()->toArray();
-//            $activite->getAutorisations()->clear();
-//            $this->addAutorisation($activite, $scout, 'CREATEUR');
-//
-//            foreach ($personnesAutorisees as $personne) {
-//                if ($personne instanceof Scout){
-//                    $this->addAutorisation($activite, $personne, 'INVITE');
-//                }
-//            }
+            $createur = new AutorisationPointageActivite();
+            $createur->setScout($scout);
+            $createur->setActivite($activite);
+            $createur->setRole(AutorisationPointeur::CREATEUR->value);
+            $createur->setCreatedAt(new \DateTimeImmutable());
 
+            $this->entityManager->persist($createur);
             $this->entityManager->persist($activite);
             $this->entityManager->flush();
 
