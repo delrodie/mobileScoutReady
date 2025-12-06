@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
+import { Camera, CameraPermissionState } from '@capacitor/camera';
 import ScannerController from "../js/utils/ScannerController.js";
 import LocalDbController from "./local_db_controller.js";
 import flasher from "@flasher/flasher";
@@ -19,23 +20,34 @@ export default class extends Controller {
     }
 
     // MODIFIÉ : Nouvelle méthode pour ouvrir la modale et démarrer le scan
-    openModal() {
-        // 1. Retire d-none (le cache initial)
-        this.modalTarget.classList.remove('d-none');
+    async openModal() {
+        try{
+            const permission = await Camera.checkPermissions();
 
-        // 2. Ajoute 'show' et 'd-flex' (classes nécessaires pour l'affichage forcé et le centrage)
-        this.modalTarget.classList.add('show', 'd-flex');
+            if (permission.camera !== CameraPermissionState.GRANTED) {
+                const requestResult = await Camera.requestPermissions({ permissions: ['camera'] });
 
-        // OPTIONNEL : Si vous voulez que le body ne scroll pas
-        document.body.classList.add('modal-open');
+                if (requestResult.camera !== CameraPermissionState.GRANTED) {
+                    // L'utilisateur a refusé. Affichez une alerte ou un message d'erreur.
+                    flasher.error("Permission de la caméra refusée. Impossible de scanner.");
+                    return; // Stoppe l'ouverture de la modale et du scanner
+                }
+            }
 
-        // 3. Démarre le scanner
-        // 2. AJOUTER UN DELAI (Timeout) POUR LA STABILISATION DU DOM
-        // Cela donne au WebView le temps de redimensionner l'élément modale
-        setTimeout(() => {
-            console.log("Démarrage du scanner après stabilisation du DOM.");
-            this.scanner.start(); // Démarre le scanner
-        }, 100);
+            // Étape B : Si la permission est GRANTED, ouvrez la modale et démarrez le scanner
+
+            // 1. Retire d-none et ajoute show/d-flex
+            this.modalTarget.classList.remove('d-none');
+            this.modalTarget.classList.add('show', 'd-flex');
+            document.body.classList.add('modal-open');
+
+            // 2. Démarre le scanner (avec le délai pour la stabilisation du DOM)
+            setTimeout(() => {
+                this.scanner.start();
+            }, 100);
+        } catch (e) {
+            console.error("Erreur lors de la gestion des permissions de la caméra: ", e);
+        }
 
     }
 
