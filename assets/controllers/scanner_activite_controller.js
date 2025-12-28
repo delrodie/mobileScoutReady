@@ -8,6 +8,7 @@ export default class extends Controller {
 
     scanner = null;
     isNative = false;
+    html5QrCode = null; // Pour stocker l'instance du scanner web
 
     connect() {
         console.log("Scanner controller connecté");
@@ -151,7 +152,7 @@ export default class extends Controller {
             this.showElement('webContainer');
 
             // Importer dynamiquement le scanner web
-            const { Html5QrcodeScanner } = await import('html5-qrcode');
+            const { Html5Qrcode } = await import('html5-qrcode');
 
             // Vérifier si l'élément existe
             const scannerElement = document.getElementById('qr-reader');
@@ -159,42 +160,41 @@ export default class extends Controller {
                 throw new Error("Élément scanner non trouvé");
             }
 
-            // Configuration du scanner web
-            this.scanner = new Html5QrcodeScanner(
-                "qr-reader",
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    rememberLastUsedCamera: true,
-                    supportedScanTypes: [0], // 0 = camera, 1 = fichier
-                    showTorchButtonIfSupported: true,
-                    showZoomSliderIfSupported: true,
-                    defaultZoomValueIfSupported: 2
-                },
-                false
-            );
+            // Créer une instance de Html5Qrcode
+            this.html5QrCode = new Html5Qrcode("qr-reader");
 
-            // Démarrer le scan
-            this.scanner.render(
-                (decodedText) => {
-                    console.log("QR Code détecté:", decodedText);
-                    if (this.scanner) {
-                        this.scanner.clear();
-                        this.scanner = null;
-                    }
-                    this.closeModal();
-                    this.sendPointage(decodedText);
-                },
-                (error) => {
+            // Démarrer le scan automatiquement
+            const qrCodeSuccessCallback = (decodedText) => {
+                console.log("QR Code détecté:", decodedText);
+                this.stopWebScan();
+                this.closeModal();
+                this.sendPointage(decodedText);
+            };
+
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                rememberLastUsedCamera: true,
+                supportedScanTypes: [0], // 0 = camera, 1 = fichier
+                showTorchButtonIfSupported: true,
+                showZoomSliderIfSupported: true,
+                defaultZoomValueIfSupported: 2
+            };
+
+            // Démarrer la caméra et le scan
+            await this.html5QrCode.start(
+                { facingMode: "environment" }, // Utiliser la caméra arrière
+                config,
+                qrCodeSuccessCallback,
+                (errorMessage) => {
                     // Ne pas afficher les erreurs normales d'arrêt
-                    if (!error || error.includes("NotFoundException") || error.includes("NotAllowedError")) {
-                        console.log("Scan arrêté:", error);
-                    } else {
-                        console.error("Erreur scan web:", error);
-                        flasher.error("Erreur scan: " + error);
+                    if (errorMessage && !errorMessage.includes("NotFoundException") && !errorMessage.includes("NotAllowedError")) {
+                        console.log("Erreur de scan:", errorMessage);
                     }
                 }
             );
+
+            console.log("Scanner web démarré avec succès");
 
         } catch (error) {
             console.error("Erreur initialisation scan web:", error);
@@ -211,16 +211,26 @@ export default class extends Controller {
         }
     }
 
-    stopScan() {
-        // Arrêter le scanner web si actif
-        if (!this.isNative && this.scanner) {
+    stopWebScan() {
+        if (this.html5QrCode) {
             try {
-                this.scanner.clear();
-                this.scanner = null;
-                console.log("Scanner web arrêté");
+                this.html5QrCode.stop().then(() => {
+                    console.log("Scanner web arrêté");
+                    this.html5QrCode.clear();
+                    this.html5QrCode = null;
+                }).catch(err => {
+                    console.error("Erreur lors de l'arrêt du scanner web:", err);
+                });
             } catch (error) {
                 console.error("Erreur arrêt scanner web:", error);
             }
+        }
+    }
+
+    stopScan() {
+        // Arrêter le scanner web si actif
+        if (!this.isNative) {
+            this.stopWebScan();
         }
     }
 

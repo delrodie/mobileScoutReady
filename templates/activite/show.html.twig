@@ -274,6 +274,29 @@
         .modal {
             z-index: 99999 !important;
         }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #qr-reader video {
+            border-radius: 10px;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Pour cacher les boutons inutiles si vous voulez un look plus épuré */
+        #qr-reader__dashboard_section {
+            display: none; /* Cache le dashboard avec les boutons de sélection de caméra, etc. */
+        }
+
+        /* Ou pour garder seulement certains éléments */
+        /*
+        #qr-reader__dashboard_section_swaplink {
+            display: none;
+        }
+        */
     </style>
 {% endblock %}
 {% block javascripts %}
