@@ -35,6 +35,7 @@
                         </figure>
                     </div>
 
+
                     <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
                          data-controller="scanner-activite"
                          data-scanner-activite-activite-id-value="{{ activite.id }}"
@@ -52,7 +53,7 @@
                             </button>
                         </div>
 
-                        {# Modal pour le scanner #}
+                        <!-- Modal pour le scanner -->
                         <div data-scanner-activite-target="modal"
                              class="modal position-fixed top-0 start-0 w-100 h-100 d-none d-flex"
                              style="background-color: rgba(0, 0, 0, 0.8); z-index: 99999;">
@@ -68,34 +69,13 @@
                                         ></button>
                                     </div>
 
-                                    <!-- Dans votre modal, remplacez la section modal-body par : -->
                                     <div class="modal-body d-flex flex-column justify-content-center align-items-center pt-0">
-                                        <!-- État initial -->
-                                        <div id="scanner-initial" class="text-center text-white">
-                                            <div class="mb-3">
-                                                <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
-                                            </div>
-                                            <h5 class="mb-2">Initialisation du scanner...</h5>
-                                            <p class="text-light mb-3" id="status-message">Vérification des permissions</p>
-                                            <div class="spinner-border text-light" role="status">
-                                                <span class="visually-hidden">Chargement...</span>
-                                            </div>
+                                        <!-- Message selon l'environnement -->
+                                        <div id="scanner-web-container" class="d-none">
+                                            <div id="qr-reader" style="width: 300px; height: 300px;"></div>
                                         </div>
 
-                                        <!-- Message d'erreur -->
-                                        <div id="scanner-error" class="d-none text-center text-white">
-                                            <div class="mb-3">
-                                                <i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i>
-                                            </div>
-                                            <h5 class="mb-2">Erreur</h5>
-                                            <p id="error-message" class="mb-3"></p>
-                                            <button class="btn btn-light mt-2" data-action="click->scanner-activite#closeModal">
-                                                Fermer
-                                            </button>
-                                        </div>
-
-                                        <!-- Scanner actif -->
-                                        <div id="scanner-active" class="d-none text-center text-white">
+                                        <div id="scanner-native-message" class="text-center text-white d-none">
                                             <div class="mb-3">
                                                 <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
                                             </div>
@@ -104,7 +84,18 @@
                                             <div class="scanner-frame mb-4" style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
                                                 <div class="scanner-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
                                             </div>
-                                            <p class="text-light small">Scanner en cours...</p>
+                                            <p class="text-light small">Le scanner s'ouvre en plein écran</p>
+                                        </div>
+
+                                        <div id="scanner-loading" class="text-center text-white">
+                                            <div class="mb-3">
+                                                <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
+                                            </div>
+                                            <h5 class="mb-2">Initialisation...</h5>
+                                            <p class="text-light mb-3" id="status-message">Chargement du scanner</p>
+                                            <div class="spinner-border text-light" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -118,7 +109,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
@@ -278,22 +268,19 @@
     {{ parent() }}
     <!-- Dans votre base.html.twig ou à la fin de show.html.twig -->
     <script>
-        // Fonction de debug pour vérifier l'environnement
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page chargée, vérification de Capacitor...');
+        // Ajoutez cette logique pour mieux gérer l'affichage
+        document.addEventListener('scanner:environment-detected', (event) => {
+            const isNative = event.detail.isNative;
 
-            // Vérifier si Capacitor est disponible
-            if (typeof Capacitor === 'undefined') {
-                console.error('Capacitor non chargé!');
-            } else {
-                console.log('Capacitor disponible:', Capacitor);
-            }
+            // Masquer le loader
+            document.getElementById('scanner-loading').classList.add('d-none');
 
-            // Vérifier si BarcodeScanner est disponible
-            if (typeof BarcodeScanner === 'undefined') {
-                console.error('BarcodeScanner non disponible!');
+            if (isNative) {
+                // Afficher le message pour le scanner natif
+                document.getElementById('scanner-native-message').classList.remove('d-none');
             } else {
-                console.log('BarcodeScanner disponible');
+                // Afficher le container pour le scanner web
+                document.getElementById('scanner-web-container').classList.remove('d-none');
             }
         });
     </script>

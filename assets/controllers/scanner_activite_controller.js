@@ -1,163 +1,178 @@
+// scanner_activite_controller.js
 import { Controller } from "@hotwired/stimulus";
-import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner';
 import LocalDbController from "./local_db_controller.js";
 import flasher from "@flasher/flasher";
 
 export default class extends Controller {
     static values = {activiteId: String};
-    static targets = ["modal"];
+    static targets = ["modal", "scannerContainer"];
+
+    scanner = null;
+    isNative = false;
+    html5QrCode = null;
 
     connect() {
         console.log("Scanner controller connecté");
-        this.isScanning = false;
+
+        // Détecter l'environnement
+        this.isNative = this.isCapacitorNative();
+        console.log("Environnement détecté:", this.isNative ? "Natif Capacitor" : "Navigateur Web");
+
+        if (this.isNative) {
+            console.log("Utilisera le scanner natif");
+        } else {
+            console.log("Utilisera le scanner web");
+        }
     }
 
     disconnect() {
         this.stopScan();
     }
 
+    isCapacitorNative() {
+        // Vérifier si nous sommes dans un environnement Capacitor natif
+        return typeof Capacitor !== 'undefined' &&
+            Capacitor.isNative &&
+            typeof Capacitor.Plugins !== 'undefined' &&
+            Capacitor.Plugins.BarcodeScanner;
+    }
+
     async openModal() {
-        console.log("Tentative d'ouverture du modal et du scanner");
+        console.log("Tentative d'ouverture du scanner");
 
         try {
-            // Afficher le modal d'abord
+            // Afficher le modal
             this.modalTarget.classList.remove('d-none');
             this.modalTarget.classList.add('show', 'd-flex');
             document.body.classList.add('modal-open');
 
-            // Attendre un peu que le modal soit visible
+            // Démarrer le scan selon l'environnement
             setTimeout(async () => {
-                await this.startScan();
+                if (this.isNative) {
+                    await this.startNativeScan();
+                } else {
+                    await this.startWebScan();
+                }
             }, 300);
 
         } catch (error) {
-            console.error("Erreur lors de l'ouverture du modal: ", error);
+            console.error("Erreur lors de l'ouverture du modal:", error);
             flasher.error("Erreur lors de l'ouverture du scanner");
             this.closeModal();
         }
     }
 
-    async startScan() {
-        console.log("Démarrage du scan...");
-
+    async startNativeScan() {
         try {
-            // 1. Vérifier si BarcodeScanner est disponible
-            if (!CapacitorBarcodeScanner || !CapacitorBarcodeScanner.checkPermission) {
-                console.error("BarcodeScanner n'est pas disponible");
-                flasher.error("Scanner non disponible. Vérifiez l'installation.");
-                return;
-            }
+            console.log("Démarrage du scan natif...");
 
-            // 2. Vérifier les permissions
-            console.log("Vérification des permissions...");
-            const status = await CapacitorBarcodeScanner.checkPermission({ force: true });
-            console.log("Statut des permissions:", status);
+            // Importer dynamiquement le scanner Capacitor
+            const { BarcodeScanner } = await import('@capacitor/barcode-scanner');
+
+            // Vérifier les permissions
+            const status = await BarcodeScanner.checkPermission({ force: true });
 
             if (status.granted) {
-                console.log("Permissions accordées, démarrage du scanner...");
-
-                // Cacher l'arrière-plan de l'app
-                await CapacitorBarcodeScanner.hideBackground();
+                await BarcodeScanner.hideBackground();
                 document.body.style.background = "transparent";
 
-                // Préparer le scanner
-                await CapacitorBarcodeScanner.prepare();
+                await BarcodeScanner.prepare();
 
-                // Définir les formats à scanner
-                const supportedFormats = await CapacitorBarcodeScanner.getSupportedFormats();
-                console.log("Formats supportés:", supportedFormats);
-
-                // Démarrer le scan avec options
-                this.isScanning = true;
-                const result = await CapacitorBarcodeScanner.startScan({
-                    targetedFormats: [
-                        'QR_CODE',
-                        'DATA_MATRIX',
-                        'UPC_E',
-                        'UPC_A',
-                        'EAN_8',
-                        'EAN_13',
-                        'CODE_128',
-                        'CODE_39',
-                        'CODE_93',
-                        'CODABAR',
-                        'ITF'
-                    ]
+                const result = await BarcodeScanner.startScan({
+                    targetedFormats: ['QR_CODE']
                 });
 
-                console.log("Résultat du scan:", result);
-
                 if (result.hasContent) {
-                    console.log("QR Code détecté:", result.content);
-                    await this.stopScan();
-                    await this.closeModal();
+                    await BarcodeScanner.stopScan();
+                    await BarcodeScanner.showBackground();
+                    this.closeModal();
                     await this.sendPointage(result.content);
                 }
-
             } else if (status.denied) {
-                console.log("Permissions refusées définitivement");
-                flasher.error("L'accès à la caméra a été refusé définitivement. Veuillez l'activer dans les paramètres de l'application.");
-
-                // Optionnel : ouvrir les paramètres de l'application
-                if (CapacitorBarcodeScanner.openAppSettings) {
-                    await CapacitorBarcodeScanner.openAppSettings();
+                flasher.error("Accès à la caméra refusé. Activez-la dans les paramètres.");
+                if (BarcodeScanner.openAppSettings) {
+                    await BarcodeScanner.openAppSettings();
                 }
                 this.closeModal();
-
             } else {
-                console.log("Demande de permissions...");
-                const requestStatus = await CapacitorBarcodeScanner.requestPermission();
-                console.log("Résultat de la demande:", requestStatus);
-
+                const requestStatus = await BarcodeScanner.requestPermission();
                 if (requestStatus.granted) {
-                    console.log("Permissions accordées après demande");
-                    // Redémarrer le scan
-                    await this.startScan();
+                    await this.startNativeScan();
                 } else {
-                    console.log("Permissions refusées après demande");
-                    flasher.error("Permission de la caméra refusée. Impossible de scanner.");
+                    flasher.error("Permission refusée");
                     this.closeModal();
                 }
             }
+        } catch (error) {
+            console.error("Erreur scan natif:", error);
+
+            if (error.message && error.message.includes('user closed')) {
+                console.log("Utilisateur a annulé");
+            } else {
+                flasher.error("Erreur scan: " + error.message);
+            }
+            this.closeModal();
+        }
+    }
+
+    async startWebScan() {
+        try {
+            console.log("Démarrage du scan web...");
+
+            // Importer dynamiquement le scanner web
+            const { Html5QrcodeScanner } = await import('html5-qrcode');
+
+            // Configuration du scanner web
+            this.scanner = new Html5QrcodeScanner(
+                "qr-reader",
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    rememberLastUsedCamera: true,
+                    supportedScanTypes: [0, 1] // 0 = camera, 1 = fichier
+                },
+                false // verbose
+            );
+
+            // Démarrer le scan
+            this.scanner.render(
+                (decodedText) => {
+                    console.log("QR Code détecté:", decodedText);
+                    if (this.scanner) {
+                        this.scanner.clear();
+                    }
+                    this.closeModal();
+                    this.sendPointage(decodedText);
+                },
+                (error) => {
+                    // Ignorer les erreurs de scan (arrêt normal)
+                    console.log("Scan arrêté ou erreur:", error);
+                }
+            );
 
         } catch (error) {
-            console.error("Erreur détaillée lors du scan:", error);
+            console.error("Erreur scan web:", error);
+            flasher.error("Erreur scan web: " + error.message);
+            this.closeModal();
+        }
+    }
 
-            // Vérifier le type d'erreur
-            if (error.message && error.message.includes('user closed')) {
-                console.log("L'utilisateur a fermé le scanner");
-                this.closeModal();
-            } else if (error.message && error.message.includes('Permission denied')) {
-                flasher.error("Permission refusée. Veuillez autoriser l'accès à la caméra.");
-                this.closeModal();
-            } else if (error.message && error.message.includes('No camera')) {
-                flasher.error("Aucune caméra disponible sur cet appareil.");
-                this.closeModal();
-            } else {
-                flasher.error("Erreur lors de l'accès à la caméra: " + error.message);
-                this.closeModal();
+    stopScan() {
+        // Arrêter le scanner selon le type
+        if (this.isNative) {
+            // Pour Capacitor, on ne peut pas arrêter de l'extérieur
+            // C'est géré par le plugin lui-même
+        } else {
+            // Arrêter le scanner web
+            if (this.scanner) {
+                this.scanner.clear();
+                this.scanner = null;
             }
         }
     }
 
-    async stopScan() {
-        if (!this.isScanning) return;
-
-        console.log("Arrêt du scanner...");
-        try {
-            await CapacitorBarcodeScanner.stopScan();
-            await CapacitorBarcodeScanner.showBackground();
-            document.body.style.background = "";
-            this.isScanning = false;
-            console.log("Scanner arrêté");
-        } catch (error) {
-            console.error("Erreur lors de l'arrêt du scanner:", error);
-        }
-    }
-
-    async closeModal() {
-        console.log("Fermeture du modal");
-        await this.stopScan();
+    closeModal() {
+        this.stopScan();
 
         // Masquer la modale
         this.modalTarget.classList.add('d-none');
