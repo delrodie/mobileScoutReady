@@ -35,7 +35,6 @@
                         </figure>
                     </div>
 
-
                     <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
                          data-controller="scanner-activite"
                          data-scanner-activite-activite-id-value="{{ activite.id }}"
@@ -70,32 +69,38 @@
                                     </div>
 
                                     <div class="modal-body d-flex flex-column justify-content-center align-items-center pt-0">
-                                        <!-- Message selon l'environnement -->
-                                        <div id="scanner-web-container" class="d-none">
-                                            <div id="qr-reader" style="width: 300px; height: 300px;"></div>
-                                        </div>
-
-                                        <div id="scanner-native-message" class="text-center text-white d-none">
-                                            <div class="mb-3">
-                                                <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
-                                            </div>
-                                            <h5 class="mb-2">Scanner actif</h5>
-                                            <p class="text-light mb-3">Pointez la caméra vers le QR Code</p>
-                                            <div class="scanner-frame mb-4" style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
-                                                <div class="scanner-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
-                                            </div>
-                                            <p class="text-light small">Le scanner s'ouvre en plein écran</p>
-                                        </div>
-
-                                        <div id="scanner-loading" class="text-center text-white">
+                                        <!-- État de chargement -->
+                                        <div data-scanner-activite-target="loading" class="text-center text-white">
                                             <div class="mb-3">
                                                 <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
                                             </div>
-                                            <h5 class="mb-2">Initialisation...</h5>
-                                            <p class="text-light mb-3" id="status-message">Chargement du scanner</p>
+                                            <h5 class="mb-2">Initialisation du scanner...</h5>
+                                            <p class="text-light mb-3">Veuillez patienter</p>
                                             <div class="spinner-border text-light" role="status">
                                                 <span class="visually-hidden">Chargement...</span>
                                             </div>
+                                        </div>
+
+                                        <!-- Message pour le scanner natif -->
+                                        <div data-scanner-activite-target="nativeMessage"
+                                             class="text-center text-white d-none">
+                                            <div class="mb-3">
+                                                <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
+                                            </div>
+                                            <h5 class="mb-2">Scanner prêt</h5>
+                                            <p class="text-light mb-3">Le scanner s'ouvrira en plein écran</p>
+                                            <div class="scanner-frame mb-4"
+                                                 style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
+                                                <div class="scanner-line"
+                                                     style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
+                                            </div>
+                                            <p class="text-light small">Pointez vers le QR Code</p>
+                                        </div>
+
+                                        <!-- Container pour le scanner web -->
+                                        <div data-scanner-activite-target="webContainer"
+                                             class="d-none w-100 d-flex justify-content-center">
+                                            <div id="qr-reader" style="width: 100%; max-width: 500px;"></div>
                                         </div>
                                     </div>
 
@@ -110,7 +115,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
                             <h3 class="text-color-main fw-semibold"
@@ -240,48 +244,67 @@
     <style>
         /* Animation pour la ligne de scan */
         @keyframes scan {
-            0% { top: 0; }
-            50% { top: calc(100% - 2px); }
-            100% { top: 0; }
+            0% { top: 0; opacity: 1; }
+            50% { top: calc(100% - 2px); opacity: 0.8; }
+            100% { top: 0; opacity: 1; }
         }
 
-        /* Style pour le cadre du scanner */
         .scanner-frame {
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .scanner-line {
+            box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        }
+
+        /* Styles spécifiques pour le scanner web */
+        #qr-reader {
+            border: 2px solid #fff;
             border-radius: 10px;
             overflow: hidden;
         }
 
-        .scanner-line {
-            box-shadow: 0 0 10px #00ff00;
-        }
-        /* Style pour quand le scanner est actif */
-        .scanner-active {
-            background: transparent !important;
+        #qr-reader video {
+            border-radius: 8px;
         }
 
-        .scanner-active ion-content {
-            background: transparent !important;
+        /* Assurez-vous que le modal est au-dessus de tout */
+        .modal {
+            z-index: 99999 !important;
         }
     </style>
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    <!-- Dans votre base.html.twig ou à la fin de show.html.twig -->
     <script>
-        // Ajoutez cette logique pour mieux gérer l'affichage
-        document.addEventListener('scanner:environment-detected', (event) => {
-            const isNative = event.detail.isNative;
+        // Script de debug
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DEBUG SCANNER ===');
 
-            // Masquer le loader
-            document.getElementById('scanner-loading').classList.add('d-none');
-
-            if (isNative) {
-                // Afficher le message pour le scanner natif
-                document.getElementById('scanner-native-message').classList.remove('d-none');
+            // Vérifier Capacitor
+            if (typeof Capacitor === 'undefined') {
+                console.log('Capacitor: NON DISPONIBLE (mode web)');
             } else {
-                // Afficher le container pour le scanner web
-                document.getElementById('scanner-web-container').classList.remove('d-none');
+                console.log('Capacitor:', Capacitor);
+                console.log('isNative:', Capacitor.isNative);
+                console.log('Plugins:', Capacitor.Plugins ? Object.keys(Capacitor.Plugins) : 'none');
             }
+
+            // Vérifier les APIs caméra
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const cameras = devices.filter(d => d.kind === 'videoinput');
+                    console.log('Caméras disponibles:', cameras.length);
+                    cameras.forEach(cam => console.log(' -', cam.label || 'Caméra sans nom'));
+                })
+                .catch(err => console.log('Erreur détection caméras:', err));
+        });
+
+        // Loguer les changements de visibilité
+        document.addEventListener('visibilitychange', function() {
+            console.log('Visibilité page:', document.visibilityState);
         });
     </script>
 {% endblock %}
