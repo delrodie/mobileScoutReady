@@ -16,6 +16,8 @@ export default class extends Controller {
         // Détecter l'environnement
         this.isNative = this.isCapacitorNative();
         console.log("Environnement:", this.isNative ? "Natif" : "Web");
+
+        this.setupTurboEvents();
     }
 
     disconnect() {
@@ -282,6 +284,7 @@ export default class extends Controller {
         }
 
         try {
+            console.log("Envoi de la requête au serveur...");
             const response = await fetch(url, {
                 method: 'POST',
                 body: new URLSearchParams({
@@ -290,31 +293,222 @@ export default class extends Controller {
                     pointeur: profil[0].code,
                 }),
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
             });
 
             console.log("Réponse reçue:", response.status);
 
-            if (!response.ok) {
-                throw new Error(`Erreur HTTP: ${response.status}`)
+            // Essayer de parser la réponse en JSON
+            let data;
+            try {
+                data = await response.json();
+                console.log("Données reçues:", data);
+            } catch (e) {
+                // Si la réponse n'est pas du JSON, on lance une erreur avec le texte de la réponse
+                const text = await response.text();
+                throw new Error(text || `Erreur HTTP: ${response.status}`);
             }
 
-            const data = await response.json();
-            console.log("Données reçues:", data);
+            // Si le statut HTTP n'est pas OK, mais qu'on a du JSON, on le traite quand même
+            if (!response.ok && data.message) {
+                // On traite l'erreur comme une réponse normale avec message
+                this.handlePointageResponse(data, response.status);
+                return;
+            }
 
+            if (!response.ok) {
+                throw new Error(data.message || `Erreur HTTP: ${response.status}`);
+            }
+
+            // Si tout est OK, traiter la réponse
+            this.handlePointageResponse(data, response.status);
+
+        } catch (error) {
+            console.error("Erreur lors de l'envoi du pointage:", error);
+            this.handlePointageError(error);
+        }
+    }
+
+    handlePointageResponse(data, statusCode) {
+        console.log("Traitement de la réponse:", data, "Status:", statusCode);
+
+        // Fermer le modal d'abord
+        this.closeModal();
+
+        // Utiliser un timeout pour s'assurer que le modal est fermé
+        setTimeout(() => {
+            if (data.status === 'success') {
+                // Afficher le message de succès
+                flasher.success(data.message || 'Opération réussie');
+
+                // Attendre un peu avant la redirection pour que le message soit visible
+                setTimeout(() => {
+                    const targetUrl = `/activites/${this.activiteIdValue}`;
+                    Turbo.visit(targetUrl, { action: 'replace', method: 'get' });
+                }, 1500);
+
+            } else if (data.status === 'warning') {
+                flasher.warning(data.message || 'Attention');
+            } else if (data.status === 'error') {
+                flasher.error(data.message || 'Erreur');
+            } else {
+                // Si le statut n'est pas défini, vérifier le code HTTP
+                if (statusCode >= 400 && statusCode < 500) {
+                    flasher.warning(data.message || `Erreur client: ${statusCode}`);
+                } else if (statusCode >= 500) {
+                    flasher.error(data.message || `Erreur serveur: ${statusCode}`);
+                } else {
+                    flasher.info(data.message || 'Réponse inattendue');
+                }
+            }
+        }, 300);
+    }
+
+    handlePointageError(error) {
+        console.error("Erreur détaillée:", error);
+
+        // Fermer le modal d'abord
+        this.closeModal();
+
+        // Utiliser un timeout pour s'assurer que le modal est fermé
+        setTimeout(() => {
+            let message = error.message || 'Erreur lors de l\'envoi du pointage';
+
+            // Extraire le message du JSON si l'erreur en contient
+            try {
+                if (error.message && error.message.includes('{')) {
+                    const jsonMatch = error.message.match(/\{.*\}/);
+                    if (jsonMatch) {
+                        const errorData = JSON.parse(jsonMatch[0]);
+                        message = errorData.message || message;
+                    }
+                }
+            } catch (e) {
+                // Ignorer si ce n'est pas du JSON valide
+            }
+
+            flasher.error(message);
+        }, 300);
+    }
+
+    handlePointageResponse(data) {
+        // Fermer le modal d'abord
+        this.closeModal();
+
+        // Utiliser un timeout pour s'assurer que le modal est fermé
+        setTimeout(() => {
             if (data.status === 'success') {
                 const targetUrl = `/activites/${this.activiteIdValue}`;
                 Turbo.visit(targetUrl, { action: 'replace', method: 'get' });
-                return;
             } else if (data.status === 'warning') {
-                flasher.warning(data.message);
+                this.showFlashMessage(data.message, 'warning');
             } else {
-                flasher.error(data.message);
+                this.showFlashMessage(data.message || 'Erreur inconnue', 'error');
             }
-        } catch (error) {
-            console.error("Erreur lors de l'envoi du pointage:", error);
-            flasher.error("Erreur lors de l'envoi du pointage: " + error.message);
+        }, 300);
+    }
+
+    handlePointageError(error) {
+        // Fermer le modal d'abord
+        this.closeModal();
+
+        // Utiliser un timeout pour s'assurer que le modal est fermé
+        setTimeout(() => {
+            this.showFlashMessage(error.message || 'Erreur lors de l\'envoi du pointage', 'error');
+        }, 300);
+    }
+
+    showFlashMessage(message, type = 'info') {
+        // Utiliser flasher selon le type
+        switch(type) {
+            case 'warning':
+                flasher.warning(message);
+                break;
+            case 'error':
+                flasher.error(message);
+                break;
+            case 'success':
+                flasher.success(message);
+                break;
+            default:
+                flasher.info(message);
         }
+
+        // Alternative : créer une notification personnalisée
+        this.createCustomNotification(message, type);
+    }
+
+// Méthode alternative pour les notifications
+    createCustomNotification(message, type = 'info') {
+        // Créer un élément de notification
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+
+        // Ajouter au DOM
+        const container = document.getElementById('flash-container') || this.createFlashContainer();
+        container.appendChild(notification);
+
+        // Auto-supprimer après 5 secondes
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    createFlashContainer() {
+        // Créer un container pour les flashs s'il n'existe pas
+        let container = document.getElementById('flash-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'flash-container';
+            container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999999;
+            width: 350px;
+        `;
+            document.body.appendChild(container);
+        }
+        return container;
+    }
+
+
+    setupTurboEvents() {
+        // Intercepter les réponses AJAX de Turbo
+        document.addEventListener('turbo:before-fetch-response', (event) => {
+            const response = event.detail.fetchResponse;
+            const contentType = response.contentType;
+
+            if (contentType && contentType.includes('application/json')) {
+                response.json().then(data => {
+                    if (data.message) {
+                        // Fermer le modal s'il est ouvert
+                        this.closeModal();
+
+                        // Afficher le message selon le statut
+                        setTimeout(() => {
+                            if (data.status === 'success') {
+                                flasher.success(data.message);
+                            } else if (data.status === 'warning') {
+                                flasher.warning(data.message);
+                            } else if (data.status === 'error') {
+                                flasher.error(data.message);
+                            }
+                        }, 300);
+                    }
+                });
+            }
+        });
     }
 }

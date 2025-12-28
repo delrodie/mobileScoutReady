@@ -37,13 +37,19 @@ class PointageController extends AbstractController
         $pointeur = $this->scoutRepository->findOneBy(['code' => $pointeurCode]); //dump($pointeur);
         if (!$pointeur) {
             notyf()->error("Votre profil est introuvable. Veuillez vous déconnecter puis reconnecter si l'erreur persiste.");
-            return $this->json(['status' => 'error', 'message' => 'Profil introuvable'], Response::HTTP_NOT_FOUND);
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Votre profil est introuvable. Veuillez vous déconnecter puis reconnecter si l\'erreur persiste.'
+            ], Response::HTTP_NOT_FOUND);
         }
 
         $activite = $this->activiteRepository->findOneBy(['id' => (int) $activiteId]);
         if(!$activite) {
             notyf()->error("L'activité concernée n'a pas été trouvée!");
-            return $this->json(['status' => 'error', 'message' => 'Activité introuvable'], Response::HTTP_NOT_FOUND);
+            return $this->json([
+                'status' => 'error',
+                'message' => "L'activité concernée n'a pas été trouvée!"
+            ], Response::HTTP_NOT_FOUND);
         }
 
         $scout = $this->scoutRepository->findOneBy(['qrCodeToken' => $code]);
@@ -60,7 +66,9 @@ class PointageController extends AbstractController
 
         if (!$verificationAutorisation){
             notyf()->error("Echèc! Vous n'êtes pas autorisé(e) à pointer à cette activité. ");
-            return $this->json(['error' => "Non autorisé"], Response::HTTP_BAD_REQUEST);
+            return $this->json([
+                'error' => "Echèc! Vous n'êtes pas autorisé(e) à pointer à cette activité. "
+            ], Response::HTTP_BAD_REQUEST);
         }
         /// si oui faire la mise a jour de la table
 
@@ -72,10 +80,18 @@ class PointageController extends AbstractController
         ]);
 
         if ($dejaPointe){
+
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'status' => 'warning',
+                    'message' => 'Attention, ce participant a déjà été scanné'
+                ], Response::HTTP_CONFLICT);
+            }
+
             notyf()->warning("Attention, ce participant a déjà été scanné");
             return $this->json([
                 'status' => 'warning',
-                'message' => 'Déjà pointé'
+                'message' => "Attention, ce participant a déjà été scanné"
             ], Response::HTTP_CONFLICT);
         }
 
@@ -89,7 +105,10 @@ class PointageController extends AbstractController
         $this->entityManager->flush();
 
         notyf()->success("Scout pointé avec succès!");
-        return $this->json(['status' => 'success'], Response::HTTP_OK);
+        return $this->json([
+            'status' => 'success',
+            'message' => "Scout pointé avec succès!"
+        ], Response::HTTP_OK);
 
     }
 }

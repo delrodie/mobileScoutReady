@@ -291,12 +291,82 @@
             display: none; /* Cache le dashboard avec les boutons de sélection de caméra, etc. */
         }
 
-        /* Ou pour garder seulement certains éléments */
-        /*
-        #qr-reader__dashboard_section_swaplink {
-            display: none;
+        /* Personnalisation du viseur de scan */
+        #qr-reader__scan_region {
+            position: relative;
         }
-        */
+
+        #qr-reader__scan_region video {
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+        }
+
+        /* Ajouter un cadre visuel */
+        #qr-reader__scan_region::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border: 2px dashed #00ff00;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Animation du viseur */
+        @keyframes scanning {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        #qr-reader__scan_region::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scanning 2s ease-in-out infinite;
+            border-radius: 2px;
+            z-index: 11;
+        }
+
+        /* Styles pour les notifications personnalisées */
+        .notification {
+            margin-bottom: 10px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* S'assurer que les alertes Bootstrap sont au-dessus du modal */
+        .alert {
+            z-index: 999999 !important;
+            position: relative;
+        }
+
+        /* Si vous utilisez flasher, assurez-vous qu'il est visible */
+        .flasher-container {
+            z-index: 999999 !important;
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+        }
     </style>
 {% endblock %}
 {% block javascripts %}
@@ -329,5 +399,43 @@
         document.addEventListener('visibilitychange', function() {
             console.log('Visibilité page:', document.visibilityState);
         });
+
+        // Dans votre contrôleur ou dans un fichier séparé
+        document.addEventListener('turbo:before-fetch-response', (event) => {
+            // Intercepter les réponses AJAX
+            const response = event.detail.fetchResponse;
+
+            // Vérifier si c'est une réponse de pointage
+            if (response.url.includes('/pointage/')) {
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    response.json().then(data => {
+                        if (data.flash) {
+                            // Afficher les flashs depuis la réponse
+                            this.displayFlashFromResponse(data.flash);
+                        }
+                    });
+                }
+            }
+        });
+
+        displayFlashFromResponse(flashData) {
+            // Fermer le modal si ouvert
+            this.closeModal();
+
+            // Afficher les messages flash
+            setTimeout(() => {
+                if (flashData.error) {
+                    flasher.error(flashData.error);
+                }
+                if (flashData.warning) {
+                    flasher.warning(flashData.warning);
+                }
+                if (flashData.success) {
+                    flasher.success(flashData.success);
+                }
+            }, 300);
+        }
     </script>
 {% endblock %}
