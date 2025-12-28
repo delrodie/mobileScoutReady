@@ -68,37 +68,43 @@
                                         ></button>
                                     </div>
 
+                                    <!-- Dans votre modal, remplacez la section modal-body par : -->
                                     <div class="modal-body d-flex flex-column justify-content-center align-items-center pt-0">
-                                        {# Message d'instruction pour le scanner #}
-                                        <div class="scanner-placeholder text-center text-white mb-4">
+                                        <!-- État initial -->
+                                        <div id="scanner-initial" class="text-center text-white">
                                             <div class="mb-3">
                                                 <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
                                             </div>
-                                            <h5 class="mb-2">Prêt à scanner</h5>
-                                            <p class="text-light mb-3">Pointez la caméra vers le QR Code</p>
-                                            <div class="scanner-frame mb-4" style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
-                                                <div class="scanner-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
-                                            </div>
-                                            <p class="text-light small">Le scanner s'ouvrira en plein écran</p>
-                                        </div>
-
-                                        {# Indicateur de chargement (optionnel) #}
-                                        <div id="scanner-loading" class="d-none text-center text-white">
-                                            <div class="spinner-border text-light mb-3" role="status">
+                                            <h5 class="mb-2">Initialisation du scanner...</h5>
+                                            <p class="text-light mb-3" id="status-message">Vérification des permissions</p>
+                                            <div class="spinner-border text-light" role="status">
                                                 <span class="visually-hidden">Chargement...</span>
                                             </div>
-                                            <p>Initialisation du scanner...</p>
                                         </div>
 
-                                        {# Message d'erreur (optionnel) #}
+                                        <!-- Message d'erreur -->
                                         <div id="scanner-error" class="d-none text-center text-white">
                                             <div class="mb-3">
                                                 <i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i>
                                             </div>
-                                            <p id="error-message"></p>
+                                            <h5 class="mb-2">Erreur</h5>
+                                            <p id="error-message" class="mb-3"></p>
                                             <button class="btn btn-light mt-2" data-action="click->scanner-activite#closeModal">
                                                 Fermer
                                             </button>
+                                        </div>
+
+                                        <!-- Scanner actif -->
+                                        <div id="scanner-active" class="d-none text-center text-white">
+                                            <div class="mb-3">
+                                                <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
+                                            </div>
+                                            <h5 class="mb-2">Scanner actif</h5>
+                                            <p class="text-light mb-3">Pointez la caméra vers le QR Code</p>
+                                            <div class="scanner-frame mb-4" style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
+                                                <div class="scanner-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
+                                            </div>
+                                            <p class="text-light small">Scanner en cours...</p>
                                         </div>
                                     </div>
 
@@ -267,4 +273,28 @@
             background: transparent !important;
         }
     </style>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <!-- Dans votre base.html.twig ou à la fin de show.html.twig -->
+    <script>
+        // Fonction de debug pour vérifier l'environnement
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page chargée, vérification de Capacitor...');
+
+            // Vérifier si Capacitor est disponible
+            if (typeof Capacitor === 'undefined') {
+                console.error('Capacitor non chargé!');
+            } else {
+                console.log('Capacitor disponible:', Capacitor);
+            }
+
+            // Vérifier si BarcodeScanner est disponible
+            if (typeof BarcodeScanner === 'undefined') {
+                console.error('BarcodeScanner non disponible!');
+            } else {
+                console.log('BarcodeScanner disponible');
+            }
+        });
+    </script>
 {% endblock %}
