@@ -38,11 +38,10 @@
                     <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
                          data-controller="scanner-activite"
                          data-scanner-activite-activite-id-value="{{ activite.id }}"
-
                     >
                         <div data-autorisation-target="scan">
-                            <button  class="btn btn-light"
-                                     data-action="scanner-activite#openModal"
+                            <button class="btn btn-light"
+                                    data-action="click->scanner-activite#openModal"
                             >
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body d-flex flex-column text-center px-5 py-2">
@@ -53,10 +52,7 @@
                             </button>
                         </div>
 
-                    <!-- Zone pour le scan web -->
-{#                        <div id="qr-reader" class="mt-3" style="width: 200px;"></div>#}
-
-                        {# Modal de scanne #}
+                        {# Modal pour le scanner #}
                         <div data-scanner-activite-target="modal"
                              class="modal position-fixed top-0 start-0 w-100 h-100 d-none d-flex"
                              style="background-color: rgba(0, 0, 0, 0.8); z-index: 99999;">
@@ -68,23 +64,56 @@
                                         <button type="button"
                                                 class="btn-close btn-close-white"
                                                 aria-label="Close"
-                                                data-action="scanner-activite#closeModal"
+                                                data-action="click->scanner-activite#closeModal"
                                         ></button>
                                     </div>
 
-                                    <div class="modal-body d-flex justify-content-center align-items-center pt-0">
-                                        <div id="qr-reader" style="width: 300px; height: 300px; border: 2px solid white;">
-                                            {# La zone du scanner de ScannerController s'affichera ici #}
+                                    <div class="modal-body d-flex flex-column justify-content-center align-items-center pt-0">
+                                        {# Message d'instruction pour le scanner #}
+                                        <div class="scanner-placeholder text-center text-white mb-4">
+                                            <div class="mb-3">
+                                                <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
+                                            </div>
+                                            <h5 class="mb-2">Prêt à scanner</h5>
+                                            <p class="text-light mb-3">Pointez la caméra vers le QR Code</p>
+                                            <div class="scanner-frame mb-4" style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
+                                                <div class="scanner-line" style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
+                                            </div>
+                                            <p class="text-light small">Le scanner s'ouvrira en plein écran</p>
                                         </div>
+
+                                        {# Indicateur de chargement (optionnel) #}
+                                        <div id="scanner-loading" class="d-none text-center text-white">
+                                            <div class="spinner-border text-light mb-3" role="status">
+                                                <span class="visually-hidden">Chargement...</span>
+                                            </div>
+                                            <p>Initialisation du scanner...</p>
+                                        </div>
+
+                                        {# Message d'erreur (optionnel) #}
+                                        <div id="scanner-error" class="d-none text-center text-white">
+                                            <div class="mb-3">
+                                                <i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i>
+                                            </div>
+                                            <p id="error-message"></p>
+                                            <button class="btn btn-light mt-2" data-action="click->scanner-activite#closeModal">
+                                                Fermer
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer border-0 pt-0">
+                                        <button type="button"
+                                                class="btn btn-outline-light"
+                                                data-action="click->scanner-activite#closeModal">
+                                            Annuler le scan
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-
                     </div>
-
-
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
@@ -102,7 +131,6 @@
                     </div>
 
                     <div class="d-flex justify-content-center align-content-center align-items-center my-5"
-{#                         data-controller="autorisation"#}
                          data-autorisation-target="btnAction"
                     >
                         <a href="{{ path('app_reunion_edit', {'id': activite.id}) }}" class="h4 mx-2 text-decoration-none" title="Modifier" data-turbo="false">
@@ -159,7 +187,7 @@
                             <div class="col d-flex justify-content-between border-bottom mt-3 pb-1">
                                 <small class="text-muted fsize-13 me-1">Cibles: </small>
                                 <div class="fsize-15 text-end">{% for cible in activite.cible %}
-                                    {{ cible }} -
+                                        {{ cible }} -
                                     {% endfor %}</div>
                             </div>
 
@@ -178,7 +206,6 @@
                                                     <div
                                                         data-controller="image-loader"
                                                         data-image-loader-src-value="{{ pointeur.scout.slug|avatar }}"
-                                                        {#                                                    data-image-loader-src-value="{{ scout.sexe == 'HOMME' ? asset('img/avatar/avatar_homme.png') : asset('img/avatar/avatar_femme.png') }}"#}
                                                         data-image-loader-native-src-value="asset://{{ asset('img/avatar/avatar_femme.png') }}"
                                                         data-image-loader-preload-value="true"
                                                         data-communaute-target="avatarLoader"
@@ -202,16 +229,42 @@
                         </div>
                     {% endif %}
 
-
-
                 </section>
 
             </main>
             <div class="" style="margin-top: 50px;">.</div>
 
-
-
         {% endblock %}
 
     </turbo-frame>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Animation pour la ligne de scan */
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: calc(100% - 2px); }
+            100% { top: 0; }
+        }
+
+        /* Style pour le cadre du scanner */
+        .scanner-frame {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .scanner-line {
+            box-shadow: 0 0 10px #00ff00;
+        }
+        /* Style pour quand le scanner est actif */
+        .scanner-active {
+            background: transparent !important;
+        }
+
+        .scanner-active ion-content {
+            background: transparent !important;
+        }
+    </style>
 {% endblock %}

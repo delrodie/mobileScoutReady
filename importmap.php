@@ -51,7 +51,7 @@ return [
         'type' => 'css',
     ],
     '@capacitor/core' => [
-        'version' => '7.4.2',
+        'version' => '8.0.0',
     ],
     '@capacitor-community/barcode-scanner' => [
         'version' => '4.0.1',
@@ -64,5 +64,11 @@ return [
     ],
     '@capacitor/camera' => [
         'version' => '7.0.2',
+    ],
+    '@capacitor-mlkit/barcode-scanning' => [
+        'version' => '7.5.0',
+    ],
+    '@capacitor/barcode-scanner' => [
+        'version' => '3.0.0',
     ],
 ];
