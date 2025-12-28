@@ -12,6 +12,7 @@ use App\Form\ActiviteType;
 use App\Repository\ActiviteRepository;
 use App\Repository\AutorisationPointageActiviteRepository;
 use App\Repository\InstanceRepository;
+use App\Repository\ParticiperRepository;
 use App\Repository\ScoutRepository;
 use App\Services\GestionAffiche;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +29,7 @@ class ActiviteController extends AbstractController
         private readonly InstanceRepository     $instanceRepository,
         private readonly ActiviteRepository     $activiteRepository,
         private readonly GestionAffiche         $gestionAffiche,
-        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository
+        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly ParticiperRepository $participerRepository
     )
     {
     }
@@ -92,7 +93,8 @@ class ActiviteController extends AbstractController
     {
         return $this->render('activite/show.html.twig', [
             'activite' => $activite,
-            'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId())
+            'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId()),
+            'participants' =>$this->participerRepository->findOneBy(['activite' => $activite])
         ]);
     }
 
