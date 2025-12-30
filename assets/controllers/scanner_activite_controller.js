@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import LocalDbController from "./local_db_controller.js";
 import flasher from "@flasher/flasher";
+import { Toast } from "@capacitor/toast";
 
 export default class extends Controller {
     static values = {activiteId: String};
@@ -306,6 +307,9 @@ export default class extends Controller {
             try {
                 data = await response.json();
                 console.log("Données reçues:", data);
+                if (data.message){
+                    Toast.show({text: data.message, duration: 'short', position: 'bottom'});
+                }
             } catch (e) {
                 // Si la réponse n'est pas du JSON, on lance une erreur avec le texte de la réponse
                 const text = await response.text();

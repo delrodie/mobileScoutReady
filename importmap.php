@@ -65,4 +65,7 @@ return [
     '@capacitor/barcode-scanner' => [
         'version' => '3.0.0',
     ],
+    '@capacitor/toast' => [
+        'version' => '8.0.0',
+    ],
 ];
