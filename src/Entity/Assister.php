@@ -26,6 +26,9 @@ class Assister
     #[ORM\ManyToOne]
     private ?Scout $scout = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pointageAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Assister
     public function setScout(?Scout $scout): static
     {
         $this->scout = $scout;
+
+        return $this;
+    }
+
+    public function getPointageAt(): ?\DateTimeImmutable
+    {
+        return $this->pointageAt;
+    }
+
+    public function setPointageAt(?\DateTimeImmutable $pointageAt): static
+    {
+        $this->pointageAt = $pointageAt;
 
         return $this;
     }
