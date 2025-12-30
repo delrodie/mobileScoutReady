@@ -400,42 +400,5 @@
             console.log('Visibilité page:', document.visibilityState);
         });
 
-        // Dans votre contrôleur ou dans un fichier séparé
-        document.addEventListener('turbo:before-fetch-response', (event) => {
-            // Intercepter les réponses AJAX
-            const response = event.detail.fetchResponse;
-
-            // Vérifier si c'est une réponse de pointage
-            if (response.url.includes('/pointage/')) {
-                const contentType = response.headers.get('content-type');
-
-                if (contentType && contentType.includes('application/json')) {
-                    response.json().then(data => {
-                        if (data.flash) {
-                            // Afficher les flashs depuis la réponse
-                            this.displayFlashFromResponse(data.flash);
-                        }
-                    });
-                }
-            }
-        });
-
-        displayFlashFromResponse(flashData) {
-            // Fermer le modal si ouvert
-            this.closeModal();
-
-            // Afficher les messages flash
-            setTimeout(() => {
-                if (flashData.error) {
-                    flasher.error(flashData.error);
-                }
-                if (flashData.warning) {
-                    flasher.warning(flashData.warning);
-                }
-                if (flashData.success) {
-                    flasher.success(flashData.success);
-                }
-            }, 300);
-        }
     </script>
 {% endblock %}
