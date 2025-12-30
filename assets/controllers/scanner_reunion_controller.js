@@ -4,7 +4,7 @@ import flasher from "@flasher/flasher";
 import { Toast } from "@capacitor/toast";
 
 export default class extends Controller {
-    static values = {activiteId: String};
+    static values = {reunionId: String};
     static targets = ["modal", "scannerContainer", "nativeMessage", "webContainer", "loading"];
 
     scanner = null;
@@ -117,6 +117,7 @@ export default class extends Controller {
                     await this.startNativeScan();
                 } else {
                     flasher.error("Permission refusée");
+                    Toast.show({text: "Permission réfusée", duration: 'long', position: 'bottom'})
                     this.closeModal();
                 }
             }
@@ -128,10 +129,13 @@ export default class extends Controller {
                 console.log("Utilisateur a annulé");
             } else if (error.message && error.message.includes('No camera')) {
                 flasher.error("Aucune caméra disponible");
+                Toast.show({text: "Aucune caméra", duration: 'long', position: 'bottom'})
             } else if (error.message && error.message.includes('Permission')) {
                 flasher.error("Permission caméra requise");
+                Toast.show({text: "Permission caméra requise", duration: 'long', position: 'bottom'});
             } else {
                 flasher.error("Erreur scanner: " + error.message);
+                Toast.show({text: "Erreur scanner : "+ error.message, duration: 'long', position: 'bottom'});
             }
 
             // Essayez de restaurer l'interface
@@ -204,6 +208,7 @@ export default class extends Controller {
 
             if (error.message && error.message.includes('NotAllowedError')) {
                 flasher.error("Permission caméra refusée dans le navigateur");
+
             } else if (error.message && error.message.includes('NotFoundError')) {
                 flasher.error("Aucune caméra disponible");
             } else {
@@ -274,9 +279,9 @@ export default class extends Controller {
 
     async sendPointage(code) {
         console.log("Envoi du pointage avec code:", code);
-        const activiteId = this.activiteIdValue;
+        const reunionId = this.reunionIdValue;
         const profil = await LocalDbController.getAllFromStore('profil');
-        const url = `/pointage/`;
+        const url = `/pointage/reunion`;
 
         if (!profil || profil.length === 0) {
             console.warn("Aucun profil trouvé en local");
@@ -289,7 +294,7 @@ export default class extends Controller {
             const response = await fetch(url, {
                 method: 'POST',
                 body: new URLSearchParams({
-                    activite: activiteId,
+                    reunion: reunionId,
                     code: code,
                     pointeur: profil[0].code,
                 }),
@@ -347,25 +352,31 @@ export default class extends Controller {
             if (data.status === 'success') {
                 // Afficher le message de succès
                 flasher.success(data.message || 'Opération réussie');
+                Toast.show({text: data.message || 'Opération réussie', duration: 'long', position: 'bottom'});
 
                 // Attendre un peu avant la redirection pour que le message soit visible
                 setTimeout(() => {
-                    const targetUrl = `/activites/${this.activiteIdValue}`;
+                    const targetUrl = `/reunion/${this.reunionIdValue}`;
                     Turbo.visit(targetUrl, { action: 'replace', method: 'get' });
                 }, 1500);
 
             } else if (data.status === 'warning') {
                 flasher.warning(data.message || 'Attention');
+                Toast.show({text: data.message || 'Attention', duration: 'long', position: 'bottom'});
             } else if (data.status === 'error') {
                 flasher.error(data.message || 'Erreur');
+                Toast.show({text: data.message || 'Erreur', duration: 'long', position: 'bottom'});
             } else {
                 // Si le statut n'est pas défini, vérifier le code HTTP
                 if (statusCode >= 400 && statusCode < 500) {
                     flasher.warning(data.message || `Erreur client: ${statusCode}`);
+                    Toast.show({text: data.message || `Erreur client: ${statusCode}`, duration: 'long', position: 'bottom'});
                 } else if (statusCode >= 500) {
                     flasher.error(data.message || `Erreur serveur: ${statusCode}`);
+                    Toast.show({text: data.message || `Erreur serveur: ${statusCode}`, duration: 'long', position: 'bottom'});
                 } else {
                     flasher.info(data.message || 'Réponse inattendue');
+                    Toast.show({text: data.message || 'Réponse inattendue', duration: 'long', position: 'bottom'});
                 }
             }
         }, 300);
@@ -405,7 +416,7 @@ export default class extends Controller {
         // Utiliser un timeout pour s'assurer que le modal est fermé
         setTimeout(() => {
             if (data.status === 'success') {
-                const targetUrl = `/activites/${this.activiteIdValue}`;
+                const targetUrl = `/reunion/${this.reunionIdValue}`;
                 Turbo.visit(targetUrl, { action: 'replace', method: 'get' });
             } else if (data.status === 'warning') {
                 this.showFlashMessage(data.message, 'warning');

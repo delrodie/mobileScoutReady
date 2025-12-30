@@ -16,6 +16,39 @@ class AutorisationPointageReunionRepository extends ServiceEntityRepository
         parent::__construct($registry, AutorisationPointageReunion::class);
     }
 
+    public function findPointeurs($reunion)
+    {
+        return $this->query()
+            ->where('r.id = :id')
+            ->orderBy('u.role', 'ASC')
+            ->addOrderBy('s.nom', 'ASC')
+            ->addOrderBy('s.prenom', 'ASC')
+            ->setParameter('id', $reunion)
+            ->getQuery()->getResult()
+            ;
+    }
+
+    public function findAutorisation($scout, $reunion)
+    {
+        return $this->query()
+            ->where('s.id = :scout')
+            ->andWhere('r.id = :reunion')
+            ->setParameter('scout', $scout)
+            ->setParameter('reunion', $reunion)
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult()
+            ;
+    }
+
+    public function query()
+    {
+        return $this->createQueryBuilder('u')
+            ->addSelect('r', 's')
+            ->leftJoin('u.reunion', 'r')
+            ->leftJoin('u.scout', 's')
+            ;
+    }
+
     //    /**
     //     * @return AutorisationPointageReunion[] Returns an array of AutorisationPointageReunion objects
     //     */

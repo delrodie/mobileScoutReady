@@ -26,13 +26,13 @@ use Symfony\Component\Routing\Attribute\Route;
 class ReunionController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly ReunionRepository      $reunionRepository,
-        private readonly ScoutRepository        $scoutRepository,
-        private readonly InstanceRepository     $instanceRepository,
-        private readonly UtilityService         $utilityService,
-        private readonly FonctionRepository $fonctionRepository,
-        private readonly AutorisationPointageReunionRepository $pointageReunionRepository
+        private readonly EntityManagerInterface                $entityManager,
+        private readonly ReunionRepository                     $reunionRepository,
+        private readonly ScoutRepository                       $scoutRepository,
+        private readonly InstanceRepository                    $instanceRepository,
+        private readonly UtilityService                        $utilityService,
+        private readonly FonctionRepository                    $fonctionRepository,
+        private readonly AutorisationPointageReunionRepository $pointageReunionRepository, private readonly AutorisationPointageReunionRepository $autorisationPointageReunionRepository
     )
     {
     }
@@ -43,7 +43,7 @@ class ReunionController extends AbstractController
         return $this->render('reunion/index.html.twig');
     }
 
-    #[Route('/new', name: 'app_reunion_new', methods: ['GET','POST'])]
+    #[Route('/new/nouveau', name: 'app_reunion_new', methods: ['GET','POST'])]
     public function new(Request $request)
     {
         $reunion = new Reunion();
@@ -88,7 +88,7 @@ class ReunionController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_reunion_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_reunion_show', methods: ['GET','POST'])]
     public function show(Reunion $reunion): Response
     {
         $fonction = $this->fonctionRepository->findOneByScoutCode($reunion?->getCreatedBy());
@@ -101,14 +101,14 @@ class ReunionController extends AbstractController
         $pointage = $this->pointageReunionRepository->findOneBy([
             'scout' => $fonction?->getScout(),
             'reunion' => $reunion
-        ]);
+        ]); //dd($auteur);
 
         return $this->render('reunion/show.html.twig', [
             'reunion' => $reunion,
             'auteur_nom' => $auteur['nom'],
             'auteur_poste' => $auteur['poste'],
             'autorisation' => $pointage,
-            'pointeurs' => $this->pointageReunionRepository->findBy(['reunion' => $reunion]),
+            'pointeurs' => $this->autorisationPointageReunionRepository->findPointeurs($reunion->getId()),
         ]);
     }
 

@@ -158,7 +158,10 @@ class PointageController extends AbstractController
         $scout = $this->scoutRepository->findOneBy(['qrCodeToken' => $code]);
         if(!$scout){
             notyf()->error(self::SCOUT_INTROUVABLE);
-            return $this->json(['error' => self::SCOUT_INTROUVABLE], Response::HTTP_NOT_FOUND);
+            return $this->json([
+                'status' => 'error',
+                'message' => self::SCOUT_INTROUVABLE
+            ], Response::HTTP_NOT_FOUND);
         }
 
         // Verifier si le pointeur a l'autorisation de scanner
@@ -170,7 +173,8 @@ class PointageController extends AbstractController
         if(!$verificationAutorisation){
             notyf()->error(self::NON_AUTORISE);
             return $this->json([
-                'error' => self::NON_AUTORISE
+                'status' => 'error',
+                'message' => self::NON_AUTORISE,
             ], Response::HTTP_BAD_REQUEST);
         }
 

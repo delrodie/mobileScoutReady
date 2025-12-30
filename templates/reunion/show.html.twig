@@ -22,7 +22,8 @@
 
             <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
                 <section class="form mt-1 px-4"
-                         data-controller="reunion"
+                         data-controller="reunion autorisation-reunion"
+                         data-autorisation-reunion-reunion-id-value="{{ reunion.id }}"
                 >
                     <div class="p-0 m-0 rounded-2">
                         <figure class="overflow-hidden position-relative rounded-2">
@@ -30,39 +31,106 @@
 
                         </figure>
                     </div>
-                    {% if autorisation %}
+
                         <div class="d-flex flex-column justify-content-center align-content-center align-items-center mt-3"
                              data-controller="scanner-reunion"
-                             data-scanner-reunion-reunion-id-value="{{ reunion.code }}"
+                             data-scanner-reunion-reunion-id-value="{{ reunion.id }}"
                         >
-                            <button  class="btn btn-light"
-                                     data-action="scanner-reunion#startScan"
-                            >
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-body d-flex flex-column text-center px-5 py-2">
-                                        <i class="bi bi-qr-code-scan text-color-main py-0 my-0" style="font-size: 3.5rem;"></i>
-                                        <h6 class="fw-medium py-0 my-0">Scannez</h6>
+                            <div data-autorisation-reunion-target="scan">
+                                <button  class="btn btn-light"
+                                         data-action="click->scanner-reunion#openModal"
+                                >
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body d-flex flex-column text-center px-5 py-2">
+                                            <i class="bi bi-qr-code-scan text-color-main py-0 my-0" style="font-size: 3.5rem;"></i>
+                                            <h6 class="fw-medium py-0 my-0">Scannez</h6>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Modal pour le scanner -->
+                            <div data-scanner-reunion-target="modal"
+                                 class="modal position-fixed top-0 start-0 w-100 h-100 d-none d-flex"
+                                 style="background-color: rgba(0, 0, 0, 0.8); z-index: 99999;">
+
+                                <div class="modal-dialog modal-dialog-centered" style="max-width: 90%; margin: auto;">
+                                    <div class="modal-content bg-transparent border-0 shadow-none">
+
+                                        <div class="modal-header border-0 pb-0">
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    aria-label="Close"
+                                                    data-action="click->scanner-reunion#closeModal"
+                                            ></button>
+                                        </div>
+
+                                        <div class="modal-body d-flex flex-column justify-content-center align-items-center pt-0">
+                                            <!-- État de chargement -->
+                                            <div data-scanner-reunion-target="loading" class="text-center text-white">
+                                                <div class="mb-3">
+                                                    <i class="bi bi-qr-code-scan" style="font-size: 4rem;"></i>
+                                                </div>
+                                                <h5 class="mb-2">Initialisation du scanner...</h5>
+                                                <p class="text-light mb-3">Veuillez patienter</p>
+                                                <div class="spinner-border text-light" role="status">
+                                                    <span class="visually-hidden">Chargement...</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Message pour le scanner natif -->
+                                            <div data-scanner-reunion-target="nativeMessage"
+                                                 class="text-center text-white d-none">
+                                                <div class="mb-3">
+                                                    <i class="bi bi-camera-video" style="font-size: 4rem;"></i>
+                                                </div>
+                                                <h5 class="mb-2">Scanner prêt</h5>
+                                                <p class="text-light mb-3">Le scanner s'ouvrira en plein écran</p>
+                                                <div class="scanner-frame mb-4"
+                                                     style="width: 250px; height: 250px; border: 2px dashed white; position: relative;">
+                                                    <div class="scanner-line"
+                                                         style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00ff00; animation: scan 2s linear infinite;"></div>
+                                                </div>
+                                                <p class="text-light small">Pointez vers le QR Code</p>
+                                            </div>
+
+                                            <!-- Container pour le scanner web -->
+                                            <div data-scanner-reunion-target="webContainer"
+                                                 class="d-none w-100 d-flex justify-content-center">
+                                                <div id="qr-reader" style="width: 100%; max-width: 500px;"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer border-0 pt-0">
+                                            <button type="button"
+                                                    class="btn btn-outline-light"
+                                                    data-action="click->scanner-reunion#closeModal">
+                                                Annuler le scan
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </button>
-
-                            <!-- Zone pour le scan web -->
-                            <div id="qr-reader" class="mt-3" style="width: 200px;"></div>
+                            </div>
                         </div>
-                    {% endif %}
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <h3 class="text-color-main fw-semibold">25</h3>
+                            <h3 class="text-color-main fw-semibold"
+                                data-autorisation-reunion-target="participantCount"
+                            >ND</h3>
                             <span class="text-muted">Participants</span>
                         </div>
                         <div class="d-flex flex-column text-center ps-1">
-                            <h3 class="text-color-main fw-semibold">11/20</h3>
+                            <h3 class="text-color-main fw-semibold"
+                                data-autorisation-reunion-target="noteMoyen"
+                            >ND</h3>
                             <span class="text-muted">Notes</span>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-center align-content-center align-items-center my-5">
+                    <div class="d-flex justify-content-center align-content-center align-items-center my-5"
+                         data-autorisation-reunion-target="btnAction"
+                    >
                         <a href="{{ path('app_reunion_edit', {'id': reunion.id}) }}" class="h4 mx-2 text-decoration-none" title="Modifier" data-turbo="false">
                             <div class="card h-100">
                                 <div class="card-body text-color-main">
@@ -194,4 +262,168 @@
         {% endblock %}
 
     </turbo-frame>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Animation pour la ligne de scan */
+        @keyframes scan {
+            0% { top: 0; opacity: 1; }
+            50% { top: calc(100% - 2px); opacity: 0.8; }
+            100% { top: 0; opacity: 1; }
+        }
+
+        .scanner-frame {
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .scanner-line {
+            box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        }
+
+        /* Styles spécifiques pour le scanner web */
+        #qr-reader {
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #qr-reader video {
+            border-radius: 8px;
+        }
+
+        /* Assurez-vous que le modal est au-dessus de tout */
+        .modal {
+            z-index: 99999 !important;
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #qr-reader video {
+            border-radius: 10px;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Pour cacher les boutons inutiles si vous voulez un look plus épuré */
+        #qr-reader__dashboard_section {
+            display: none; /* Cache le dashboard avec les boutons de sélection de caméra, etc. */
+        }
+
+        /* Personnalisation du viseur de scan */
+        #qr-reader__scan_region {
+            position: relative;
+        }
+
+        #qr-reader__scan_region video {
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+        }
+
+        /* Ajouter un cadre visuel */
+        #qr-reader__scan_region::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border: 2px dashed #00ff00;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Animation du viseur */
+        @keyframes scanning {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        #qr-reader__scan_region::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scanning 2s ease-in-out infinite;
+            border-radius: 2px;
+            z-index: 11;
+        }
+
+        /* Styles pour les notifications personnalisées */
+        .notification {
+            margin-bottom: 10px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* S'assurer que les alertes Bootstrap sont au-dessus du modal */
+        .alert {
+            z-index: 999999 !important;
+            position: relative;
+        }
+
+        /* Si vous utilisez flasher, assurez-vous qu'il est visible */
+        .flasher-container {
+            z-index: 999999 !important;
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+        }
+    </style>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Script de debug
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DEBUG SCANNER ===');
+
+            // Vérifier Capacitor
+            if (typeof Capacitor === 'undefined') {
+                console.log('Capacitor: NON DISPONIBLE (mode web)');
+            } else {
+                console.log('Capacitor:', Capacitor);
+                console.log('isNative:', Capacitor.isNative);
+                console.log('Plugins:', Capacitor.Plugins ? Object.keys(Capacitor.Plugins) : 'none');
+            }
+
+            // Vérifier les APIs caméra
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const cameras = devices.filter(d => d.kind === 'videoinput');
+                    console.log('Caméras disponibles:', cameras.length);
+                    cameras.forEach(cam => console.log(' -', cam.label || 'Caméra sans nom'));
+                })
+                .catch(err => console.log('Erreur détection caméras:', err));
+        });
+
+        // Loguer les changements de visibilité
+        document.addEventListener('visibilitychange', function() {
+            console.log('Visibilité page:', document.visibilityState);
+        });
+
+    </script>
 {% endblock %}
