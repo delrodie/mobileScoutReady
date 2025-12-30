@@ -11,7 +11,7 @@ export default class extends Controller {
 
     connect() {
         this.userAccess();
-        // this.interractionValues()
+        this.interractionValues()
     }
 
     async userAccess() {
@@ -68,41 +68,41 @@ export default class extends Controller {
         }
     }
 
-    //  async interractionValues(){
-    //     try{
-    //         const urlGetNombre = `/api/activite/nombre/${this.activiteIdValue}`;
-    //
-    //         const response = await fetch(urlGetNombre, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'X-Requested-With': 'XMLHttpRequest'
-    //             },
-    //             body: JSON.stringify({
-    //                 activite: this.activiteIdValue
-    //             })
-    //         });
-    //         console.log('statistques', this.activiteIdValue)
-    //         console.log(response);
-    //
-    //         if (!response.ok) throw new Error('Erreur API');
-    //
-    //         const responseData =  response.json();
-    //        const nombre = responseData.data || responseData;
-    //
-    //         console.log('Nombre')
-    //         console.log(responseData)
-    //
-    //         if (this.hasParticipantCountTarget){
-    //             this.participantCountTarget.textContent = nombre.participant || 'ND';
-    //         }
-    //
-    //         if (this.hasnoteMoyenTarget){
-    //             this.noteMoyenTarget.textContent = nombre.note || 'ND' ;
-    //         }
-    //
-    //     }catch (e) {
-    //         console.error("Interraction: ", e)
-    //     }
-    // }
+     async interractionValues(){
+        try{
+            const urlGetNombre = `/api/activite/nombre/${this.activiteIdValue}`;
+
+            const response = await fetch(urlGetNombre, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    activite: this.activiteIdValue
+                })
+            });
+            console.log('statistques', this.activiteIdValue)
+            console.log(response);
+
+            if (!response.ok) throw new Error('Erreur API');
+
+            const responseData = await  response.json();
+           // const nombre = responseData.data || responseData;
+
+            // console.log('Nombre', nombre.ok)
+            console.log(responseData)
+
+            if (this.hasParticipantCountTarget){
+                this.participantCountTarget.textContent = responseData.participant || 'ND';
+            }
+
+            if (this.hasnoteMoyenTarget){
+                this.noteMoyenTarget.textContent = responseData.note || 'ND' ;
+            }
+
+        }catch (e) {
+            console.error("Interraction: ", e)
+        }
+    }
 }

@@ -118,13 +118,14 @@ class ApiActiviteController extends AbstractController
         return $this->json($data, Response::HTTP_OK);
     }
 
-    #[ROute('/nombre/{id}', name: 'api_activite_nombre', methods: ['POST'])]
+    #[ROute('/nombre/{id}', name: 'api_activite_nombre', methods: ['GET','POST'])]
     public function nombre(Activite $activite): Response
     {
         $present = $this->participerRepository->findBy(['activite' =>$activite->getId() ]);
 
         return $this->json([
             'participant' => count($present),
+            'statut' => 'success'
         ], Response::HTTP_OK);
     }
 

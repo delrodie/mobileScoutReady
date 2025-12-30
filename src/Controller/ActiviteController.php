@@ -40,7 +40,7 @@ class ActiviteController extends AbstractController
         return $this->render('activite/index.html.twig');
     }
 
-    #[Route('/new', name:'app_activite_new', methods: ['GET','POST'])]
+    #[Route('/new/nouveau', name:'app_activite_new', methods: ['GET','POST'])]
     public function new(Request $request)
     {
         $activite = new Activite();
@@ -88,7 +88,7 @@ class ActiviteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_activite_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_activite_show', methods: ['GET','POST'])]
     public function show(Activite $activite): Response
     {
         return $this->render('activite/show.html.twig', [
