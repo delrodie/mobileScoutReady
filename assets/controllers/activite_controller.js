@@ -105,8 +105,40 @@ export default class extends Controller {
         }
     }
 
-    affecteActivite(activite) {
+    async affecteActivite(activite) {
         const clone = this.templateTarget.content.cloneNode(true);
+
+        // Gestion des nombres participants
+        console.log('/api/activite/nombre/' + activite.id)
+        console.log("Url " + this.apiUrlListValue)
+
+        const response = await  fetch('/api/activite/nombre/' + activite.id,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            /*body: JSON.stringify({
+                slug: profil[0].slug,
+                code: profil[0].code,
+                instance: instance && instance.length > 0 ? instance[0].id : null,
+                parentId: instance && instance.length > 0 ? instance[0].parentId : null,
+            })*/
+        });
+
+        console.log('response')
+        console.log(response)
+
+        if (!response.ok) throw new Error('Erreur API');
+
+        const responseData = await response.json();
+
+        // const activites = responseData.data || responseData;
+        console.log('==== Nombre de participants ====')
+        console.log(responseData)
+
+        const elNombreParticipant = clone.querySelector('.activite-participant');
+        if (elNombreParticipant) elNombreParticipant.innerHTML = `<i class="bi bi-people-fill text-body"></i> ${responseData.participant}`
 
         const elInstance = clone.querySelector('.activite-instance');
         if (elInstance) elInstance.textContent = activite.instance.nom || 'Non défini';

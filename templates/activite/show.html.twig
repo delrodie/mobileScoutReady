@@ -117,10 +117,20 @@
                     </div>
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <h3 class="text-color-main fw-semibold"
-                                data-autorisation-target="participantCount"
-                            >{{ participants|length }}</h3>
-                            <span class="text-muted">Participants</span>
+                            {% if participants|length > 0 %}
+                                <a href="{{ path('app_activite_participant', {'id':activite.id}) }}" class="text-decoration-none">
+                                    <h3 class="text-color-main fw-semibold"
+                                        data-autorisation-target="participantCount"
+                                    >{{ participants|length }}</h3>
+                                    <span class="text-muted">Participants</span>
+                                </a>
+                            {% else %}
+                                <h3 class="text-color-main fw-semibold"
+                                    data-autorisation-target="participantCount"
+                                >{{ participants|length }}</h3>
+                                <span class="text-muted">Participants</span>
+                            {% endif %}
+
                         </div>
                         <div class="d-flex flex-column text-center ps-1">
                             <h3 class="text-color-main fw-semibold"

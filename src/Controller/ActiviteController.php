@@ -98,6 +98,15 @@ class ActiviteController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/participants', name: 'app_activite_participant', methods: ['GET'])]
+    public function participant(Activite $activite): Response
+    {
+        return $this->render('activite/participants.html.twig', [
+            'activite' => $activite,
+            'participants' => $this->participerRepository->findPresenceByActivite($activite->getId()),
+        ]);
+    }
+
     /**
      * Crée et lie une entité AutorisationPointageActivite pour un scout donné.
      * @param Activite $activite
