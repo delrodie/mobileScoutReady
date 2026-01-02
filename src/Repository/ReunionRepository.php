@@ -41,6 +41,41 @@ class ReunionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findReunionByInstanceAndChamp(?int $champ, array $instanceIds, ?string $branche = null)
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->addSelect('c','i')
+            ->join('r.champs', 'c')
+            ->join('r.instance', 'i')
+            ->where('i.id IN (:ids)')
+            ->andWhere('c.id = :champ')
+            ->orderBy('r.dateAt', 'DESC')
+            ->addOrderBy('r.heureDebut', 'DESC')
+            ->setParameter('ids', $instanceIds)
+            ->setParameter('champ', $champ)
+            ;
+        if ($branche){
+            $qb->andWhere('r.branche = :branche')
+                ->setParameter('branche', $branche);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findReunionByChamps(?int $champ)
+    {
+        return $this->createQueryBuilder('r')
+            ->addSelect('c', 'i')
+            ->join('r.instance', 'i')
+            ->join('r.champs', 'c')
+            ->where('c.id = :champ')
+            ->orderBy('r.dateAt', 'DESC')
+            ->addOrderBy('r.heureDebut', 'DESC')
+            ->setParameter('champ', $champ)
+            ->getQuery()->getResult()
+            ;
+    }
+
     //    /**
     //     * @return Reunion[] Returns an array of Reunion objects
     //     */

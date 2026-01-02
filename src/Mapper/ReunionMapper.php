@@ -34,6 +34,7 @@ class ReunionMapper
         $dto->createdBy = $r->getCreatedBy();
         $dto->cible = $r->getCible();
         $dto->urlShow = $this->urlGenerator->generate('app_reunion_show', ['id' => $r->getId()]);
+        $dto->nbParticipant = count($r->getParticipants());
 
         $dto->champs = [
             'id' => $r->getChamps()?->getId(),

@@ -22,6 +22,20 @@
                             </a>
                         </div>
                     </li>
+                    <li class="slide-visible">
+                        <div id="slide1">
+                            <a href="{{ path('app_activite_index') }}">
+                                <div
+                                    data-controller="image-loader"
+                                    data-image-loader-src-value="{{ asset('img/activites/lancement-regional.png') }}"
+                                    data-image-loader-native-src-value="asset://{{ asset('img/activites/lancement-regional.png') }}"
+                                    data-image-loader-preload-value="true"
+                                >
+                                    <img src="" alt="" class="img-fluid rounded">
+                                </div>
+                            </a>
+                        </div>
+                    </li>
                 </ul>
 
 
@@ -143,8 +157,24 @@
 
     {{ include('default/_nav.html.twig')}}
 {% endblock %}
+
+{% block extra_stylesheets %}
+    <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+{% endblock %}
+
 {% block extra_javascripts %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js" crossorigin="anonymous"
             defer></script>
+    <script>
+        // Dans base.html.twig ou app.js
+        document.addEventListener('turbo:load', function() {
+            // Vérifie si la bibliothèque swiffySlider est disponible
+            if (typeof swiffySlider !== 'undefined') {
+                // Initialise tous les sliders présents sur la page
+                window.swiffySlider.init();
+            }
+        });
+    </script>
 {% endblock %}

@@ -25,4 +25,6 @@ class ReunionDTO
     public ?array $instance;
 
     public ?array $auteur;
+
+    public ?int $nbParticipant;
 }

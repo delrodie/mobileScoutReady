@@ -115,7 +115,7 @@
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <a href="{{ path('app_reunion_participants', {'id': reunion.id}) }}" class="text-decoration-none">
+                            <a href="{{ reunion.participants|length > 0 ? path('app_reunion_participants', {'id': reunion.id}) : '#' }}" class="text-decoration-none">
                                 <h3 class="text-color-main fw-semibold"
                                     data-autorisation-reunion-target="participantCount"
                                 >ND</h3>

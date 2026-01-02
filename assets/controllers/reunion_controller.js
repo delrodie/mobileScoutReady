@@ -113,10 +113,16 @@ export default class extends Controller {
         const elPeriode = clone.querySelector('.reunion-periode');
         if (elPeriode){
             const date = reunion.dateAt || 'Non défini';
-            const heureDebut = reunion.heureDebut || 'Non d"fini';
-            const heureFin = reunion.heureFin || 'Non d"fini';
+            const heureDebut = reunion.heureDebut || 'Non défini';
+            const heureFin = reunion.heureFin || 'Non défini';
 
             elPeriode.innerHTML =`<i class="bi bi-calendar-event text-body"></i> ${date} de ${heureDebut} à ${heureFin}`
+        }
+
+        const elParticipant = clone.querySelector('.reunion-participant');
+        if (elParticipant){
+            const participant = reunion.nbParticipant || 'Non défini'
+            elParticipant.innerHTML = `<i class="bi bi-people-fill text-body"></i> ${participant}`;
         }
 
         console.log(reunion.urlShow)
