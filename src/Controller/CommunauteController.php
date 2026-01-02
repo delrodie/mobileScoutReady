@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\AssisterRepository;
 use App\Repository\FonctionRepository;
 use App\Repository\ScoutRepository;
 use App\Services\UtilityService;
@@ -15,9 +16,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class CommunauteController extends AbstractController
 {
     public function __construct(
-        private FonctionRepository $fonctionRepository,
+        private FonctionRepository       $fonctionRepository,
         private readonly ScoutRepository $scoutRepository,
-        private readonly UtilityService $utilityService
+        private readonly UtilityService  $utilityService, private readonly AssisterRepository $assisterRepository
     )
     {
     }
@@ -32,7 +33,8 @@ class CommunauteController extends AbstractController
     public function membre($slug): Response
     {
         return $this->render('communaute/membre.html.twig',[
-            'membre' => $this->fonctionRepository->findOneByScoutSlug($slug)
+            'membre' => $this->fonctionRepository->findOneByScoutSlug($slug),
+            'total_reunion' => $this->assisterRepository->findReunionByScout($slug)
         ]);
     }
 }

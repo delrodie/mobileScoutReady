@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Assister;
+use App\Services\UtilityService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AssisterRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private UtilityService $utilityService)
     {
         parent::__construct($registry, Assister::class);
     }
@@ -53,6 +54,21 @@ class AssisterRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function findReunionByScout(?string $scoutSlug)
+    {
+        $uuid = $this->utilityService->convertSlugToUuid($scoutSlug);
+        if (!$uuid) {
+            return null;
+        }
+
+        return $this->query()
+            ->where('s.slug = :slug')
+            ->orderBy('a.pointageAt', 'DESC')
+            ->setParameter('slug', $uuid, 'uuid')
+            ->getQuery()->getResult()
+            ;
     }
 
     public function query()

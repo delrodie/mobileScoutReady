@@ -26,11 +26,20 @@
                         <div class="col">
                             <div class="text-decoration-none text-center d-flex justify-content-center align-items-center">
                                 <div class="card h-100 bg-main-30 shadow-sm border border-0">
-                                    <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
-                                         style="width: 150px;">
-                                        <span class="fs-1 text-color-main fw-bold">25</span>
-                                        <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Badge</div>
-                                    </div>
+                                    {% if membre.scout.statut.value == 'JEUNE' %}
+                                        <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
+                                             style="width: 150px;">
+                                            <span class="fs-1 text-color-main fw-bold">0</span>
+                                            <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Badge</div>
+                                        </div>
+                                    {% else %}
+                                        <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
+                                             style="width: 150px;">
+                                            <span class="fs-1 text-color-main fw-bold">0</span>
+                                            <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Activité</div>
+                                        </div>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>
@@ -39,8 +48,10 @@
                                 <div class="card h-100 bg-main-30 shadow-sm border border-0">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
                                          style="width: 150px;">
-                                        <span class="fs-1 text-color-main fw-bold">25</span>
-                                        <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Réunions</div>
+                                        <span class="fs-1 text-color-main fw-bold">{{ total_reunion ? total_reunion|length : 0 }}</span>
+                                        <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">
+                                            {{ total_reunion ? total_reunion|length >= 2 ? 'Réunions' : 'Réunion' : 'Réunion' }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
