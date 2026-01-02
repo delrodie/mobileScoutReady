@@ -28,7 +28,7 @@ class ParticiperRepository extends ServiceEntityRepository
             ;
     }
 
-    public function findPresenceByActiviteAndRecherche(?int $activite, ?string $search, ?int $limit = 2, ?int $offset = 0)
+    public function findPresenceByActiviteAndRecherche(?int $activite, ?string $search, ?int $limit = 10, ?int $offset = 0)
     { //dd($search);
         $qb = $this->query()
             ->where('a.id = :activite')

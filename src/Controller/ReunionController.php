@@ -112,6 +112,14 @@ class ReunionController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/participants/list', name: 'app_reunion_participants', methods: ['GET'])]
+    public function participants(Reunion $reunion): Response
+    {
+        return $this->render('reunion/participants.html.twig',[
+            'reunion' => $reunion
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'app_reunion_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Reunion $reunion): Response
     {

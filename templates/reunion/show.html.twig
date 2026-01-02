@@ -115,10 +115,12 @@
 
                     <div class="d-flex justify-content-around align-content-center mt-5">
                         <div class="d-flex flex-column text-center pe-5 border-end">
-                            <h3 class="text-color-main fw-semibold"
-                                data-autorisation-reunion-target="participantCount"
-                            >ND</h3>
-                            <span class="text-muted">Participants</span>
+                            <a href="{{ path('app_reunion_participants', {'id': reunion.id}) }}" class="text-decoration-none">
+                                <h3 class="text-color-main fw-semibold"
+                                    data-autorisation-reunion-target="participantCount"
+                                >ND</h3>
+                                <span class="text-muted">Participants</span>
+                            </a>
                         </div>
                         <div class="d-flex flex-column text-center ps-1">
                             <h3 class="text-color-main fw-semibold"

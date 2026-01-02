@@ -1,0 +1,195 @@
+{% extends 'base.html.twig' %}
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+
+                        <a href="{{ path('app_reunion_show', {'id': reunion.id}) }}"
+                           data-turbo-frame="_top"
+                           class="retour"
+                        >
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">{{ reunion.code }}</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm mx-auto mt-3 mb-5" data-controller="header profil">
+                {{ component('ParticipantReunion',{reunion: reunion}) }}
+            </main>
+            <div class="" style="margin-top: 50px;">.</div>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Animation pour la ligne de scan */
+        @keyframes scan {
+            0% { top: 0; opacity: 1; }
+            50% { top: calc(100% - 2px); opacity: 0.8; }
+            100% { top: 0; opacity: 1; }
+        }
+
+        .scanner-frame {
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .scanner-line {
+            box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        }
+
+        /* Styles spécifiques pour le scanner web */
+        #qr-reader {
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #qr-reader video {
+            border-radius: 8px;
+        }
+
+        /* Assurez-vous que le modal est au-dessus de tout */
+        .modal {
+            z-index: 99999 !important;
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #qr-reader video {
+            border-radius: 10px;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Pour cacher les boutons inutiles si vous voulez un look plus épuré */
+        #qr-reader__dashboard_section {
+            display: none; /* Cache le dashboard avec les boutons de sélection de caméra, etc. */
+        }
+
+        /* Personnalisation du viseur de scan */
+        #qr-reader__scan_region {
+            position: relative;
+        }
+
+        #qr-reader__scan_region video {
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+        }
+
+        /* Ajouter un cadre visuel */
+        #qr-reader__scan_region::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border: 2px dashed #00ff00;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Animation du viseur */
+        @keyframes scanning {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        #qr-reader__scan_region::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scanning 2s ease-in-out infinite;
+            border-radius: 2px;
+            z-index: 11;
+        }
+
+        /* Styles pour les notifications personnalisées */
+        .notification {
+            margin-bottom: 10px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* S'assurer que les alertes Bootstrap sont au-dessus du modal */
+        .alert {
+            z-index: 999999 !important;
+            position: relative;
+        }
+
+        /* Si vous utilisez flasher, assurez-vous qu'il est visible */
+        .flasher-container {
+            z-index: 999999 !important;
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+        }
+    </style>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Script de debug
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DEBUG SCANNER ===');
+
+            // Vérifier Capacitor
+            if (typeof Capacitor === 'undefined') {
+                console.log('Capacitor: NON DISPONIBLE (mode web)');
+            } else {
+                console.log('Capacitor:', Capacitor);
+                console.log('isNative:', Capacitor.isNative);
+                console.log('Plugins:', Capacitor.Plugins ? Object.keys(Capacitor.Plugins) : 'none');
+            }
+
+            // Vérifier les APIs caméra
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const cameras = devices.filter(d => d.kind === 'videoinput');
+                    console.log('Caméras disponibles:', cameras.length);
+                    cameras.forEach(cam => console.log(' -', cam.label || 'Caméra sans nom'));
+                })
+                .catch(err => console.log('Erreur détection caméras:', err));
+        });
+
+        // Loguer les changements de visibilité
+        document.addEventListener('visibilitychange', function() {
+            console.log('Visibilité page:', document.visibilityState);
+        });
+
+    </script>
+{% endblock %}

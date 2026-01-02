@@ -16,6 +16,54 @@ class AssisterRepository extends ServiceEntityRepository
         parent::__construct($registry, Assister::class);
     }
 
+    public function findPresenceByReunion(?int $reunion, ?string $search, ?int $limit, ?int $offset = 0)
+    {
+        $qb = $this->query()
+            ->where('r.id = :reunion')
+            ->orderBy('s.nom', 'ASC')
+            ->addOrderBy('s.prenom', 'ASC')
+            ->setParameter('reunion', $reunion)
+            ;
+
+        if ($search){
+            $qb->andWhere('s.nom LIKE :search OR s.prenom LIKE :search OR a.pointageAt LIKE :search')
+                ->setParameter('search', '%'.$search.'%');
+        }
+
+        return $qb
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()->getResult()
+            ;
+    }
+
+    public function countPresenceByReunion(?int $reunion, ?string $search)
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->leftJoin('a.reunion', 'r')
+            ->leftJoin('a.scout', 's')
+            ->where('r.id = :reunion')
+            ->setParameter('reunion', $reunion)
+            ;
+        if ($search){
+            $qb->andWhere('s.nom LIKE :search OR s.prenom LIKE :search OR a.pointageAt LIKE :search')
+                ->setParameter('search', '%'.$search.'%')
+                ;
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function query()
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('r', 's')
+            ->leftJoin('a.reunion', 'r')
+            ->leftJoin('a.scout', 's')
+            ;
+    }
+
     //    /**
     //     * @return Assister[] Returns an array of Assister objects
     //     */
