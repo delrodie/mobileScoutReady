@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
-const DB_NAME = 'db_scoutready'
-const DB_VERSION = 1.2
+export const DB_NAME = 'db_scoutready'
+export const DB_VERSION = 1.3
 
 /**
  * Contrôleur responsable de la gestion de la base locale IndexedDB.
@@ -77,6 +77,8 @@ export default class extends Controller {
                     db.createObjectStore("profil_instance", { keyPath: "id" });
                 if (!db.objectStoreNames.contains("champs_activite"))
                     db.createObjectStore("champs_activite", { keyPath: "id" });
+                if (!db.objectStoreNames.contains("profil_infocomplementaire"))
+                    db.createObjectStore("profil_infocomplementaire", { keyPath: "id" });
             };
 
             request.onsuccess = (event) => {
@@ -107,6 +109,8 @@ export default class extends Controller {
                     db.createObjectStore("profil_instance", { keyPath: "id" });
                 if (!db.objectStoreNames.contains("champs_activite"))
                     db.createObjectStore("champs_activite", { keyPath: "id" });
+                if (!db.objectStoreNames.contains("profil_infocomplementaire"))
+                    db.createObjectStore("profil_infocomplementaire", { keyPath: "id" });
             };
 
             request.onsuccess = (event) => resolve(event.target.result);
@@ -153,15 +157,19 @@ export default class extends Controller {
                 if (!db.objectStoreNames.contains('champs_activite')) {
                     db.createObjectStore('champs_activite', {keyPath: 'id'});
                 }
+                if (!db.objectStoreNames.contains('profil_infocomplementaire')) {
+                    db.createObjectStore('profil_infocomplementaire', {keyPath: 'id'});
+                }
             };
 
             request.onsuccess = async (event) => {
                 const db = event.target.result;
-                const tx = db.transaction(['profil', 'profil_fonction', 'profil_instance', 'champs_activite'], 'readwrite');
+                const tx = db.transaction(['profil', 'profil_fonction', 'profil_instance', 'profil_infocomplementaire', 'champs_activite'], 'readwrite');
 
                 const profilStore = tx.objectStore('profil');
                 const fonctionStore = tx.objectStore('profil_fonction');
                 const instanceStore = tx.objectStore('profil_instance');
+                const infocomplementaireStore = tx.objectStore('profil_infocomplementaire');
                 const champsStore = tx.objectStore('champs_activite');
 
                 // --- PROFIL & FONCTIONS ---
@@ -178,6 +186,10 @@ export default class extends Controller {
                 if (data.profil_instance) {
                     instanceStore.clear();
                     instanceStore.put(data.profil_instance);
+                }
+                if (data.profil_infocomplementaire) {
+                    infocomplementaireStore.clear();
+                    infocomplementaireStore.put(data.profil_infocomplementaire);
                 }
 
                 // --- CHAMPS D'ACTIVITÉ ---

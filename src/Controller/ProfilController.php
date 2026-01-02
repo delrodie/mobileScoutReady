@@ -34,4 +34,10 @@ class ProfilController extends AbstractController
     {
         return $this->render('profil/qrcode.html.twig');
     }
+
+    #[ROute('/infos/scoute/complementaires/adulte', name: 'app_profil_infos_complementaires_adulte')]
+    public function infosComplementaires(): Response
+    {
+        return $this->render('profil/infos_complementaires.html.twig');
+    }
 }

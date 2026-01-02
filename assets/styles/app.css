@@ -285,3 +285,9 @@ figcaption{
     50%{transform: scale(1);}
     100%{transform: scale(1.1);}
 }
+
+.form-switch .form-check-input.form-switch-lg{
+    width: 3em;
+    height: 1.5em;
+    background-size: contain;
+}

@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Informations complémentaires</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil profil-infoscomplementaire">
+                <!-- Bouton d'enregistrement -->
+                <div class="d-flex flex-column justify-content-center align-items-center align-content-center d-none"
+                     data-profil-infoscomplementaire-target="initialisation"
+                     style="height: 60vh;"
+                >
+                    <h6 class="text-color-main text-center fst-italic mb-5">
+                        Oups!!! veuillez enregistrer les informations complémentaires correspondantes à vos formations
+                    </h6>
+                    <a href="#"
+                       class="btn btn-outline-secondary rounded-pill px-5 py-2"
+                       data-profil-infoscomplementaire-target="urlAdd"
+                       data-turbo="false"
+                    >
+                        Renseigner le formulaire
+                    </a>
+                </div>
+
+                <!-- Informations complémentaires -->
+                <div class="mt-3 d-none"
+                     data-profil-infoscomplementaire-target="tableau"
+                >
+                    <ul class="list-group list-group-flus">
+                        <li class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-diagram-3-fill text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Branche d'origine</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="branche"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-calendar-fill text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Participation à une formation </small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="isFormation"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage de base Niveau 1</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="baseNv1"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateBaseNv1"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="baseNv1Annee"></span>
+                            </div>
+                        </li>
+
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage de base Niveau 2</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="baseNv2"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateBaseNv2"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="baseNv2Annee"></span>
+                            </div>
+                        </li>
+
+                        <!-- Stage avance niveau 1 -->
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage avancé Niveau 1</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv1"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateAvanceNv1"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv1Annee"></span>
+                            </div>
+                        </li>
+
+                        <!-- Stage avance niveau 2 -->
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage avancé Niveau 2</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv2"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateAvanceNv2"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv2Annee"></span>
+                            </div>
+                        </li>
+
+                        <!-- Stage avance niveau 3 -->
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage avancé Niveau 3</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv3"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateAvanceNv3"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv3Annee"></span>
+                            </div>
+                        </li>
+
+                        <!-- Stage avance niveau 4 -->
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2">
+                            <i class="bi bi-star text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Stage avancé Niveau 4</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv4"></span>
+                            </div>
+                        </li>
+
+                        <li
+                            class="list-group-item mb-2 rounded-end rounded-start bg-body-tertiary d-flex justify-content-start align-items-center shadow-sm py-2"
+                            data-profil-infoscomplementaire-target="showDateAvanceNv4"
+                        >
+                            <i class="bi bi-calendar-event text-color-main fs-2 ms-1 me-3"></i>
+                            <div class="d-flex flex-column justify-content-center align-items-start">
+                                <small class="text-muted fst-italic">Date de formation</small>
+                                <span class="fw-semibold" data-profil-infoscomplementaire-target="avanceNv4Annee"></span>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                    <div class="text-end mt-4">
+                        <a href="#"
+                           id="edit-link"
+                           class="text-decoration-none text-color-main fw-medium"
+                           data-profil-infoscomplementaire-target="urlEdit"
+                           data-turbo="false"
+                        >
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Modifier les informations
+                        </a>
+                    </div>
+                </div>
+
+            </main>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}

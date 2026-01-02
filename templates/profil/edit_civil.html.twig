@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+    {% block turbo_frame %}
+        <turbo-frame id="main-frame">
+            {% block body %}
+                <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                    <div class="row">
+                        <div class="col-3">
+                            <a href="{{ historique_navigation() ?? path('app_profil_civil') }}" class="retour" data-turbo="false">
+                                <i class="bi bi-arrow-left fs-5"></i>
+                            </a>
+                        </div>
+                        <div class="col-9">
+                            <h5 class="fs-4">Informations civiles</h5>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="vh-100 px-4 max-w-sm mx-auto"
+                      data-controller="profil-sync"
+                >
+                    {{ form_start(form,
+                        {'attr':
+                            {
+                                'data-action': 'submit->profil-sync#handleSubmission',
+                                'data-turbo': 'false'
+                            }
+                        })
+                    }}
+                        <h5 class="fs-5 mt-5 text-center text-color-main">{{ scout.code }}</h5>
+
+                        <div class="position-relative form-floating mt-5">
+                            {{ form_widget(form.nom) }}
+                            {{ form_label(form.nom) }}
+                            <i
+                                class="bi bi-person-badge position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.prenom) }}
+                            {{ form_label(form.prenom) }}
+                            <i
+                                class="bi bi-person-badge-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.sexe) }}
+                            {{ form_label(form.sexe) }}
+                            <i
+                                class="bi bi-people-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.dateNaissance) }}
+                            {{ form_label(form.dateNaissance) }}
+                            <i
+                                class="bi bi-calendar-event position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.telephone) }}
+                            {{ form_label(form.telephone) }}
+                            <i
+                                class="bi bi-phone position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.phoneParent) }}
+                            {{ form_label(form.phoneParent) }}
+                            <i
+                                class="bi bi-telephone-inbound-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        <div class="position-relative form-floating mt-3">
+                            {{ form_widget(form.email) }}
+                            {{ form_label(form.email) }}
+                            <i
+                                class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                        </div>
+
+                        {{ form_widget(form) }}
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-main btn-lg">Modifier et synchroniser</button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </main>
+
+            {% endblock %}
+        </turbo-frame>
+    {% endblock %}
+
+
+

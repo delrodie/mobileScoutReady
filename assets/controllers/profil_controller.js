@@ -8,7 +8,7 @@ export default class extends Controller {
         "scoutSlug", "scoutId", "fonctionId", "poste", "detailPoste",
         "branche", "annee", "validation", "instanceId", "instanceSlug",
         "instanceNom", "instanceType", "instanceParent", "parentId", "parentNom",
-        "instanceRegion", "instanceASN", "instanceDistrict", "instanceGroupe"
+        "instanceRegion", "instanceASN", "instanceDistrict", "instanceGroupe", "urlEdit"
     ];
 
     connect() {
@@ -75,6 +75,15 @@ export default class extends Controller {
             if (imageLoaderController) {
                 imageLoaderController.loadImage();
             }
+        }
+
+        // --- Edit URL ---
+        if (this.hasUrlEditTarget){
+            console.log(`Url : ${this.urlEditTarget}`)
+            const newUrl = `/profil-edit/${profil.slug}`;
+
+            console.log(`Url : ${newUrl}`)
+            this.urlEditTarget.href= newUrl;
         }
 
 

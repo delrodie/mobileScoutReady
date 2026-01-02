@@ -1,0 +1,376 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+
+        {% block body %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_accueil') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Informations complémentaires</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil profil-infoscomplementaire">
+
+                <!-- Formulaire d'enregistrement -->
+                <div class="mt-3"
+                     data-profil-infoscomplementaire-target="form"
+                >
+                    <form method="post"
+                          data-action="submit->profil-infoscomplementaire#save"
+                          data-profil-infoscomplementaire-target="form"
+                    >
+                        <div class="form-group">
+
+                            <div class="position-relative form-floating mt-3">
+                                <select
+                                    id="complementBranche"
+                                    class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                    name="_complementBranche"
+                                    required
+                                    data-profil-infoscomplementaire-target="branche"
+                                >
+
+
+                                    {% if complementaire and complementaire.branche %}
+                                        <option value="{{ complementaire.branche }}" selected>{{ complementaire.branche }}</option>
+                                    {% else %}
+                                        <option value="" disabled selected>-- Sélectionnez la branche --</option>
+                                    {% endif %}
+                                    {% for branche in branches %}
+                                        <option value="{{ branche.value }}">{{ branche.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="complementBranche" class="ms-3">Branche d'origine</label>
+                                <i
+                                    class="bi bi-diagram-3-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                            </div>
+
+                            <div class="position-relative mt-3">
+                                <div class="form-check form-switch d-flex justify-content-center align-content-center align-items-center ">
+                                    <label class="form-check-label" for="isFormation">Avez-vous déjà participé à une formation ?</label>
+                                    <input class="form-check-input form-switch-lg"
+                                           type="checkbox" role="switch"
+                                           id="isFormation"
+                                           name="_complementIsFormation"
+                                           data-profil-infoscomplementaire-target="isFormation"
+                                           {{ complementaire.isFormation ? 'checked' : '' }}
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Stage de base de niveau 1 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage de base Niveau 1</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementBaseNiveau1"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementBaseNiveau1"
+                                        data-profil-infoscomplementaire-target="baseNv1"
+                                    >
+
+                                        {% if complementaire and complementaire.stageBaseNiveau1 %}
+                                            <option value="{{ complementaire.stageBaseNiveau1 }}" selected>{{ complementaire.stageBaseNiveau1 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for base_nv1 in stage_base_niveau1 %}
+                                            <option value="{{ base_nv1.value }}">{{ base_nv1.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementBaseNiveau1" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementBaseNiveau1Annee"
+                                           placeholder="Nom de famille"
+                                           name="_complementBaseNiveau1Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="baseNv1Annee"
+                                            value="{{ complementaire.anneeBaseNiveau1 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+                            <!-- Stage de base de niveau 2 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage de base Niveau 2</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementBaseNiveau2"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementBaseNiveau2"
+                                        data-profil-infoscomplementaire-target="baseNv2"
+                                    >
+
+                                        {% if complementaire and complementaire.stageBaseNiveau2 %}
+                                            <option value="{{ complementaire.stageBaseNiveau2 }}" selected>{{ complementaire.stageBaseNiveau2 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for base_nv2 in stage_base_niveau2 %}
+                                            <option value="{{ base_nv2.value }}">{{ base_nv2.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementBaseNiveau2" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementBaseNiveau2Annee"
+                                           placeholder="Nom de famille"
+                                           name="_complementBaseNiveau2Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="baseNv2Annee"
+                                           value="{{ complementaire.anneeBaseNiveau2 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+                            <!-- Stage avancé niveau 1 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage avancé Niveau 1</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementAvanceNiveau1"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementAvanceNiveau1"
+                                        data-profil-infoscomplementaire-target="avanceNv1"
+                                    >
+
+                                        {% if complementaire and complementaire.stageAvanceNiveau1 %}
+                                            <option value="{{ complementaire.stageAvanceNiveau1 }}" selected>{{ complementaire.stageAvanceNiveau1 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for stage in stage_avance_niveau1 %}
+                                            <option value="{{ stage.value }}">{{ stage.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementAvanceNiveau1" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementAvanceNiveau1Annee"
+                                           placeholder="Année de formation"
+                                           name="_complementAvanceNiveau1Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="avanceNv1Annee"
+                                           value="{{ complementaire.anneeAvanceNiveau1 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+
+                            <!-- Stage avancé niveau 2 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage avancé Niveau 2</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementAvanceNiveau2"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementAvanceNiveau2"
+                                        data-profil-infoscomplementaire-target="avanceNv2"
+                                    >
+
+                                        {% if complementaire and complementaire.stageAvanceNiveau2 %}
+                                            <option value="{{ complementaire.stageAvanceNiveau2 }}" selected>{{ complementaire.stageAvanceNiveau2 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for stage in stage_avance_niveau2 %}
+                                            <option value="{{ stage.value }}">{{ stage.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementAvanceNiveau2" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementAvanceNiveau2Annee"
+                                           placeholder="Année de formation"
+                                           name="_complementAvanceNiveau2Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="avanceNv2Annee"
+                                           value="{{ complementaire.anneeAvanceNiveau2 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+
+                            <!-- Stage avancé niveau 3 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage avancé Niveau 3</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementAvanceNiveau3"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementAvanceNiveau3"
+                                        data-profil-infoscomplementaire-target="avanceNv3"
+                                    >
+
+                                        {% if complementaire and complementaire.stageAvanceNiveau3 %}
+                                            <option value="{{ complementaire.stageAvanceNiveau3 }}" selected>{{ complementaire.stageAvanceNiveau3 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for stage in stage_avance_niveau3 %}
+                                            <option value="{{ stage.value }}">{{ stage.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementAvanceNiveau3" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementAvanceNiveau3Annee"
+                                           placeholder="Année de formation"
+                                           name="_complementAvanceNiveau3Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="avanceNv3Annee"
+                                           value="{{ complementaire.anneeAvanceNiveau3 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+
+                            <!-- Stage avancé niveau 4 -->
+                            <div class="mt-5">
+                                <h6 class="fw-semibold text-color-main">Stage avancé Niveau 4</h6>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <select
+                                        id="complementAvanceNiveau4"
+                                        class="form-select rounded-start-pill rounded-end-pill input-style  ps-5"
+                                        name="_complementAvanceNiveau4"
+                                        data-profil-infoscomplementaire-target="avanceNv4"
+                                    >
+
+                                        {% if complementaire and complementaire.stageAvanceNiveau4 %}
+                                            <option value="{{ complementaire.stageAvanceNiveau4 }}" selected>{{ complementaire.stageAvanceNiveau4 }}</option>
+                                        {% else %}
+                                            <option value="" disabled selected>-- Sélectionnez la formation --</option>
+                                        {% endif %}
+                                        {% for stage in stage_avance_niveau4 %}
+                                            <option value="{{ stage.value }}">{{ stage.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="complementAvanceNiveau4" class="ms-3">Formation</label>
+                                    <i
+                                        class="bi bi-star-fill position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                                <div class="position-relative form-floating mt-3">
+                                    <input type="number"
+                                           class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                           id="complementAvanceNiveau4Annee"
+                                           placeholder="Année de formation"
+                                           name="_complementAvanceNiveau4Annee"
+                                           autocomplete="off"
+                                           data-profil-infoscomplementaire-target="avanceNv4Annee"
+                                           value="{{ complementaire.anneeAvanceNiveau4 }}"
+                                    >
+                                    <label for="inscriptionNom" class="ms-3">Année de formation</label>
+                                    <i
+                                        class="bi bi-calendar position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-check mt-5 d-flex justify-content-center align-items-center">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="complementCertifie"
+                                       required
+                                       name="_complementCertifie"
+                                       data-profil-infoscomplementaire-target="certification"
+                                >
+                                <label class="form-check-label ms-3" for="complementCertifie">
+                                    <span class="text-decoration-none text-color-main">Je certifie que les informations fournies sont exactes et vérifiables.</span>
+                                </label>
+                            </div>
+
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('_scout_token') }}">
+
+                            <div class="d-grid gap-2 mt-5">
+                                <div class="row row-cols-2">
+                                    <div class="col d-grid gap-2">
+                                        <a href="{{ path('app_profil_index') }}" class="btn btn-outline-secondary btn-lg">Retour</a>
+                                    </div>
+                                    <div class="col d-grid gap-2">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-main btn-lg"
+                                            data-profil-infoscomplementaire-target="btnSave"
+                                        >
+                                            Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="my-5 text-muted" style="margin-bottom: 150px;">.</div>
+
+            </main>
+
+        {% endblock %}
+
+    </turbo-frame>
+{% endblock %}
+
