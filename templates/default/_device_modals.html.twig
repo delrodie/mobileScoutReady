@@ -1,0 +1,242 @@
+{# Modal de vérification OTP #}
+<template id="otp-verification-modal-template">
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-shield-lock"></i> Vérification de l'appareil
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="bi bi-phone-vibrate text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <p class="lead">Un code OTP a été envoyé sur votre appareil</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="otpInput" class="form-label fw-bold">Code de vérification</label>
+                        <input type="text"
+                               class="form-control form-control-lg text-center"
+                               id="otpInput"
+                               maxlength="6"
+                               placeholder="• • • • • •"
+                               pattern="[0-9]{6}"
+                               inputmode="numeric"
+                               autofocus>
+                        <div class="form-text text-center mt-2">
+                            <i class="bi bi-clock"></i> Code valide pendant <strong>10 minutes</strong>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <div>
+                            Vérifiez vos notifications ou consultez vos SMS
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" id="verifyOtpBtn">
+                        <i class="bi bi-check-circle"></i> Vérifier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{# Modal de nouveau device #}
+<template id="new-device-modal-template">
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle"></i> Nouvel appareil détecté
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning border-0 d-flex align-items-start" role="alert">
+                        <i class="bi bi-shield-exclamation fs-3 me-3"></i>
+                        <div>
+                            <h6 class="alert-heading fw-bold mb-2">Sécurité renforcée</h6>
+                            <p class="mb-0" id="newDeviceMessage">
+                                Une connexion depuis un nouvel appareil a été détectée.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light border-0 mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted small mb-2">Nouvel appareil</h6>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-phone fs-4 text-primary me-3" id="deviceIcon"></i>
+                                <div>
+                                    <div class="fw-bold" id="deviceModel">-</div>
+                                    <div class="text-muted small" id="devicePlatform">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-center mb-0">
+                        <i class="bi bi-hourglass-split"></i>
+                        Veuillez approuver la connexion depuis votre ancien appareil
+                    </p>
+
+                    <div class="mt-4 pt-3 border-top" id="noAccessSection">
+                        <p class="text-muted small text-center mb-2">
+                            <i class="bi bi-question-circle"></i> Vous n'avez plus accès à votre ancien téléphone ?
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer flex-column flex-sm-row">
+                    <button type="button" class="btn btn-light w-100 w-sm-auto mb-2 mb-sm-0" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                    <button type="button" class="btn btn-warning w-100 w-sm-auto mb-2 mb-sm-0" id="noAccessBtn">
+                        <i class="bi bi-phone-x"></i> Plus d'accès à l'ancien téléphone
+                    </button>
+                    <button type="button" class="btn btn-primary w-100 w-sm-auto" id="waitApprovalBtn" disabled>
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        En attente...
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{# Modal de confirmation de transfert (pour l'ancien device) #}
+<template id="transfer-confirmation-modal-template">
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-shield-fill-exclamation"></i> Alerte de sécurité
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-phone-vibrate text-danger" style="font-size: 3rem;"></i>
+                    </div>
+
+                    <div class="alert alert-danger border-0" role="alert">
+                        <h6 class="alert-heading fw-bold">
+                            <i class="bi bi-exclamation-octagon"></i> Tentative de connexion détectée
+                        </h6>
+                        <p class="mb-0">Quelqu'un tente de se connecter à votre compte depuis un nouvel appareil.</p>
+                    </div>
+
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted small mb-3">Détails de l'appareil</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-phone text-primary me-2"></i>
+                                        <div>
+                                            <div class="small text-muted">Plateforme</div>
+                                            <div class="fw-bold" id="transferPlatform">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-device-ssd text-primary me-2"></i>
+                                        <div>
+                                            <div class="small text-muted">Modèle</div>
+                                            <div class="fw-bold" id="transferModel">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-center fw-bold mb-3">
+                        <i class="bi bi-question-circle"></i> Est-ce vous qui tentez de vous connecter ?
+                    </p>
+
+                    <div class="alert alert-info small mb-0" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Conseil :</strong> Si ce n'est pas vous, refusez immédiatement et changez votre mot de passe.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="denyTransferBtn">
+                        <i class="bi bi-x-circle"></i> Refuser
+                    </button>
+                    <button type="button" class="btn btn-success" id="approveTransferBtn">
+                        <i class="bi bi-check-circle"></i> Oui, c'est moi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{# Style CSS pour les modals #}
+<style>
+    .modal-content {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1.5rem;
+    }
+
+    #otpInput {
+        font-size: 1.5rem;
+        letter-spacing: 0.5rem;
+        font-weight: bold;
+    }
+
+    #otpInput::placeholder {
+        letter-spacing: 0.5rem;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    #waitApprovalBtn .spinner-border {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+</style>
