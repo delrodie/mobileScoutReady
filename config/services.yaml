@@ -29,3 +29,15 @@ services:
             $afficheDirectory: '%kernel.project_dir%/public/uploads/activites/affiche'
 #            $tdrDirectory: '%kernel.project_dir%/public/upload/activites/tdr'
 
+    App\Services\FirebaseNotificationService:
+        arguments:
+            $messaging: '@kreait_firebase.app.messaging'
+            $logger: '@logger'
+
+    App\Services\DeviceManagerService:
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $utilisateurRepository: '@App\Repository\UtilisateurRepository'
+            $firebaseService: '@App\Services\FirebaseNotificationService'
+            $logger: '@logger'
+

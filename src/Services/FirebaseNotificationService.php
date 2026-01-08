@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging;
+use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Psr\Log\LoggerInterface;
@@ -12,7 +12,7 @@ readonly class FirebaseNotificationService
 {
 
     public function __construct(
-//        private Messaging       $messaging,
+        private Messaging       $messaging,
         private LoggerInterface $logger,
     )
     {
@@ -47,7 +47,7 @@ readonly class FirebaseNotificationService
                     'timestamp' => time()
                 ])
             ;
-            $this->messaging()->send($message);
+            $this->messaging->send($message);
             $this->logger->info('OTP envoyé via Firebase', ['phone' => $phoneNumber]);
             return true;
         } catch (\Exception $e){
@@ -86,7 +86,7 @@ readonly class FirebaseNotificationService
                     'timestamp' => time()
                 ])
                 ;
-            $this->messaging()->send($message);
+            $this->messaging->send($message);
             $this->logger->info("Demande de transfert envoyée", ['phone' => $phoneNumber]);
             return true;
         } catch (\Exception $e){
@@ -106,7 +106,7 @@ readonly class FirebaseNotificationService
         string $adminFcmToken,
         string $userPhone,
         string $otp
-    )
+    ): bool
     {
         try{
             $message = CloudMessage::new()
@@ -124,7 +124,7 @@ readonly class FirebaseNotificationService
                     'priority' => 'high'
                 ])
                 ;
-            $this->messaging()->send($message);
+            $this->messaging->send($message);
             $this->logger->info("Admin notifié pour transfert",['user_phone' => $userPhone]);
             return true;
         } catch (\Exception $e){
@@ -160,7 +160,7 @@ readonly class FirebaseNotificationService
                 ->withNotification(Notification::create($title, $body))
                 ->withData($data);
 
-            $this->messaging()->send($message);
+            $this->messaging->send($message);
             return true;
         } catch(\Exception $e){
             $this->logger->error("Erreur envoi notification", ['error' => $e->getMessage()]);
@@ -168,9 +168,9 @@ readonly class FirebaseNotificationService
         }
     }
 
-    private function messaging()
-    {
-        $factory = (new Factory())->withServiceAccount(dirname(__DIR__).'/config/firebase.credentials.json');
-        return $factory->createMessaging();
-    }
+//    private function messaging()
+//    {
+//        $factory = (new Factory())->withServiceAccount(dirname(__DIR__).'/config/firebase.credentials.json');
+//        return $factory->createMessaging();
+//    }
 }

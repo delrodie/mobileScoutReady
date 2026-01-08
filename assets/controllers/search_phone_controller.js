@@ -17,12 +17,17 @@ export default class extends Controller {
             'firebase'
         );
 
+        console.log(firebaseController)
+
         let deviceInfo = {
             device_id: this.getOrCreateDeviceId(),
             fcm_token: localStorage.getItem('fcm_token') || '',
             device_platform: 'web',
             device_model: navigator.userAgent
         };
+
+        console.log('device')
+        console.log(deviceInfo)
 
         // Si Firebase controller existe, récupérer les vraies infos
         if (firebaseController) {

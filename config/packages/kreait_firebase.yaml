@@ -1,4 +1,4 @@
 kreait_firebase:
     projects:
         app:
-            credentials: '%kernel.project_dir%/config/firebae_credentials.json'
+            credentials: '%kernel.project_dir%/config/firebase_credentials.json'
