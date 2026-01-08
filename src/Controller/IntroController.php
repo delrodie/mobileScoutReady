@@ -77,7 +77,7 @@ class IntroController extends AbstractController
 
                 // Récupération des infos device depuis le frontend
                 $deviceId = $request->request->get('device_id');
-                $fcmToken = $request->request->get('fcm_token');
+                $fcmToken = $request->request->get('fcm_token'); //dump($deviceId);
                 $devicePlatform = $request->request->get('device_platform') ?? 'unknown';
                 $deviceModel = $request->request->get('device_model') ?? 'unknown';
 
@@ -157,9 +157,5 @@ class IntroController extends AbstractController
         return $this->redirectToRoute('app_accueil');
     }
 
-    #[Route('/verify-device', name:'app_verify_device', methods: ['POST'])]
-    public function verifyDevice(Request $request)
-    {
 
-    }
 }

@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Device } from '@capacitor/device';
 import { Capacitor } from '@capacitor/core';
+import { Toast } from '@capacitor/toast';
 
 export default class extends Controller {
     static values = {
@@ -30,6 +31,7 @@ export default class extends Controller {
 
             if (permStatus.receive !== 'granted') {
                 console.error('❌ Permission notifications refusée');
+                Toast.show({text:'❌ Permission notifications refusée', duration: 'short'})
                 return;
             }
 
@@ -40,9 +42,11 @@ export default class extends Controller {
             this.setupPushNotificationListeners();
 
             console.log("✅ Push notifications initialisées");
+            Toast.show({text: '✅ Push notifications initialisées', duration: 'short'})
 
         } catch (error) {
             console.error("❌ Erreur init push notifications:", error);
+            Toast.show({text:`❌ Erreur init push notifications: ${error}`, duration: 'long', position:'bottom'})
         }
     }
 
@@ -50,6 +54,7 @@ export default class extends Controller {
         // Token FCM reçu
         PushNotifications.addListener('registration', (token) => {
             console.log('🔑 FCM Token reçu:', token.value);
+            Toast.show({text: `🔑 FCM Token reçu:, ${token.value}`, duration: 'long'})
             this.saveFcmToken(token.value);
         });
 
@@ -209,6 +214,7 @@ export default class extends Controller {
             // Stocker le token localement
             localStorage.setItem('fcm_token', fcmToken);
             console.log('💾 FCM Token sauvegardé localement');
+            Toast.show({text: '💾 FCM Token sauvegardé localement', duration: 'short'})
 
             // Dispatcher un événement pour d'autres controllers
             window.dispatchEvent(new CustomEvent('fcm-token-ready', {
