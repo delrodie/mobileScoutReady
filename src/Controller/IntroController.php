@@ -9,6 +9,8 @@ use App\DTO\ProfilDTO;
 use App\Repository\ChampActiviteRepository;
 use App\Repository\FonctionRepository;
 use App\Repository\ScoutRepository;
+use App\Repository\UtilisateurRepository;
+use App\Services\DeviceManagerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +22,9 @@ class IntroController extends AbstractController
 {
     public function __construct(
         private readonly FonctionRepository $fonctionRepository,
-        private readonly ChampActiviteRepository $champActiviteRepository
+        private readonly ChampActiviteRepository $champActiviteRepository,
+        private readonly DeviceManagerService $deviceManager,
+        private readonly UtilisateurRepository $utilisateurRepository
     )
     {
     }
@@ -69,13 +73,30 @@ class IntroController extends AbstractController
             // Si requête AJAX (depuis Stimulus)
             if ($request->isXmlHttpRequest()) {
                 $scout = $scouts[0];
+                $utilisateur = $scout->getUtilisateur();
+
+                // Récupération des infos device depuis le frontend
+                $deviceId = $request->request->get('device_id');
+                $fcmToken = $request->request->get('fcm_token');
+                $devicePlatform = $request->request->get('device_platform') ?? 'unknown';
+                $deviceModel = $request->request->get('device_model') ?? 'unknown';
+
+                // Vérifier le device
+                $deviceCheck = $this->deviceManager->handleDeviceAuthenticatinon(
+                    $utilisateur,
+                    $deviceId,
+                    $fcmToken,
+                    $devicePlatform,
+                    $deviceModel
+                );
+
                 $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
                 $profilDTO = ProfilDTO::fromScout($fonctions);
-
                 $champs = $this->champActiviteRepository->findAll();
                 //dump(ChampsDTO::listChamps($champs));
 
                 return $this->json([
+                    'device_check' => $deviceCheck,
                     'profil' => $profilDTO->profil,
                     'profil_fonction' => $profilDTO->profil_fonction,
                     'profil_instance' => $profilDTO->profil_instance,
@@ -134,5 +155,11 @@ class IntroController extends AbstractController
 
         $request->getSession()->set('profil', $scout);
         return $this->redirectToRoute('app_accueil');
+    }
+
+    #[Route('/verify-device', name:'app_verify_device', methods: ['POST'])]
+    public function verifyDevice(Request $request)
+    {
+
     }
 }

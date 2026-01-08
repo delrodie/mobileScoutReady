@@ -1,8 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import LoadDbController from './local_db_controller.js';
 
-const DB_NAME = 'db_scoutready';
-const DB_VERSION = 1.2; // 🔹 Incrémenté car on ajoute un nouveau champ (qrCodeLocal)
 
 export default class extends Controller {
     static targets = ['form', 'phone'];
@@ -12,6 +10,30 @@ export default class extends Controller {
 
         const form = this.formTarget;
         const formData = new FormData(form);
+
+        // 🔥 Récupérer les infos du device depuis le firebase controller
+        const firebaseController = this.application.getControllerForElementAndIdentifier(
+            document.body,
+            'firebase'
+        );
+
+        let deviceInfo = {
+            device_id: this.getOrCreateDeviceId(),
+            fcm_token: localStorage.getItem('fcm_token') || '',
+            device_platform: 'web',
+            device_model: navigator.userAgent
+        };
+
+        // Si Firebase controller existe, récupérer les vraies infos
+        if (firebaseController) {
+            deviceInfo = await firebaseController.getDeviceInfoForAuth();
+        }
+
+        // Ajouter les infos device au FormData
+        formData.append('device_id', deviceInfo.device_id);
+        formData.append('fcm_token', deviceInfo.fcm_token);
+        formData.append('device_platform', deviceInfo.device_platform);
+        formData.append('device_model', deviceInfo.device_model);
 
         try {
             const response = await fetch(form.action, {
@@ -33,7 +55,29 @@ export default class extends Controller {
 
             console.log("✅ Données reçues du backend:", data);
 
-            console.log("Donnees unique : ", data.profil.isParent)
+            // 🔥 Vérifier le statut du device
+            if (data.device_check) {
+                const deviceCheck = data.device_check;
+
+                switch (deviceCheck.status) {
+                    case 'verification_required':
+                        // Premier device ou nouveau device → attendre OTP
+                        this.showOtpVerificationDialog(data.profil.telephone);
+                        return;
+
+                    case 'new_device':
+                        // Nouveau device détecté → attendre approbation
+                        this.showNewDeviceDialog(deviceCheck);
+                        return;
+
+                    case 'ok':
+                        // Device vérifié → continuer normalement
+                        break;
+
+                    default:
+                        console.warn('Statut device inconnu:', deviceCheck.status);
+                }
+            }
 
             if (data.profil.isParent === true){
                 console.log("Profile parent")
@@ -53,112 +97,189 @@ export default class extends Controller {
         }
     }
 
-    async saveToIndexedDB(data) {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
+    showOtpVerificationDialog(phoneNumber) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'block';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
 
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">🔐 Vérification de l'appareil</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Un code OTP a été envoyé sur votre appareil.</p>
+                        <div class="mb-3">
+                            <label for="otpInput" class="form-label">Entrez le code OTP :</label>
+                            <input type="text" class="form-control" id="otpInput"
+                                   maxlength="6" placeholder="000000" autofocus>
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            ⏱️ Code valide pendant 10 minutes
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-primary" id="verifyOtpBtn">Vérifier</button>
+                    </div>
+                </div>
+            </div>
+        `;
 
-                // 🔹 Création / mise à jour des stores si nécessaires
-                if (!db.objectStoreNames.contains('profil')) {
-                    db.createObjectStore('profil', { keyPath: 'slug' });
-                }
-                if (!db.objectStoreNames.contains('profil_fonction')) {
-                    db.createObjectStore('profil_fonction', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('profil_instance')) {
-                    db.createObjectStore('profil_instance', { keyPath: 'id' });
-                }
-            };
+        document.body.appendChild(modal);
 
-            request.onsuccess = async (event) => {
-                const db = event.target.result;
-                const tx = db.transaction(['profil', 'profil_fonction', 'profil_instance'], 'readwrite');
+        // Event listeners
+        document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+            const otp = document.getElementById('otpInput').value;
+            await this.verifyOtp(phoneNumber, otp);
+            document.body.removeChild(modal);
+        });
 
-                const profilStore = tx.objectStore('profil');
-                const fonctionStore = tx.objectStore('profil_fonction');
-                const instanceStore = tx.objectStore('profil_instance');
-
-                // Nettoyage avant réinsertion
-                profilStore.clear();
-                fonctionStore.clear();
-                instanceStore.clear();
-
-                // Insertion des données
-                profilStore.put(data.profil);
-                fonctionStore.put(data.profil_fonction);
-                instanceStore.put(data.profil_instance);
-
-                tx.oncomplete = async () => {
-                    console.log("💾 Données principales sauvegardées avec succès dans IndexedDB");
-
-                    try {
-                        // ⚡ Téléchargement et stockage du QR code APRÈS la transaction
-                        await LoadDbController.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
-                        // await this.fetchAndStoreQrCode(data.profil.qrCodeFile, data.profil.slug);
-                    } catch (e) {
-                        console.warn("⚠️ Échec téléchargement QR Code :", e);
-                    }
-
-                    resolve();
-                };
-
-                tx.onerror = (e) => reject(e.target.error);
-            };
-
-            request.onerror = (e) => reject(e.target.error);
+        modal.querySelector('[data-dismiss="modal"]').addEventListener('click', () => {
+            document.body.removeChild(modal);
         });
     }
 
-    async fetchAndStoreQrCode(url, slug) {
-        if (!url) return console.warn("⚠️ Aucun QR Code à télécharger");
+    showNewDeviceDialog(deviceCheck) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'block';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
 
-        const absoluteUrl = url.startsWith('http')
-            ? url
-            : `${window.location.origin}/qrcode/${url.replace(/^\/+/, '')}`;
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">📱 Nouvel appareil détecté</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            <strong>⚠️ Attention</strong><br>
+                            ${deviceCheck.message}
+                        </div>
+                        <p>Veuillez approuver la connexion depuis votre ancien appareil.</p>
+                        ${deviceCheck.show_no_access_option ? `
+                            <hr>
+                            <p class="text-muted small">
+                                Vous n'avez plus accès à votre ancien téléphone ?
+                            </p>
+                        ` : ''}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                        ${deviceCheck.show_no_access_option ? `
+                            <button type="button" class="btn btn-warning" id="noAccessBtn">
+                                Je n'ai plus accès à l'ancien téléphone
+                            </button>
+                        ` : ''}
+                        <button type="button" class="btn btn-primary" id="waitApprovalBtn">
+                            En attente d'approbation...
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
 
-        console.log("📡 Téléchargement du QR Code depuis :", absoluteUrl);
+        document.body.appendChild(modal);
 
+        // Event listeners
+        if (deviceCheck.show_no_access_option) {
+            document.getElementById('noAccessBtn').addEventListener('click', async () => {
+                await this.handleNoAccessToOldDevice();
+                document.body.removeChild(modal);
+            });
+        }
+
+        modal.querySelector('[data-dismiss="modal"]').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        // Polling pour vérifier si le transfert a été approuvé
+        this.pollTransferApproval();
+    }
+
+    async verifyOtp(phoneNumber, otp) {
         try {
-            const response = await fetch(absoluteUrl);
-            if (!response.ok) throw new Error(`Erreur téléchargement (${response.status})`);
+            const response = await fetch('/firebase-actions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    phone: phoneNumber,
+                    otp: otp
+                })
+            });
 
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
+            const data = await response.json();
 
-            // On sauvegarde le blob dans une transaction séparée
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
-            request.onsuccess = (event) => {
-                const db = event.target.result;
-                const tx = db.transaction(['profil'], 'readwrite');
-                const store = tx.objectStore('profil');
+            if (data.status === 'verified') {
+                alert('✅ Appareil vérifié avec succès !');
+                // Recharger les données et continuer
+                window.location.reload();
+            } else {
+                alert('❌ Code OTP invalide ou expiré');
+            }
 
-                const getReq = store.get(slug);
-                getReq.onsuccess = () => {
-                    const profil = getReq.result;
-                    if (profil) {
-                        profil.qrCodeBlob = blobUrl;
-                        store.put(profil);
-                        console.log("📸 QR Code sauvegardé localement !");
-                    }
-                };
-            };
-        } catch (e) {
-            console.error("⚠️ Échec du téléchargement du QR Code :", e);
+        } catch (error) {
+            console.error('Erreur vérification OTP:', error);
+            alert('Erreur lors de la vérification');
         }
     }
 
+    async handleNoAccessToOldDevice() {
+        try {
+            const phoneNumber = this.phoneTarget.value;
 
-    /**
-     * Convertit un Blob en chaîne base64
-     */
-    blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
+            const response = await fetch('/firebase-actions/no-access/old/device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    phone: phoneNumber
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'admin_notified') {
+                alert('✅ ' + data.message);
+                // Afficher un dialog pour entrer l'OTP admin
+                this.showOtpVerificationDialog(phoneNumber);
+            }
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue');
+        }
     }
+
+    pollTransferApproval() {
+        // Vérifier toutes les 5 secondes si le transfert a été approuvé
+        const intervalId = setInterval(async () => {
+            // TODO: Ajouter un endpoint pour vérifier le statut
+            // Pour l'instant, on arrête après 2 minutes
+            clearInterval(intervalId);
+        }, 5000);
+
+        // Arrêter après 2 minutes
+        setTimeout(() => {
+            clearInterval(intervalId);
+        }, 120000);
+    }
+
+    getOrCreateDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
+    }
+
 }

@@ -71,4 +71,10 @@ return [
     '@symfony/ux-live-component' => [
         'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
+    '@capacitor/push-notifications' => [
+        'version' => '8.0.0',
+    ],
+    '@capacitor/device' => [
+        'version' => '8.0.0',
+    ],
 ];

@@ -46,6 +46,36 @@ class Utilisateur
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastConnectedIp = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $fcmToken = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $deviceId = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $devicePlatform = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $deviceModel = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $fcmTokenUpdatedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $deviceVerified = null;
+
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $deviceVerificationOtp = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deviceVerificationOtpExpiry = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $previousFcmToken = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $pendingDeviceId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -169,5 +199,139 @@ class Utilisateur
         $this->lastConnectedIp = $lastConnectedIp;
 
         return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
+        $this->fcmTokenUpdatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getDeviceId(): ?string
+    {
+        return $this->deviceId;
+    }
+
+    public function setDeviceId(?string $deviceId): static
+    {
+        $this->deviceId = $deviceId;
+
+        return $this;
+    }
+
+    public function getDevicePlatform(): ?string
+    {
+        return $this->devicePlatform;
+    }
+
+    public function setDevicePlatform(?string $devicePlatform): static
+    {
+        $this->devicePlatform = $devicePlatform;
+
+        return $this;
+    }
+
+    public function getDeviceModel(): ?string
+    {
+        return $this->deviceModel;
+    }
+
+    public function setDeviceModel(?string $deviceModel): static
+    {
+        $this->deviceModel = $deviceModel;
+
+        return $this;
+    }
+
+    public function getFcmTokenUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->fcmTokenUpdatedAt;
+    }
+
+    public function setFcmTokenUpdatedAt(?\DateTimeImmutable $fcmTokenUpdatedAt): static
+    {
+        $this->fcmTokenUpdatedAt = $fcmTokenUpdatedAt;
+
+        return $this;
+    }
+
+    public function isDeviceVerified(): ?bool
+    {
+        return $this->deviceVerified;
+    }
+
+    public function setDeviceVerified(?bool $deviceVerified): static
+    {
+        $this->deviceVerified = $deviceVerified;
+
+        return $this;
+    }
+
+    public function getDeviceVerificationOtp(): ?string
+    {
+        return $this->deviceVerificationOtp;
+    }
+
+    public function setDeviceVerificationOtp(?string $deviceVerificationOtp): static
+    {
+        $this->deviceVerificationOtp = $deviceVerificationOtp;
+
+        return $this;
+    }
+
+    public function getDeviceVerificationOtpExpiry(): ?\DateTimeImmutable
+    {
+        return $this->deviceVerificationOtpExpiry;
+    }
+
+    public function setDeviceVerificationOtpExpiry(?\DateTimeImmutable $deviceVerificationOtpExpiry): static
+    {
+        $this->deviceVerificationOtpExpiry = $deviceVerificationOtpExpiry;
+
+        return $this;
+    }
+
+    public function getPreviousFcmToken(): ?string
+    {
+        return $this->previousFcmToken;
+    }
+
+    public function setPreviousFcmToken(?string $previousFcmToken): static
+    {
+        $this->previousFcmToken = $previousFcmToken;
+
+        return $this;
+    }
+
+    public function getPendingDeviceId(): ?string
+    {
+        return $this->pendingDeviceId;
+    }
+
+    public function setPendingDeviceId(?string $pendingDeviceId): static
+    {
+        $this->pendingDeviceId = $pendingDeviceId;
+
+        return $this;
+    }
+
+    public function isDeviceOptValid(string $otp): bool
+    {
+        if (!$this->deviceVerificationOtp || !$this->deviceVerificationOtpExpiry) {
+            return false;
+        }
+
+        if (new \DateTimeImmutable() > $this->deviceVerificationOtpExpiry){
+            return false;
+        }
+
+        return $this->deviceVerificationOtp === $otp;
     }
 }

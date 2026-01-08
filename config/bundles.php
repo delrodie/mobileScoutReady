@@ -21,4 +21,5 @@ return [
     Flasher\Symfony\FlasherSymfonyBundle::class => ['all' => true],
     Flasher\Notyf\Symfony\FlasherNotyfSymfonyBundle::class => ['all' => true],
     Symfony\UX\LiveComponent\LiveComponentBundle::class => ['all' => true],
+    Kreait\Firebase\Symfony\Bundle\FirebaseBundle::class => ['all' => true],
 ];

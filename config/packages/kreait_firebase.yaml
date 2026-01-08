@@ -1,0 +1,4 @@
+kreait_firebase:
+    projects:
+        app:
+            credentials: '%kernel.project_dir%/config/firebae_credentials.json'
