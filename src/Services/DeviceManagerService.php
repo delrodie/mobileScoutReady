@@ -24,7 +24,7 @@ class DeviceManagerService
     /**
      *Gère la connexion avec vérification du device
      */
-    public function handleDeviceAuthenticatinon(
+    public function handleDeviceAuthentication(
         Utilisateur $utilisateur,
         string $deviceId,
         string $fcmToken,
