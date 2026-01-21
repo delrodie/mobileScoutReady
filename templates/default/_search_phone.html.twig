@@ -82,9 +82,13 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        // Fonction de test des notifications
-        async function testNotificationStatus() {
+    <script type="module">
+        // Import des modules nécessaires
+        import { PushNotifications } from '@capacitor/push-notifications';
+        import { Capacitor } from '@capacitor/core';
+
+        // Fonction de test des notifications (accessible globalement)
+        window.testNotificationStatus = async function() {
             const results = [];
 
             // 1. Vérifier localStorage
@@ -94,46 +98,73 @@
             results.push(`📱 Device ID: ${deviceId ? '✅ Présent' : '❌ Absent'}`);
             results.push(`🔑 Token FCM: ${fcmToken ? '✅ Présent (' + fcmToken.length + ' chars)' : '❌ Absent'}`);
 
+            if (fcmToken) {
+                results.push(`   Aperçu: ${fcmToken.substring(0, 30)}...`);
+            }
+
             // 2. Vérifier Capacitor
-            if (typeof Capacitor !== 'undefined') {
+            try {
                 results.push(`⚡ Capacitor: ✅ Chargé`);
                 results.push(`📍 Platform: ${Capacitor.getPlatform()}`);
                 results.push(`🔌 Native: ${Capacitor.isNativePlatform() ? '✅ Oui' : '⚠️ Non (web)'}`);
-            } else {
-                results.push(`⚡ Capacitor: ❌ Non chargé`);
-            }
 
-            // 3. Vérifier PushNotifications (si disponible)
-            if (typeof PushNotifications !== 'undefined' && Capacitor.isNativePlatform()) {
-                try {
-                    const { PushNotifications } = await import('@capacitor/push-notifications');
-                    const permStatus = await PushNotifications.checkPermissions();
-                    results.push(`🔔 Permissions: ${permStatus.receive}`);
+                // 3. Vérifier PushNotifications (si plateforme native)
+                if (Capacitor.isNativePlatform()) {
+                    try {
+                        const permStatus = await PushNotifications.checkPermissions();
+                        results.push(`🔔 Permissions: ${permStatus.receive}`);
 
-                    if (permStatus.receive === 'denied') {
-                        results.push(`⚠️ Les notifications sont désactivées`);
-                    } else if (permStatus.receive === 'prompt') {
-                        results.push(`⏸️ Permissions non encore demandées`);
-                    } else if (permStatus.receive === 'granted') {
-                        results.push(`✅ Permissions accordées`);
+                        if (permStatus.receive === 'denied') {
+                            results.push(`   ❌ Les notifications sont DÉSACTIVÉES`);
+                            results.push(`   👉 Activer dans: Paramètres > Apps > ScoutReady > Notifications`);
+                        } else if (permStatus.receive === 'prompt') {
+                            results.push(`   ⏸️ Permissions non encore demandées`);
+                            results.push(`   👉 Elles seront demandées lors de la connexion`);
+                        } else if (permStatus.receive === 'granted') {
+                            results.push(`   ✅ Permissions ACCORDÉES`);
+                        }
+                    } catch (e) {
+                        results.push(`❌ Erreur PushNotifications: ${e.message}`);
                     }
-                } catch (e) {
-                    results.push(`❌ Erreur vérification: ${e.message}`);
+                } else {
+                    results.push(`🔔 Mode web - notifications limitées`);
                 }
-            } else {
-                results.push(`🔔 PushNotifications: N/A (web)`);
+
+            } catch (e) {
+                results.push(`❌ Erreur Capacitor: ${e.message}`);
             }
 
             // 4. Vérifier les controllers Stimulus
             const firebaseController = document.querySelector('[data-controller~="firebase"]');
             results.push(`🔥 Firebase Controller: ${firebaseController ? '✅ Présent' : '❌ Absent'}`);
 
+            // 5. Recommandations
+            results.push('');
+            results.push('=== RECOMMANDATIONS ===');
+
+            if (!fcmToken && Capacitor.isNativePlatform()) {
+                results.push('⚠️ TOKEN MANQUANT - Actions:');
+                results.push('1. Redémarrer l\'application');
+                results.push('2. Vérifier les permissions');
+                results.push('3. Vérifier la connexion internet');
+            } else if (fcmToken) {
+                results.push('✅ Tout semble OK !');
+                results.push('Le token FCM est présent et prêt à être utilisé.');
+            }
+
             // Afficher les résultats
-            alert(results.join('\n\n'));
+            alert(results.join('\n'));
 
             // Logger dans la console
             console.log('=== DIAGNOSTIC NOTIFICATIONS ===');
             results.forEach(r => console.log(r));
+
+            return {
+                fcmToken,
+                deviceId,
+                platform: Capacitor.getPlatform(),
+                isNative: Capacitor.isNativePlatform()
+            };
         }
     </script>
 {% endblock %}
