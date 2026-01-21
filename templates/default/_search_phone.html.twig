@@ -1,13 +1,20 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    
     <div
-        data-controller="search-phone form-loader"
+        data-controller="search-phone firebase form-loader"
+        data-firebase-phone-value=""
         class="d-flex justify-content-center align-items-center align-content-center vh-100"
     >
-        <div class="mx-w-sm mx-auto d-flex flex-column justify-content-center align-items-center">
+        <div class="mx-w-sm mx-auto d-flex flex-column justify-content-center align-items-center px-3">
             <img src="{{ asset('img/logo-scoutready.png') }}" alt="" class="img-fluid" style="width:250px">
+
+            {# Statut des notifications #}
+            <div class="w-100 mt-3" style="max-width: 340px;">
+                <div data-search-phone-target="permissionStatus">
+                    {# Sera rempli dynamiquement #}
+                </div>
+            </div>
 
             <div class="d-flex flex-column justify-content-center align-items-center mt-3">
                 <p class="px-4 text-center" style="font-size: 15px;">
@@ -20,9 +27,10 @@
                     action="{{ path('app_search_phone') }}"
                     method="post"
                 >
-                    <div class="position-relative mb-3 mt-5" style="max-width: 340px; width: 100%;">
+                    <div class="position-relative mb-3 mt-4" style="max-width: 340px; width: 100%;">
                         <input type="tel"
                                name="_phone_search"
+                               data-search-phone-target="phone"
                                class="form-control form-control-lg input-style ps-5"
                                id="phoneInput"
                                placeholder="Entre votre numéro de téléphone"
@@ -46,14 +54,88 @@
                         </button>
                     </div>
                 </form>
+
+                {# Bouton de debug pour tester les notifications #}
+                <div class="mt-3 w-100" style="max-width: 340px;">
+                    <button
+                        class="btn btn-outline-secondary btn-sm w-100"
+                        onclick="testNotificationStatus()"
+                        type="button">
+                        <i class="bi bi-bell"></i> Vérifier les notifications
+                    </button>
+                </div>
             </div>
 
             <p class="fst-italic fw-light text-center mt-5 px-4" style="font-size:13px">
                 NB: Le numéro de téléphone ne sera partagé à aucun membre de la communauté sauf aux Admins.
             </p>
+
+            {# Info sur les notifications #}
+            <div class="alert alert-info small mt-3 px-3" style="max-width: 340px;">
+                <i class="bi bi-info-circle"></i>
+                <strong>Notifications requises :</strong><br>
+                Cette application utilise les notifications pour vous envoyer des codes de vérification sécurisés.
+            </div>
         </div>
     </div>
 {% endblock %}
 
-{% block title %}{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Fonction de test des notifications
+        async function testNotificationStatus() {
+            const results = [];
 
+            // 1. Vérifier localStorage
+            const fcmToken = localStorage.getItem('fcm_token');
+            const deviceId = localStorage.getItem('device_id');
+
+            results.push(`📱 Device ID: ${deviceId ? '✅ Présent' : '❌ Absent'}`);
+            results.push(`🔑 Token FCM: ${fcmToken ? '✅ Présent (' + fcmToken.length + ' chars)' : '❌ Absent'}`);
+
+            // 2. Vérifier Capacitor
+            if (typeof Capacitor !== 'undefined') {
+                results.push(`⚡ Capacitor: ✅ Chargé`);
+                results.push(`📍 Platform: ${Capacitor.getPlatform()}`);
+                results.push(`🔌 Native: ${Capacitor.isNativePlatform() ? '✅ Oui' : '⚠️ Non (web)'}`);
+            } else {
+                results.push(`⚡ Capacitor: ❌ Non chargé`);
+            }
+
+            // 3. Vérifier PushNotifications (si disponible)
+            if (typeof PushNotifications !== 'undefined' && Capacitor.isNativePlatform()) {
+                try {
+                    const { PushNotifications } = await import('@capacitor/push-notifications');
+                    const permStatus = await PushNotifications.checkPermissions();
+                    results.push(`🔔 Permissions: ${permStatus.receive}`);
+
+                    if (permStatus.receive === 'denied') {
+                        results.push(`⚠️ Les notifications sont désactivées`);
+                    } else if (permStatus.receive === 'prompt') {
+                        results.push(`⏸️ Permissions non encore demandées`);
+                    } else if (permStatus.receive === 'granted') {
+                        results.push(`✅ Permissions accordées`);
+                    }
+                } catch (e) {
+                    results.push(`❌ Erreur vérification: ${e.message}`);
+                }
+            } else {
+                results.push(`🔔 PushNotifications: N/A (web)`);
+            }
+
+            // 4. Vérifier les controllers Stimulus
+            const firebaseController = document.querySelector('[data-controller~="firebase"]');
+            results.push(`🔥 Firebase Controller: ${firebaseController ? '✅ Présent' : '❌ Absent'}`);
+
+            // Afficher les résultats
+            alert(results.join('\n\n'));
+
+            // Logger dans la console
+            console.log('=== DIAGNOSTIC NOTIFICATIONS ===');
+            results.forEach(r => console.log(r));
+        }
+    </script>
+{% endblock %}
+
+{% block title %}Connexion{% endblock %}
