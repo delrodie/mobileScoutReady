@@ -9,11 +9,7 @@ export default class extends Controller {
 
     async connect() {
         console.log('🔌 Search Phone Controller connecté');
-
-        // Vérifier l'état des permissions au chargement
         await this.checkNotificationPermissions();
-
-        // Écouter l'événement de token prêt
         window.addEventListener('fcm-token-ready', (e) => {
             console.log('✅ Token FCM prêt:', e.detail.fcmToken);
             this.updatePermissionStatus('granted');
@@ -30,7 +26,6 @@ export default class extends Controller {
         try {
             const permStatus = await PushNotifications.checkPermissions();
             console.log('🔍 Statut permissions:', permStatus);
-
             this.updatePermissionStatus(permStatus.receive);
 
             if (permStatus.receive === 'denied') {
@@ -38,14 +33,12 @@ export default class extends Controller {
             } else if (permStatus.receive === 'prompt') {
                 this.showPermissionPrompt();
             } else if (permStatus.receive === 'granted') {
-                // Vérifier si le token existe déjà
                 const token = localStorage.getItem('fcm_token');
                 if (!token) {
                     console.warn('⚠️ Permission accordée mais pas de token');
                     await this.requestNotificationSetup();
                 }
             }
-
         } catch (error) {
             console.error('❌ Erreur vérification permissions:', error);
             Toast.show({
@@ -56,7 +49,6 @@ export default class extends Controller {
     }
 
     updatePermissionStatus(status) {
-        // Mettre à jour l'interface si un élément de statut existe
         if (this.hasPermissionStatusTarget) {
             const statusMessages = {
                 'granted': '✅ Notifications activées',
@@ -91,7 +83,6 @@ export default class extends Controller {
         `;
 
         if (confirm(message + '\n\nOuvrir les paramètres maintenant ?')) {
-            // Sur certaines plateformes, on peut ouvrir les paramètres
             Toast.show({
                 text: 'Veuillez activer les notifications dans les paramètres',
                 duration: 'long'
@@ -134,7 +125,6 @@ export default class extends Controller {
                 this.updatePermissionStatus('denied');
                 this.showPermissionDeniedWarning();
             }
-
         } catch (error) {
             console.error('❌ Erreur demande permissions:', error);
             Toast.show({
@@ -147,7 +137,6 @@ export default class extends Controller {
     async submit(event) {
         event.preventDefault();
 
-        // 🔥 Vérifier les permissions AVANT la soumission
         const permissionsOk = await this.ensureNotificationsEnabled();
 
         if (!permissionsOk) {
@@ -158,7 +147,6 @@ export default class extends Controller {
         const form = this.formTarget;
         const formData = new FormData(form);
 
-        // 🔥 Récupérer les infos du device depuis le firebase controller
         const firebaseController = this.application.getControllerForElementAndIdentifier(
             document.body,
             'firebase'
@@ -175,7 +163,6 @@ export default class extends Controller {
 
         console.log('📱 Device Info initial:', deviceInfo);
 
-        // Si Firebase controller existe, récupérer les vraies infos
         if (firebaseController) {
             try {
                 deviceInfo = await firebaseController.getDeviceInfoForAuth();
@@ -185,7 +172,6 @@ export default class extends Controller {
             }
         }
 
-        // ⚠️ Vérifier que le token n'est pas vide
         if (!deviceInfo.fcm_token && Capacitor.isNativePlatform()) {
             console.error('❌ Token FCM manquant!');
 
@@ -199,7 +185,6 @@ export default class extends Controller {
 
             if (retry) {
                 await this.requestNotificationSetup();
-                // Attendre 2 secondes pour laisser le temps au token d'arriver
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 deviceInfo.fcm_token = localStorage.getItem('fcm_token') || '';
 
@@ -212,7 +197,6 @@ export default class extends Controller {
             }
         }
 
-        // Ajouter les infos device au FormData
         formData.append('device_id', deviceInfo.device_id);
         formData.append('fcm_token', deviceInfo.fcm_token);
         formData.append('device_platform', deviceInfo.device_platform);
@@ -248,13 +232,16 @@ export default class extends Controller {
 
             console.log("✅ Données reçues du backend:", data);
 
-            // 🔥 Vérifier le statut du device
+            // 🔥 FLUX CORRIGÉ - Stocker les données pour utilisation après OTP
+            sessionStorage.setItem('pending_login_data', JSON.stringify(data));
+            sessionStorage.setItem('pending_phone', data.profil.telephone);
+
             if (data.device_check) {
                 const deviceCheck = data.device_check;
 
                 switch (deviceCheck.status) {
                     case 'verification_required':
-                        // Premier device ou nouveau device → attendre OTP
+                        console.log('🔐 Premier device - OTP requis');
                         Toast.show({
                             text: '📬 Code OTP envoyé',
                             duration: 'long'
@@ -263,16 +250,16 @@ export default class extends Controller {
                         return;
 
                     case 'new_device':
-                        // Nouveau device détecté → attendre approbation
+                        console.log('📱 Nouveau device détecté');
                         Toast.show({
                             text: '🔔 Notification envoyée sur votre ancien appareil',
                             duration: 'long'
                         });
-                        this.showNewDeviceDialog(deviceCheck);
+                        this.showNewDeviceDialog(deviceCheck, data.profil.telephone);
                         return;
 
                     case 'ok':
-                        // Device vérifié → continuer normalement
+                        console.log('✅ Device vérifié - accès direct');
                         Toast.show({
                             text: '✅ Connexion réussie',
                             duration: 'short'
@@ -280,19 +267,17 @@ export default class extends Controller {
                         break;
 
                     default:
-                        console.warn('Statut device inconnu:', deviceCheck.status);
+                        console.warn('⚠️ Statut device inconnu:', deviceCheck.status);
                 }
             }
 
             if (data.profil.isParent === true){
-                console.log("Profile parent");
+                console.log("➡️ Profil parent");
                 Turbo.visit('/intro/choix/profil');
                 return;
             }
 
             await LoadDbController.saveToIndexedDB(data);
-
-            // Redirection vers l'accueil après succès
             Turbo.visit('/accueil');
 
         } catch (error) {
@@ -307,7 +292,6 @@ export default class extends Controller {
 
     async ensureNotificationsEnabled() {
         if (!Capacitor.isNativePlatform()) {
-            // Sur web, on continue sans vérification
             return true;
         }
 
@@ -322,7 +306,6 @@ export default class extends Controller {
                 const requested = await PushNotifications.requestPermissions();
                 if (requested.receive === 'granted') {
                     await PushNotifications.register();
-                    // Attendre que le token arrive
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     return true;
                 }
@@ -347,10 +330,8 @@ export default class extends Controller {
             }
 
             return false;
-
         } catch (error) {
             console.error('❌ Erreur vérification permissions:', error);
-            // En cas d'erreur, on continue quand même (pour le web)
             return true;
         }
     }
@@ -360,6 +341,7 @@ export default class extends Controller {
         modal.className = 'modal fade show';
         modal.style.display = 'block';
         modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.id = 'otpVerificationModal';
 
         modal.innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
@@ -371,12 +353,13 @@ export default class extends Controller {
                         <p>Un code OTP a été envoyé sur votre appareil.</p>
                         <div class="mb-3">
                             <label for="otpInput" class="form-label">Entrez le code OTP :</label>
-                            <input type="text" class="form-control" id="otpInput"
+                            <input type="text" class="form-control form-control-lg text-center" id="otpInput"
                                    maxlength="6" placeholder="000000" autofocus>
                         </div>
                         <div class="alert alert-info" role="alert">
                             ⏱️ Code valide pendant 10 minutes
                         </div>
+                        <div id="otpError" class="alert alert-danger d-none"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
@@ -388,23 +371,53 @@ export default class extends Controller {
 
         document.body.appendChild(modal);
 
-        // Event listeners
         document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
             const otp = document.getElementById('otpInput').value;
-            await this.verifyOtp(phoneNumber, otp);
-            document.body.removeChild(modal);
+            const btn = document.getElementById('verifyOtpBtn');
+            const errorDiv = document.getElementById('otpError');
+
+            if (!otp || otp.length !== 6) {
+                errorDiv.textContent = 'Veuillez entrer un code à 6 chiffres';
+                errorDiv.classList.remove('d-none');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Vérification...';
+            errorDiv.classList.add('d-none');
+
+            const success = await this.verifyOtp(phoneNumber, otp);
+
+            if (success) {
+                document.body.removeChild(modal);
+                // 🔥 CORRECTION: Continuer le flux après vérification
+                await this.continueAfterOtpVerification();
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = 'Vérifier';
+                errorDiv.textContent = 'Code OTP invalide ou expiré';
+                errorDiv.classList.remove('d-none');
+            }
         });
 
         modal.querySelector('[data-dismiss="modal"]').addEventListener('click', () => {
             document.body.removeChild(modal);
         });
+
+        // Enter pour valider
+        document.getElementById('otpInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('verifyOtpBtn').click();
+            }
+        });
     }
 
-    showNewDeviceDialog(deviceCheck) {
+    showNewDeviceDialog(deviceCheck, phoneNumber) {
         const modal = document.createElement('div');
         modal.className = 'modal fade show';
         modal.style.display = 'block';
         modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.id = 'newDeviceModal';
 
         modal.innerHTML = `
             <div class="modal-dialog modal-dialog-centered">
@@ -432,8 +445,8 @@ export default class extends Controller {
                                 Je n'ai plus accès à l'ancien téléphone
                             </button>
                         ` : ''}
-                        <button type="button" class="btn btn-primary" id="waitApprovalBtn">
-                            En attente d'approbation...
+                        <button type="button" class="btn btn-primary" id="waitApprovalBtn" disabled>
+                            <span class="spinner-border spinner-border-sm"></span> En attente...
                         </button>
                     </div>
                 </div>
@@ -442,11 +455,10 @@ export default class extends Controller {
 
         document.body.appendChild(modal);
 
-        // Event listeners
         if (deviceCheck.show_no_access_option) {
             document.getElementById('noAccessBtn').addEventListener('click', async () => {
-                await this.handleNoAccessToOldDevice();
                 document.body.removeChild(modal);
+                await this.handleNoAccessToOldDevice(phoneNumber);
             });
         }
 
@@ -454,12 +466,13 @@ export default class extends Controller {
             document.body.removeChild(modal);
         });
 
-        // Polling pour vérifier si le transfert a été approuvé
         this.pollTransferApproval();
     }
 
     async verifyOtp(phoneNumber, otp) {
         try {
+            console.log('🔍 Vérification OTP:', { phone: phoneNumber, otp });
+
             const response = await fetch('/firebase-actions/', {
                 method: 'POST',
                 headers: {
@@ -473,33 +486,71 @@ export default class extends Controller {
             });
 
             const data = await response.json();
+            console.log('📥 Réponse vérification OTP:', data);
 
             if (data.status === 'verified') {
                 Toast.show({
                     text: '✅ Appareil vérifié',
                     duration: 'short'
                 });
-                window.location.reload();
+                return true;
             } else {
                 Toast.show({
                     text: '❌ Code OTP invalide',
                     duration: 'long'
                 });
+                return false;
             }
-
         } catch (error) {
-            console.error('Erreur vérification OTP:', error);
+            console.error('❌ Erreur vérification OTP:', error);
             Toast.show({
                 text: '❌ Erreur de vérification',
                 duration: 'long'
             });
+            return false;
         }
     }
 
-    async handleNoAccessToOldDevice() {
-        try {
-            const phoneNumber = this.phoneTarget.value;
+    // 🔥 NOUVEAU: Continuer le flux après vérification OTP
+    async continueAfterOtpVerification() {
+        console.log('✅ OTP vérifié - continuation du flux');
 
+        const pendingData = sessionStorage.getItem('pending_login_data');
+
+        if (!pendingData) {
+            console.warn('⚠️ Pas de données en attente, rechargement');
+            window.location.reload();
+            return;
+        }
+
+        try {
+            const data = JSON.parse(pendingData);
+            sessionStorage.removeItem('pending_login_data');
+            sessionStorage.removeItem('pending_phone');
+
+            console.log('💾 Données récupérées, redirection...');
+
+            if (data.profil.isParent === true){
+                console.log("➡️ Profil parent");
+                Turbo.visit('/intro/choix/profil');
+                return;
+            }
+
+            await LoadDbController.saveToIndexedDB(data);
+            Toast.show({
+                text: '✅ Connexion réussie',
+                duration: 'short'
+            });
+            Turbo.visit('/accueil');
+
+        } catch (error) {
+            console.error('❌ Erreur continuation flux:', error);
+            window.location.reload();
+        }
+    }
+
+    async handleNoAccessToOldDevice(phoneNumber) {
+        try {
             const response = await fetch('/firebase-actions/no-access/old/device', {
                 method: 'POST',
                 headers: {
@@ -520,7 +571,6 @@ export default class extends Controller {
                 });
                 this.showOtpVerificationDialog(phoneNumber);
             }
-
         } catch (error) {
             console.error('Erreur:', error);
             Toast.show({
@@ -531,14 +581,10 @@ export default class extends Controller {
     }
 
     pollTransferApproval() {
-        // Vérifier toutes les 5 secondes si le transfert a été approuvé
         const intervalId = setInterval(async () => {
-            // TODO: Ajouter un endpoint pour vérifier le statut
-            // Pour l'instant, on arrête après 2 minutes
             clearInterval(intervalId);
         }, 5000);
 
-        // Arrêter après 2 minutes
         setTimeout(() => {
             clearInterval(intervalId);
         }, 120000);

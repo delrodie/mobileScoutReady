@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -25,8 +27,8 @@ readonly class FirebaseNotificationService
      * @param string $otp
      * @param string $phoneNumber
      * @return bool
-     * @throws \Kreait\Firebase\Exception\FirebaseException
-     * @throws \Kreait\Firebase\Exception\MessagingException
+     * @throws FirebaseException
+     * @throws MessagingException
      */
 
     public function sendDeviceVerificationOtp(string $fcmToken, string $otp, string $phoneNumber): bool
