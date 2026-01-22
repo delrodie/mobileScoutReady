@@ -163,6 +163,12 @@ readonly class FirebaseNotificationService
                 ->withData($data);
 
             $this->messaging->send($message);
+
+            $this->logger->info('Notification envoyée avec succès', [
+//                'phone' => $user->getTelephone(),
+                'token' => substr($fcmToken, 0, 20) . '...'
+            ]);
+
             return true;
         } catch(\Exception $e){
             $this->logger->error("Erreur envoi notification", ['error' => $e->getMessage()]);
