@@ -77,4 +77,7 @@ return [
     '@capacitor/device' => [
         'version' => '8.0.0',
     ],
+    '@capacitor/local-notifications' => [
+        'version' => '8.0.0',
+    ],
 ];
