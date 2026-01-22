@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:test-send-notification',
-    description: "Test d'envoie de notification",
+    description: "Test d'envoie de notification ",
 )]
 class TestSendNotificationCommand extends Command
 {
