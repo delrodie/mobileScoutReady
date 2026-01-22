@@ -61,7 +61,7 @@ class TestSendNotificationCommand extends Command
         // Test d'envoi de notification
         $io->newLine();
         $io->section("Test d'envoi de notification");
-        $sendTest = $io->confirm("Voulez-vous envoyer une notification de test ?", false);
+        $sendTest = $io->confirm("Voulez-vous envoyer une notification de test ?", true);
 
         if ($sendTest){
             $io->text("Envoi d'une notification test ...");
