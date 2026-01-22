@@ -159,7 +159,7 @@ readonly class FirebaseNotificationService
     {
         try{
             $message = CloudMessage::new()
-                ->toToken('token', $fcmToken)
+                ->toToken($fcmToken)
                 ->withNotification(Notification::create($title, $body))
                 ->withData($data);
 
