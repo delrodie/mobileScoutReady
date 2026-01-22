@@ -28,9 +28,7 @@ class TestSendNotificationCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('phone', InputArgument::REQUIRED, 'Numéro de téléphone')
-//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
+        $this->addArgument('phone', InputArgument::REQUIRED, 'Numéro de téléphone')
         ;
     }
 
@@ -41,10 +39,10 @@ class TestSendNotificationCommand extends Command
 
         // Recherche de l'utilisateur
         $io->text("Recherche de l'utilisateur....");
-        $utilisateur = $this->utilisateurRepository->findOneBy(['telephone', $phoneNumber]);
+        $utilisateur = $this->utilisateurRepository->findOneBy(['telephone' => $phoneNumber]);
 
-        if ($utilisateur) {
-            $io->error(sprintf("le numero {$phoneNumber} ne correspond à aucun utilisateur"));
+        if (!$utilisateur) {
+            $io->error("le numero {$phoneNumber} ne correspond à aucun utilisateur");
             return Command::FAILURE;
         }
 
@@ -63,7 +61,7 @@ class TestSendNotificationCommand extends Command
         // Test d'envoi de notification
         $io->newLine();
         $io->section("Test d'envoi de notification");
-        $sendTest = $io->confirm("Voulez-vous envoyer une notification de test ?", true);
+        $sendTest = $io->confirm("Voulez-vous envoyer une notification de test ?", false);
 
         if ($sendTest){
             $io->text("Envoi d'une notification test ...");
