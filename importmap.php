@@ -80,4 +80,28 @@ return [
     '@capacitor/local-notifications' => [
         'version' => '8.0.0',
     ],
+    'firebase/app' => [
+        'version' => '12.9.0',
+    ],
+    '@firebase/app' => [
+        'version' => '0.14.6',
+    ],
+    '@firebase/component' => [
+        'version' => '0.7.0',
+    ],
+    '@firebase/logger' => [
+        'version' => '0.5.0',
+    ],
+    '@firebase/util' => [
+        'version' => '1.13.0',
+    ],
+    'idb' => [
+        'version' => '7.1.1',
+    ],
+    'firebase/auth' => [
+        'version' => '12.9.0',
+    ],
+    '@firebase/auth' => [
+        'version' => '1.12.0',
+    ],
 ];

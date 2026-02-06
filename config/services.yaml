@@ -38,6 +38,6 @@ services:
         arguments:
             $em: '@doctrine.orm.entity_manager'
             $utilisateurRepository: '@App\Repository\UtilisateurRepository'
-            $firebaseService: '@App\Services\FirebaseNotificationService'
+#            $firebaseService: '@App\Services\FirebaseNotificationService'
             $logger: '@logger'
 
