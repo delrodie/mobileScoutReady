@@ -74,6 +74,7 @@ class IntroController extends AbstractController
 
             // Si requête AJAX (depuis Stimulus)
             if ($request->isXmlHttpRequest()) {
+                try {
                 $scout = $scouts[0];
                 $utilisateur = $scout->getUtilisateur();
 
@@ -114,6 +115,13 @@ class IntroController extends AbstractController
                     'profil_instance' => $profilDTO->profil_instance,
                     'champs_activite' => ChampsDTO::listChamps($champs)
                 ]);
+                } catch (\Throwable $e) {
+                    return $this->json([
+                        'error' => true,
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
             }
 
             // Cas fallback (classique)
