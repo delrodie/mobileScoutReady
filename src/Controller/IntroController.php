@@ -14,6 +14,7 @@ use App\Repository\UtilisateurRepository;
 use App\Services\DeviceManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +30,7 @@ class IntroController extends AbstractController
         private readonly DeviceManagerService $deviceManager,
         private readonly UtilisateurRepository $utilisateurRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly Logger $logger
+        private readonly LoggerInterface $logger
     ) {}
 
     #[Route('/', name:'app_intro_synchro')]
