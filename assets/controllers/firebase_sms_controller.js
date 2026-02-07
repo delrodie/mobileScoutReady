@@ -38,6 +38,8 @@ export default class extends Controller {
                 appId: firebaseConfig.appId // "VOTRE_APP_ID"
             };
 
+            console.log(configFirebase);
+
             // Initialiser Firebase
             const app = initializeApp(configFirebase);
             this.auth = getAuth(app);

@@ -26,6 +26,9 @@ export default class extends Controller {
             'firebase-sms'
         );
 
+        console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
+        console.log(firebaseSmsController);
+
         let deviceInfo = {
             device_id: this.getOrCreateDeviceId(),
             device_platform: 'web',
