@@ -52,14 +52,17 @@ export default class extends Controller {
                 duration: 'short'
             });
 
-            console.log(form);
-            Toast.show({text: form, duration: 'long'});
+            console.log(form.action);
+            Toast.show({text: form, duration: 'short'});
 
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
+
+            console.log(response);
+            Toast.show({text: response, duration: 'short'});
 
             if (!response.ok) throw new Error("Erreur serveur");
 
