@@ -52,6 +52,9 @@ export default class extends Controller {
                 duration: 'short'
             });
 
+            console.log(form);
+            Toast.show({text: form, duration: 'long'});
+
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: formData,
