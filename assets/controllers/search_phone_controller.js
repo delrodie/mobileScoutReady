@@ -52,7 +52,7 @@ export default class extends Controller {
                 duration: 'short'
             });
 
-            console.log(form.action);
+            console.log(formData);
             Toast.show({text: form, duration: 'short'});
 
             const response = await fetch(form.action, {

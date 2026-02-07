@@ -13,6 +13,7 @@ use App\Repository\ScoutRepository;
 use App\Repository\UtilisateurRepository;
 use App\Services\DeviceManagerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +28,8 @@ class IntroController extends AbstractController
         private readonly ChampActiviteRepository $champActiviteRepository,
         private readonly DeviceManagerService $deviceManager,
         private readonly UtilisateurRepository $utilisateurRepository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Logger $logger
     ) {}
 
     #[Route('/', name:'app_intro_synchro')]
@@ -45,6 +47,8 @@ class IntroController extends AbstractController
 
             $phoneRequest = $request->request->get('_phone_search');
             $scouts = $scoutRepository->findBy(['telephone' => $phoneRequest]);
+
+            $this->logger->info("Le telephone {$phoneRequest}");
 
             $session->set('_phone_input', $phoneRequest);
 
