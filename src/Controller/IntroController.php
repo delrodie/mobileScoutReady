@@ -6,11 +6,13 @@ namespace App\Controller;
 
 use App\DTO\ChampsDTO;
 use App\DTO\ProfilDTO;
+use App\Entity\Utilisateur;
 use App\Repository\ChampActiviteRepository;
 use App\Repository\FonctionRepository;
 use App\Repository\ScoutRepository;
 use App\Repository\UtilisateurRepository;
 use App\Services\DeviceManagerService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +26,8 @@ class IntroController extends AbstractController
         private readonly FonctionRepository $fonctionRepository,
         private readonly ChampActiviteRepository $champActiviteRepository,
         private readonly DeviceManagerService $deviceManager,
-        private readonly UtilisateurRepository $utilisateurRepository
+        private readonly UtilisateurRepository $utilisateurRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {}
 
     #[Route('/', name:'app_intro_synchro')]
@@ -68,6 +71,15 @@ class IntroController extends AbstractController
             if ($request->isXmlHttpRequest()) {
                 $scout = $scouts[0];
                 $utilisateur = $scout->getUtilisateur();
+
+                // 🔥 Correction: Créer l'utilisateur s'il n'existe pas
+                if (!$utilisateur) {
+                    $utilisateur = new Utilisateur();
+                    $utilisateur->setScout($scout);
+                    $utilisateur->setTelephone($scout->getTelephone());
+                    $this->entityManager->persist($utilisateur);
+                    $this->entityManager->flush();
+                }
 
                 // 🔥 Récupérer les infos device depuis le frontend
                 $deviceId = $request->request->get('device_id');
