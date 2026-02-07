@@ -92,6 +92,8 @@ class IntroController extends AbstractController
                 $devicePlatform = $request->request->get('device_platform') ?? 'unknown';
                 $deviceModel = $request->request->get('device_model') ?? 'unknown';
 
+                $this->logger->info("device_plateforme: {$devicePlatform}, device_id: {$deviceId}, device_model: {$deviceModel}");
+
                 // 🔥 Vérifier le device
                 $deviceCheck = $this->deviceManager->handleDeviceAuthentication(
                     $utilisateur,
