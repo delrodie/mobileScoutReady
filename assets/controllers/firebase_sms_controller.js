@@ -4,17 +4,12 @@ import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth
 import { Device } from '@capacitor/device';
 import { Capacitor } from '@capacitor/core';
 import { Toast } from '@capacitor/toast';
-import { firebaseConfig } from "../../assets/firebaseConfig.js";
 
 /**
- * Contrôleur Firebase SIMPLIFIÉ pour SMS OTP
- * Gère l'envoi et la vérification des SMS via Firebase Auth
+ * Contrôleur Firebase pour SMS OTP
+ * Gère UNIQUEMENT l'envoi et la vérification des SMS
  */
 export default class extends Controller {
-    static values = {
-        phone: String
-    }
-
     async connect() {
         console.log("📱 Firebase SMS Controller connecté");
 
@@ -22,53 +17,43 @@ export default class extends Controller {
         this.initializeFirebase();
     }
 
-    /**
-     * Initialise Firebase avec votre configuration
-     */
     initializeFirebase() {
         try {
-            // ✅ VOTRE CONFIGURATION FIREBASE ICI
-            // Allez sur Firebase Console > Paramètres du projet > Config
-            const configFirebase = {
-                apiKey: firebaseConfig.apiKey, // "VOTRE_API_KEY",
-                authDomain: firebaseConfig.authDomain, // "VOTRE_PROJECT_ID.firebaseapp.com",
-                projectId: firebaseConfig.projectId, // "VOTRE_PROJECT_ID",
-                storageBucket: firebaseConfig.storageBucket, // "VOTRE_PROJECT_ID.appspot.com",
-                messagingSenderId: firebaseConfig.messagingSenderId, // "VOTRE_MESSAGING_SENDER_ID",
-                appId: firebaseConfig.appId // "VOTRE_APP_ID"
+            // ⚙️ CONFIGURATION FIREBASE
+            // Récupérez ces valeurs depuis: Firebase Console > Paramètres du projet > Config
+            const firebaseConfig = {
+                apiKey: "VOTRE_API_KEY_ICI",
+                authDomain: "VOTRE_PROJECT_ID.firebaseapp.com",
+                projectId: "VOTRE_PROJECT_ID",
+                storageBucket: "VOTRE_PROJECT_ID.appspot.com",
+                messagingSenderId: "VOTRE_SENDER_ID",
+                appId: "VOTRE_APP_ID"
             };
 
-            console.log(configFirebase);
-
             // Initialiser Firebase
-            const app = initializeApp(configFirebase);
+            const app = initializeApp(firebaseConfig);
             this.auth = getAuth(app);
-            this.auth.languageCode = 'fr'; // SMS en français
+            this.auth.languageCode = 'fr';
 
             console.log('✅ Firebase Auth initialisé');
 
         } catch (error) {
-            console.error('❌ Erreur initialisation Firebase:', error);
-            Toast.show({
-                text: '❌ Erreur Firebase',
-                duration: 'long'
-            });
+            console.error('❌ Erreur init Firebase:', error);
         }
     }
 
     /**
-     * Envoie un code OTP par SMS
-     * Cette méthode est appelée depuis search_phone_controller
+     * Envoie un SMS OTP via Firebase
+     * Appelé par search_phone_controller
      */
     async sendSmsOtp(phoneNumber) {
         try {
             console.log('📤 Envoi SMS OTP pour:', phoneNumber);
 
-            // Formater le numéro au format international
             const formattedPhone = this.formatPhoneNumber(phoneNumber);
             console.log('📱 Numéro formaté:', formattedPhone);
 
-            // Configurer reCAPTCHA (nécessaire pour le web, pas pour mobile)
+            // Configurer reCAPTCHA (web uniquement)
             if (!Capacitor.isNativePlatform()) {
                 await this.setupRecaptcha();
             }
@@ -78,14 +63,14 @@ export default class extends Controller {
                 duration: 'short'
             });
 
-            // ✅ ENVOYER LE SMS via Firebase
+            // ✅ ENVOYER LE SMS
             const confirmationResult = await signInWithPhoneNumber(
                 this.auth,
                 formattedPhone,
                 this.recaptchaVerifier || undefined
             );
 
-            // Sauvegarder pour vérification ultérieure
+            // Sauvegarder pour vérification
             window.confirmationResult = confirmationResult;
 
             console.log('✅ SMS envoyé avec succès');
@@ -95,11 +80,6 @@ export default class extends Controller {
                 duration: 'short'
             });
 
-            // Notifier que le SMS a été envoyé
-            window.dispatchEvent(new CustomEvent('sms-otp-sent', {
-                detail: { phoneNumber: formattedPhone }
-            }));
-
             return {
                 success: true,
                 phoneNumber: formattedPhone
@@ -108,13 +88,12 @@ export default class extends Controller {
         } catch (error) {
             console.error('❌ Erreur envoi SMS:', error);
 
-            // Messages d'erreur personnalisés
             let errorMessage = 'Erreur lors de l\'envoi du SMS';
 
             if (error.code === 'auth/invalid-phone-number') {
-                errorMessage = 'Numéro de téléphone invalide';
+                errorMessage = 'Numéro invalide';
             } else if (error.code === 'auth/too-many-requests') {
-                errorMessage = 'Trop de tentatives. Réessayez dans quelques minutes';
+                errorMessage = 'Trop de tentatives. Réessayez plus tard';
             } else if (error.code === 'auth/quota-exceeded') {
                 errorMessage = 'Quota SMS dépassé';
             }
@@ -132,14 +111,14 @@ export default class extends Controller {
     }
 
     /**
-     * Vérifie le code OTP saisi par l'utilisateur
+     * Vérifie le code OTP saisi
      */
     async verifySmsOtp(code) {
         try {
             console.log('🔍 Vérification code OTP');
 
             if (!window.confirmationResult) {
-                throw new Error('Session expirée, veuillez redemander un code');
+                throw new Error('Session expirée');
             }
 
             Toast.show({
@@ -147,15 +126,11 @@ export default class extends Controller {
                 duration: 'short'
             });
 
-            // ✅ VÉRIFIER LE CODE avec Firebase
+            // ✅ VÉRIFIER LE CODE
             const result = await window.confirmationResult.confirm(code);
-
-            // Récupérer l'ID token (optionnel, pour auth serveur)
-            const idToken = await result.user.getIdToken();
 
             console.log('✅ Code vérifié par Firebase');
             console.log('👤 UID:', result.user.uid);
-            console.log('📞 Phone:', result.user.phoneNumber);
 
             Toast.show({
                 text: '✅ Code validé !',
@@ -165,8 +140,7 @@ export default class extends Controller {
             return {
                 success: true,
                 uid: result.user.uid,
-                phoneNumber: result.user.phoneNumber,
-                idToken: idToken
+                phoneNumber: result.user.phoneNumber
             };
 
         } catch (error) {
@@ -195,16 +169,14 @@ export default class extends Controller {
     }
 
     /**
-     * Configure reCAPTCHA pour le web
-     * (Pas nécessaire sur mobile natif)
+     * Configure reCAPTCHA (web uniquement)
      */
     async setupRecaptcha() {
         if (this.recaptchaVerifier) {
-            return; // Déjà configuré
+            return;
         }
 
         try {
-            // Créer le conteneur si absent
             if (!document.getElementById('recaptcha-container')) {
                 const container = document.createElement('div');
                 container.id = 'recaptcha-container';
@@ -214,12 +186,7 @@ export default class extends Controller {
             this.recaptchaVerifier = new RecaptchaVerifier(
                 this.auth,
                 'recaptcha-container',
-                {
-                    'size': 'invisible',
-                    'callback': () => {
-                        console.log('✅ reCAPTCHA résolu');
-                    }
-                }
+                { 'size': 'invisible' }
             );
 
             await this.recaptchaVerifier.render();
@@ -231,7 +198,7 @@ export default class extends Controller {
     }
 
     /**
-     * Formate le numéro au format international (+225XXXXXXXXXX)
+     * Formate le numéro au format international
      */
     formatPhoneNumber(phoneNumber) {
         let phone = phoneNumber.replace(/[^0-9]/g, '');
@@ -273,7 +240,7 @@ export default class extends Controller {
     }
 
     /**
-     * Génère un ID device pour le web
+     * Génère un ID device
      */
     generateDeviceId() {
         let deviceId = localStorage.getItem('device_id');
@@ -285,7 +252,7 @@ export default class extends Controller {
     }
 
     /**
-     * Déconnexion Firebase
+     * Déconnexion
      */
     async signOut() {
         try {

@@ -8,12 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Version SIMPLIFIÉE pour SMS OTP
- * Pas besoin de Firebase SDK PHP - tout se passe côté client !
+ * Service de gestion des devices avec SMS OTP
+ * Version finale - 100% compatible avec le flux existant
  */
 class DeviceManagerService
 {
     private const OTP_EXPIRY_MINUTES = 10;
+    private const ADMIN_PHONE = '0709321521';
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -22,7 +23,8 @@ class DeviceManagerService
     ) {}
 
     /**
-     * Vérifie si le device est autorisé ou nécessite une validation SMS
+     * Gère l'authentification du device
+     * Retourne le statut pour que le frontend sache quoi faire
      */
     public function handleDeviceAuthentication(
         Utilisateur $utilisateur,
@@ -30,80 +32,59 @@ class DeviceManagerService
         string $devicePlatform,
         string $deviceModel
     ): array {
-        // Cas 1: Utilisateur n'a aucun device enregistré (Nouvelle installation)
+        $this->logger->info('🔍 Vérification device', [
+            'user_id' => $utilisateur->getId(),
+            'device_id' => $deviceId,
+            'current_device' => $utilisateur->getDeviceId(),
+            'is_verified' => $utilisateur->isDeviceVerified()
+        ]);
+
+        // CAS 1: AUCUN DEVICE ENREGISTRÉ → Premier device
         if (!$utilisateur->getDeviceId()) {
-            return [
-                'status' => 'new_device',
-                'message' => 'Premier enregistrement requis',
-                'requires_otp' => true,
-                'phone' => $utilisateur->getTelephone()
-            ];
+            return $this->initializeFirstDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
         }
 
-        // Cas 2: Le device ID correspond à celui enregistré
-        if ($utilisateur->getDeviceId() === $deviceId ) {
-            $this->logger->info('✅ Même device vérifié', [
-                'user_id' => $utilisateur->getId()
+        // CAS 2: MÊME DEVICE ET VÉRIFIÉ → Accès direct
+        if ($utilisateur->getDeviceId() === $deviceId && $utilisateur->isDeviceVerified()) {
+            $this->logger->info('✅ Device connu et vérifié', [
+                'user_id' => $utilisateur->getId(),
+                'device_id' => $deviceId
             ]);
 
             return [
                 'status' => 'ok',
-                'message' => 'Connexion autorisée',
-                'requires_otp' => false,
-                'phone' => $utilisateur->getTelephone()
+                'message' => 'Device vérifié',
+                'requires_otp' => false
             ];
         }
 
-        // Cas 3: Changement de device detecté
-        $this->logger->warning("Tentative de connexion depuis un nouveau device",[
-            'user_id' => $utilisateur->getId(),
-            'old_device' => $utilisateur->getDeviceId(),
-            'new_device' => $deviceId
-        ]);
+        // CAS 3: MÊME DEVICE MAIS NON VÉRIFIÉ → Renvoyer OTP
+        if ($utilisateur->getDeviceId() === $deviceId && !$utilisateur->isDeviceVerified()) {
+            return $this->requestOtpVerification($utilisateur);
+        }
 
-        return [
-            'status' => 'new_device',
-            'message' => "Validation par SMS requise pour ce nouveau terminal",
-            'requires_otp' => true,
-            'phone' => $utilisateur->getTelephone()
-        ];
+        // CAS 4: NOUVEAU DEVICE → Demander vérification
+        return $this->handleNewDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
     }
 
     /**
-     * Enregistre officiellement le device une fois que le SMS a été valid" coté client
+     * Initialise le premier device (jamais connecté)
+     * Génère un OTP que le frontend enverra par SMS Firebase
      */
-    public function confirmDeviceRegistration(Utilisateur $utilisateur, string $deviceId, string $platform, string $model): void
-    {
-        $utilisateur->setDeviceId($deviceId);
-        $utilisateur->setDevicePlatform($platform);
-        $utilisateur->setDeviceModel($model);
-        $utilisateur->setDeviceVerified(true);
-        $utilisateur->setLastConnectedAt(new \DateTimeImmutable());
-
-        $this->em->flush();
-
-        $this->logger->info("Nouveau device enregistré avec succès",[
-            'user' => $utilisateur->getTelephone(),
-            'device_id' => $deviceId
-        ]);
-    }
-
-    /**
-     * Enregistre le premier device
-     * Note: L'envoi du SMS se fait côté client avec Firebase
-     */
-    private function registerFirstDevice(
+    private function initializeFirstDevice(
         Utilisateur $utilisateur,
         string $deviceId,
         string $devicePlatform,
         string $deviceModel
     ): array {
-        // Générer un OTP pour validation serveur
         $otp = $this->generateOtp();
 
+        // Enregistrer le device
         $utilisateur->setDeviceId($deviceId);
         $utilisateur->setDevicePlatform($devicePlatform);
         $utilisateur->setDeviceModel($deviceModel);
+
+        // Stocker l'OTP pour validation
         $utilisateur->setDeviceVerificationOtp($otp);
         $utilisateur->setDeviceVerificationOtpExpiry(
             (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
@@ -112,20 +93,67 @@ class DeviceManagerService
 
         $this->em->flush();
 
-        $this->logger->info("📱 Premier device enregistré", [
+        $this->logger->info('📱 Premier device initialisé', [
             'user_id' => $utilisateur->getId(),
             'device_id' => $deviceId,
-            'phone' => $utilisateur->getTelephone()
+            'phone' => $utilisateur->getTelephone(),
+            'otp_generated' => '***' // Ne pas logger l'OTP complet
         ]);
 
         return [
             'status' => 'verification_required',
-            'message' => 'Code OTP requis',
+            'message' => 'Premier device - Vérification requise',
             'requires_otp' => true,
             'phone' => $utilisateur->getTelephone(),
             'otp_expiry' => self::OTP_EXPIRY_MINUTES,
-            // ⚠️ En dev, on peut retourner l'OTP (À SUPPRIMER EN PROD)
+            // En dev: décommenter pour voir l'OTP dans les logs
             // 'dev_otp' => $otp
+        ];
+    }
+
+    /**
+     * Demande une vérification OTP pour un device non vérifié
+     */
+    private function requestOtpVerification(Utilisateur $utilisateur): array
+    {
+        // Vérifier si l'OTP est encore valide
+        if ($utilisateur->getDeviceVerificationOtp()
+            && $utilisateur->getDeviceVerificationOtpExpiry()
+            && new \DateTimeImmutable() < $utilisateur->getDeviceVerificationOtpExpiry()) {
+
+            $this->logger->info('♻️ OTP encore valide', [
+                'user_id' => $utilisateur->getId()
+            ]);
+
+            return [
+                'status' => 'verification_required',
+                'message' => 'Vérification en attente',
+                'requires_otp' => true,
+                'phone' => $utilisateur->getTelephone(),
+                'otp_expiry' => self::OTP_EXPIRY_MINUTES
+            ];
+        }
+
+        // Générer un nouvel OTP
+        $otp = $this->generateOtp();
+
+        $utilisateur->setDeviceVerificationOtp($otp);
+        $utilisateur->setDeviceVerificationOtpExpiry(
+            (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
+        );
+
+        $this->em->flush();
+
+        $this->logger->info('🔄 Nouvel OTP généré', [
+            'user_id' => $utilisateur->getId()
+        ]);
+
+        return [
+            'status' => 'verification_required',
+            'message' => 'Nouveau code requis',
+            'requires_otp' => true,
+            'phone' => $utilisateur->getTelephone(),
+            'otp_expiry' => self::OTP_EXPIRY_MINUTES
         ];
     }
 
@@ -141,65 +169,86 @@ class DeviceManagerService
         $this->logger->warning('⚠️ Nouveau device détecté', [
             'user_id' => $utilisateur->getId(),
             'old_device' => $utilisateur->getDeviceId(),
-            'new_device' => $newDeviceId
+            'new_device' => $newDeviceId,
+            'old_platform' => $utilisateur->getDevicePlatform(),
+            'new_platform' => $newDevicePlatform
         ]);
 
-        // Générer un nouvel OTP
+        // Générer un OTP pour le nouveau device
         $otp = $this->generateOtp();
 
+        // Sauvegarder le pending device
         $utilisateur->setPendingDeviceId($newDeviceId);
         $utilisateur->setDeviceVerificationOtp($otp);
         $utilisateur->setDeviceVerificationOtpExpiry(
             (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
         );
-        $utilisateur->setDeviceVerified(false);
 
         $this->em->flush();
 
         return [
             'status' => 'new_device',
-            'message' => 'Nouveau device détecté. Un code OTP va être envoyé par SMS',
+            'message' => 'Nouveau device détecté',
             'requires_otp' => true,
             'phone' => $utilisateur->getTelephone(),
             'otp_expiry' => self::OTP_EXPIRY_MINUTES,
-            'show_no_access_option' => true
+            'old_device' => [
+                'platform' => $utilisateur->getDevicePlatform(),
+                'model' => $utilisateur->getDeviceModel()
+            ],
+            'new_device' => [
+                'platform' => $newDevicePlatform,
+                'model' => $newDeviceModel
+            ]
         ];
     }
 
     /**
-     * Valide l'OTP de vérification du device
-     * ✅ MÉTHODE PRINCIPALE - Appelée après vérification Firebase côté client
+     * Vérifie l'OTP et valide le device
+     * MÉTHODE PRINCIPALE appelée après que Firebase ait envoyé le SMS
      */
     public function verifyDeviceOtp(Utilisateur $utilisateur, string $otp): bool
     {
-        $this->logger->info('🔍 Vérification OTP serveur', [
-            'user_id' => $utilisateur->getId()
+        $this->logger->info('🔍 Vérification OTP', [
+            'user_id' => $utilisateur->getId(),
+            'has_otp' => !empty($utilisateur->getDeviceVerificationOtp()),
+            'otp_expired' => $utilisateur->getDeviceVerificationOtpExpiry()
+                ? (new \DateTimeImmutable() > $utilisateur->getDeviceVerificationOtpExpiry())
+                : true
         ]);
 
-        // Vérifier que l'OTP correspond et n'a pas expiré
+        // Vérifier la validité de l'OTP
         if (!$utilisateur->isDeviceOptValid($otp)) {
-            $this->logger->warning('⚠️ OTP invalide ou expiré', [
+            $this->logger->warning('❌ OTP invalide ou expiré', [
                 'user_id' => $utilisateur->getId()
             ]);
             return false;
         }
 
-        // ✅ MARQUER LE DEVICE COMME VÉRIFIÉ
+        // ✅ OTP VALIDE → Marquer le device comme vérifié
         $utilisateur->setDeviceVerified(true);
         $utilisateur->setDeviceVerificationOtp(null);
         $utilisateur->setDeviceVerificationOtpExpiry(null);
 
         // Si c'était un pending device, l'activer
         if ($utilisateur->getPendingDeviceId()) {
+            $oldDeviceId = $utilisateur->getDeviceId();
             $utilisateur->setDeviceId($utilisateur->getPendingDeviceId());
             $utilisateur->setPendingDeviceId(null);
+
+            $this->logger->info('🔄 Device changé', [
+                'user_id' => $utilisateur->getId(),
+                'old_device' => $oldDeviceId,
+                'new_device' => $utilisateur->getDeviceId()
+            ]);
         }
 
         $this->em->flush();
 
         $this->logger->info('✅ Device vérifié avec succès', [
             'user_id' => $utilisateur->getId(),
-            'device_id' => $utilisateur->getDeviceId()
+            'device_id' => $utilisateur->getDeviceId(),
+            'verified' => true
         ]);
 
         return true;
@@ -207,7 +256,6 @@ class DeviceManagerService
 
     /**
      * Renvoie un nouvel OTP
-     * Note: L'envoi du SMS se fait côté client
      */
     public function resendOtp(Utilisateur $utilisateur): array
     {
@@ -219,16 +267,16 @@ class DeviceManagerService
         );
         $this->em->flush();
 
-        $this->logger->info('🔄 OTP regénéré', [
-            'user_id' => $utilisateur->getId()
+        $this->logger->info('🔄 OTP renvoyé', [
+            'user_id' => $utilisateur->getId(),
+            'phone' => $utilisateur->getTelephone()
         ]);
 
         return [
             'success' => true,
             'message' => 'Nouveau code généré',
-            'otp_expiry' => self::OTP_EXPIRY_MINUTES,
-            // ⚠️ En dev uniquement
-            // 'dev_otp' => $otp
+            'phone' => $utilisateur->getTelephone(),
+            'otp_expiry' => self::OTP_EXPIRY_MINUTES
         ];
     }
 
@@ -241,20 +289,58 @@ class DeviceManagerService
 
         $utilisateur->setDeviceVerificationOtp($otp);
         $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+24 hours')
+            (new \DateTimeImmutable())->modify('+24 hours') // 24h pour laisser le temps
         );
         $this->em->flush();
 
-        $this->logger->warning("⚠️ Demande sans accès ancien device", [
-            'user_phone' => $utilisateur->getTelephone()
+        $this->logger->warning('⚠️ Demande sans accès ancien device', [
+            'user_id' => $utilisateur->getId(),
+            'phone' => $utilisateur->getTelephone()
         ]);
+
+        // TODO: Notifier un admin si nécessaire
+        // $this->notifyAdmin($utilisateur, $otp);
 
         return [
             'status' => 'otp_sent',
-            'message' => 'Un code OTP va être envoyé par SMS',
+            'message' => 'Un code OTP va être envoyé',
             'phone' => $utilisateur->getTelephone(),
             'otp_expiry' => 1440 // 24h en minutes
         ];
+    }
+
+    /**
+     * Approuve le transfert vers un nouveau device (legacy - pour compatibilité)
+     */
+    public function approveDeviceTransfer(Utilisateur $utilisateur, string $newDeviceId, string $newFcmToken): bool
+    {
+        if ($utilisateur->getPendingDeviceId() !== $newDeviceId) {
+            $this->logger->error('Device ID ne correspond pas', [
+                'pending' => $utilisateur->getPendingDeviceId(),
+                'provided' => $newDeviceId
+            ]);
+            return false;
+        }
+
+        $utilisateur->setDeviceId($newDeviceId);
+        $utilisateur->setDeviceVerified(true);
+        $utilisateur->setPendingDeviceId(null);
+        $utilisateur->setDeviceVerificationOtp(null);
+        $utilisateur->setDeviceVerificationOtpExpiry(null);
+
+        // Sauvegarder le FCM token si fourni (pour compatibilité)
+        if ($newFcmToken) {
+            $utilisateur->setFcmToken($newFcmToken);
+        }
+
+        $this->em->flush();
+
+        $this->logger->info('✅ Transfert approuvé', [
+            'user_id' => $utilisateur->getId(),
+            'new_device_id' => $newDeviceId
+        ]);
+
+        return true;
     }
 
     /**
@@ -267,7 +353,7 @@ class DeviceManagerService
         $utilisateur->setDeviceVerificationOtpExpiry(null);
         $this->em->flush();
 
-        $this->logger->warning("❌ Transfert refusé", [
+        $this->logger->warning('❌ Transfert refusé', [
             'user_id' => $utilisateur->getId()
         ]);
     }
@@ -281,8 +367,7 @@ class DeviceManagerService
     }
 
     /**
-     * Obtient l'OTP actuel (pour debug uniquement)
-     * ⚠️ À SUPPRIMER EN PRODUCTION
+     * Debug: Obtient l'OTP actuel (À SUPPRIMER EN PRODUCTION)
      */
     public function getCurrentOtp(Utilisateur $utilisateur): ?string
     {
