@@ -37,7 +37,7 @@ export default class extends Controller {
         };
 
         if (firebaseSmsController) {
-            deviceInfo = await firebaseSmsController.getDeviceInfo();
+            [deviceInfo] = await Promise.all([firebaseSmsController.getDeviceInfo()]);
         }
 
         // Ajouter les infos du device
@@ -85,7 +85,7 @@ export default class extends Controller {
 
                 // Envoyer le SMS via Firebase
                 if (firebaseSmsController) {
-                    const smsResult = await firebaseSmsController.sendSmsOtp(phoneNumber);
+                    const [smsResult] = await Promise.all([firebaseSmsController.sendSmsOtp(phoneNumber)]);
 
                     if (smsResult.success) {
                         // Afficher le modal de saisie OTP
