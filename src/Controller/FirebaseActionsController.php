@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\DTO\ChampsDTO;
+use App\DTO\ProfilDTO;
+use App\Repository\ChampActiviteRepository;
+use App\Repository\FonctionRepository;
+use App\Repository\ScoutRepository;
 use App\Repository\UtilisateurRepository;
 use App\Services\DeviceManagerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +24,10 @@ class FirebaseActionsController extends AbstractController
     public function __construct(
         private readonly UtilisateurRepository $utilisateurRepository,
         private readonly DeviceManagerService $deviceManager,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly ScoutRepository $scoutRepository,
+        private readonly FonctionRepository $fonctionRepository,
+        private readonly ChampActiviteRepository $champActiviteRepository
     ) {}
 
     #[Route('/', name: 'app_firebase_actions_verify_device', methods: ['POST'])]
@@ -159,5 +167,47 @@ class FirebaseActionsController extends AbstractController
         ]);
 
         return $this->json($result);
+    }
+
+    #[Route('/confirm-device', name: 'app_confirm_device', methods: ['POST'])]
+    public function confirmDevice(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $phone = $data['phone'] ?? null;
+        $deviceId = $data['device_id'] ?? null;
+
+        if (!$phone || !$deviceId) {
+            return $this->json(['error' => 'Données incomplètes'], 400);
+        }
+
+        $utilisateur = $this->utilisateurRepository->findOneBy(['telephone' => $phone]);
+
+        if ($utilisateur) {
+            $this->deviceManager->confirmDeviceRegistration(
+                $utilisateur,
+                $deviceId,
+                $data['device_platform'] ?? 'web',
+                $data['device_model'] ?? 'unknown'
+            );
+
+            $scout = $this->scoutRepository->findOneBy(['telephone' => $phone]);
+            $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
+            $profilDTO = ProfilDTO::fromScout($fonctions);
+            $champs = $this->champActiviteRepository->findAll();
+
+            return $this->json([
+                'status' => 'success',
+                'user_data' => [
+                    'id' => $utilisateur->getId(),
+                    'phone' => $utilisateur->getTelephone(),
+                    'profil' => $profilDTO->profil,
+                    'profil_fonction' => $profilDTO->profil_fonction,
+                    'profil_instance' => $profilDTO->profil_instance,
+                    'champs_activite' => ChampsDTO::listChamps($champs)
+                ]
+            ]);
+        }
+
+        return $this->json(['error' => 'Utilisateur non trouvé'], 404);
     }
 }

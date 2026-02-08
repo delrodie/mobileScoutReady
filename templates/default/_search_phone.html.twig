@@ -39,6 +39,8 @@
                         <i class="bi bi-phone position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
                     </div>
 
+                    <div id="recaptcha-container"></div>
+
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('_searchPhone') }}">
 
                     <div class="d-grid gap-2 mt-3">
@@ -77,7 +79,56 @@
                 Cette application utilise les notifications pour vous envoyer des codes de vérification sécurisés.
             </div>
         </div>
+
+        {# --- BLOC 2 : VERIFICATION OTP (Caché par défaut avec d-none) --- #}
+        <div data-search-phone-target="otpContainer" class="d-none text-center animate__animated animate__fadeIn">
+            <div class="mb-3">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                <h4 class="fw-bold">Vérification</h4>
+                <p class="text-muted small">
+                    Un code a été envoyé au <span data-search-phone-target="displayPhone" class="fw-bold"></span>
+                </p>
+            </div>
+
+            <div class="form-group mb-4">
+                <input
+                    type="number"
+                    data-search-phone-target="otpInput"
+                    class="form-control form-control-lg text-center fw-bold"
+                    placeholder="000000"
+                    style="letter-spacing: 0.5rem; font-size: 2rem;"
+                    maxlength="6"
+                >
+            </div>
+
+            <button
+                data-action="click->search-phone#verifyOtp"
+                class="btn btn-success btn-lg w-100 mb-3"
+                style="border-radius: 12px;"
+            >
+                Valider le code
+            </button>
+
+            <button
+                data-action="click->search-phone#resendOtp"
+                class="btn btn-link btn-sm text-decoration-none"
+            >
+                Renvoyer un code
+            </button>
+        </div>
+
     </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .animate__fadeIn { animation-duration: 0.5s; }
+        .input-group-text { border-radius: 12px 0 0 12px; }
+        .form-control { border-radius: 12px; }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
 {% endblock %}
 
 {% block javascripts %}

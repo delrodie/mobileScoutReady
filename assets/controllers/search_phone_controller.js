@@ -8,7 +8,12 @@ import firebaseSmsController  from './firebase_sms_controller.js';
  * Contrôleur de connexion avec SMS OTP (version simplifiée)
  */
 export default class extends Controller {
-    static targets = ['form', 'phone'];
+    static targets = ['form', 'phone', 'otpContainer', 'otpInput', 'submiBtn'];
+
+    get firebaseSms() {
+        const element = document.querySelector('[data-controller="firebase-sms"]');
+        return element ? this.application.getControllerForElementAndIdentifier(element, 'firebase-sms') : null;
+    }
 
     async connect() {
         console.log('🔌 Search Phone Controller (SMS Mode)');
@@ -21,37 +26,34 @@ export default class extends Controller {
         const formData = new FormData(form);
         const phoneNumber = this.phoneTarget.value;
 
-        // Récupérer les infos du device
-        // const firebaseSmsController = this.application.getControllerForElementAndIdentifier(
-        //     document.body,
-        //     'firebase-sms'
-        // );
+        const deviceInfo = this.firebaseSms ? await this.firebaseSms.getDeviceInfo() : this.getFallbackDeviceInfo();
 
-        const firebaseElement = document.querySelector('[data-controller="firebase-sms"]');
-
-        let firebaseInstance = null;
-        if (firebaseElement) {
-            firebaseInstance = this.application.getControllerForElementAndIdentifier(
-                firebaseElement,
-                'firebase-sms'
-            );
-        }
-
-        let deviceInfo;
-        if (firebaseInstance) {
-            // ✅ Maintenant, on appelle la méthode sur l'INSTANCE
-            deviceInfo = await firebaseInstance.getDeviceInfo();
-        } else {
-            // Fallback si le contrôleur n'est pas trouvé
-            deviceInfo = {
-                deviceId: this.getOrCreateDeviceId(),
-                platform: 'web',
-                model: navigator.userAgent
-            };
-        }
-
-        console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
-        console.log(firebaseInstance);
+        //
+        // const firebaseElement = document.querySelector('[data-controller="firebase-sms"]');
+        //
+        // let firebaseInstance = null;
+        // if (firebaseElement) {
+        //     firebaseInstance = this.application.getControllerForElementAndIdentifier(
+        //         firebaseElement,
+        //         'firebase-sms'
+        //     );
+        // }
+        //
+        // let deviceInfo;
+        // if (firebaseInstance) {
+        //     // ✅ Maintenant, on appelle la méthode sur l'INSTANCE
+        //     deviceInfo = await firebaseInstance.getDeviceInfo();
+        // } else {
+        //     // Fallback si le contrôleur n'est pas trouvé
+        //     deviceInfo = {
+        //         deviceId: this.getOrCreateDeviceId(),
+        //         platform: 'web',
+        //         model: navigator.userAgent
+        //     };
+        // }
+        //
+        // console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
+        // console.log(firebaseInstance);
 
         // let deviceInfo = {
         //     device_id: this.getOrCreateDeviceId(),
@@ -64,14 +66,14 @@ export default class extends Controller {
         // }
 
         // Ajouter les infos du device
-        formData.append('device_id', deviceInfo.deviceId);
+        /*formData.append('device_id', deviceInfo.deviceId);
         formData.append('device_platform', deviceInfo.platform);
         formData.append('device_model', deviceInfo.model);
 
         console.log('📤 Envoi au serveur:', {
             phone: phoneNumber,
             device_id: deviceInfo.deviceId
-        });
+        });*/
 
         try {
             Toast.show({
@@ -80,12 +82,16 @@ export default class extends Controller {
             });
 
             console.log(formData);
-            Toast.show({text: form, duration: 'short'});
 
-            const response = await fetch(form.action, {
+            const response = await fetch('/intro/phone', {
                 method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                // body: formData,
+                // headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    phone: phoneNumber,
+                    ...deviceInfo
+                })
             });
 
             console.log('RESPONSE DATA')
@@ -96,38 +102,52 @@ export default class extends Controller {
             const data = await response.json();
             console.log('📥 Réponse serveur:', data);
 
-            // Gérer les différents cas
-            if (data.status === 'ok') {
-                // ✅ Device déjà vérifié
-                await this.handleSuccessfulLogin(data);
-
-            } else if (data.status === 'verification_required' || data.status === 'new_device') {
-                // 📱 Envoyer SMS et demander vérification
-                sessionStorage.setItem('pending_phone', phoneNumber);
-                sessionStorage.setItem('pending_login_data', JSON.stringify(data));
-
-                // Envoyer le SMS via Firebase
-                if (firebaseInstance) {
-                    const smsResult = await firebaseInstance.sendSmsOtp(phoneNumber);
-
-                    if (smsResult.success) {
-                        // Afficher le modal de saisie OTP
-                        this.showOtpModal(phoneNumber, data);
-                    } else {
-                        alert('❌ Impossible d\'envoyer le SMS: ' + smsResult.error);
-                    }
-                } else {
-                    alert('❌ Firebase SMS non initialisé');
-                }
-
-            } else if (data.status === 'nouveau') {
+            if (data.status === 'new_device'){
+                // Declenche le flux SMS
+                await this.startSmsVerification(phoneNumber, deviceInfo)
+            } else if (data.status === 'ok'){
+                // Accès direct
+                await this.finalizeLogin(data);
+            }else if(data.status === 'nouveau'){
                 // 🆕 Nouvel utilisateur
                 sessionStorage.setItem('_phone_input', phoneNumber);
                 Turbo.visit('/inscription');
-
-            } else {
-                throw new Error(data.message || 'Erreur inconnuuue');
+            } else{
+                Toast.show({ text: data.error || 'Erreur serveur'})
             }
+
+            // Gérer les différents cas
+            // if (data.status === 'ok') {
+            //     // ✅ Device déjà vérifié
+            //     await this.handleSuccessfulLogin(data);
+            //
+            // } else if (data.status === 'verification_required' || data.status === 'new_device') {
+            //     // 📱 Envoyer SMS et demander vérification
+            //     sessionStorage.setItem('pending_phone', phoneNumber);
+            //     sessionStorage.setItem('pending_login_data', JSON.stringify(data));
+            //
+            //     // Envoyer le SMS via Firebase
+            //     if (firebaseInstance) {
+            //         const smsResult = await firebaseInstance.sendSmsOtp(phoneNumber);
+            //
+            //         if (smsResult.success) {
+            //             // Afficher le modal de saisie OTP
+            //             this.showOtpModal(phoneNumber, data);
+            //         } else {
+            //             alert('❌ Impossible d\'envoyer le SMS: ' + smsResult.error);
+            //         }
+            //     } else {
+            //         alert('❌ Firebase SMS non initialisé');
+            //     }
+            //
+            // } else if (data.status === 'nouveau') {
+            //     // 🆕 Nouvel utilisateur
+            //     sessionStorage.setItem('_phone_input', phoneNumber);
+            //     Turbo.visit('/inscription');
+            //
+            // } else {
+            //     throw new Error(data.message || 'Erreur inconnuuue');
+            // }
 
         } catch (error) {
             console.error('❌ Erreur:', error);
@@ -136,6 +156,65 @@ export default class extends Controller {
                 duration: 'long'
             });
         }
+    }
+
+    async startSmsVerification(phoneNumber, deviceInfo) {
+        if (!this.firebaseSms) return Toast.show({ text: 'Service SMS indisponible'});
+
+        const sent = await this.firebaseSms.sendSmsOtp(phone);
+        if (sent) {
+            this.pendingDeviceInfo = deviceInfo; // On garde les infos pour l'enregistrement final
+            this.otpContainerTarget.classList.remove('hidden');
+            this.formTarget.classList.add('hidden');
+            Toast.show({ text: 'Code envoyé au ' + phone });
+        }
+    }
+
+    /**
+     * Étape 3 : Vérification finale et synchronisation DB
+     */
+    async verifyOtp() {
+        const code = this.otpInputTarget.value;
+        const isValid = await this.firebaseSms.verifySmsOtp(code);
+
+        if (isValid) {
+            // Confirmation au backend pour enregistrer le device
+            const response = await fetch('/firebase-actions/confirm-device', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: this.phoneTarget.value,
+                    device_id: this.pendingDeviceInfo.deviceId,
+                    device_platform: this.pendingDeviceInfo.platform,
+                    device_model: this.pendingDeviceInfo.model
+                })
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                await this.finalizeLogin(data.user_data);
+            }
+        } else {
+            Toast.show({ text: 'Code incorrect' });
+        }
+    }
+
+    async finalizeLogin(data) {
+        if (data.profil && data.profil.isParent === true) {
+            Turbo.visit('/intro/choix/profil');
+            return;
+        }
+
+        await LoadDbController.saveToIndexedDB(data);
+        Turbo.visit('/accueil');
+    }
+
+    getFallbackDeviceInfo() {
+        return {
+            deviceId: localStorage.getItem('device_id') || 'web_user',
+            platform: 'web',
+            model: navigator.userAgent
+        };
     }
 
     /**
@@ -236,7 +315,7 @@ export default class extends Controller {
     /**
      * Vérifie l'OTP saisi
      */
-    async verifyOtp(phoneNumber) {
+    async verifyOtp_old(phoneNumber) {
         const otpInput = document.getElementById('otpInput');
         const code = otpInput.value.trim();
         const verifyBtn = document.getElementById('verifyBtn');

@@ -22,7 +22,7 @@ class DeviceManagerService
     ) {}
 
     /**
-     * Gère la connexion avec vérification du device
+     * Vérifie si le device est autorisé ou nécessite une validation SMS
      */
     public function handleDeviceAuthentication(
         Utilisateur $utilisateur,
@@ -30,13 +30,18 @@ class DeviceManagerService
         string $devicePlatform,
         string $deviceModel
     ): array {
-        // Cas 1: Premier device
+        // Cas 1: Utilisateur n'a aucun device enregistré (Nouvelle installation)
         if (!$utilisateur->getDeviceId()) {
-            return $this->registerFirstDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
+            return [
+                'status' => 'new_device',
+                'message' => 'Premier enregistrement requis',
+                'requires_otp' => true,
+                'phone' => $utilisateur->getTelephone()
+            ];
         }
 
-        // Cas 2: Même device → accès direct
-        if ($utilisateur->getDeviceId() === $deviceId && $utilisateur->isDeviceVerified()) {
+        // Cas 2: Le device ID correspond à celui enregistré
+        if ($utilisateur->getDeviceId() === $deviceId ) {
             $this->logger->info('✅ Même device vérifié', [
                 'user_id' => $utilisateur->getId()
             ]);
@@ -48,8 +53,38 @@ class DeviceManagerService
             ];
         }
 
-        // Cas 3: Nouveau device → demander validation
-        return $this->handleNewDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
+        // Cas 3: Changement de device detecté
+        $this->logger->warning("Tentative de connexion depuis un nouveau device",[
+            'user_id' => $utilisateur->getId(),
+            'old_device' => $utilisateur->getDeviceId(),
+            'new_device' => $deviceId
+        ]);
+
+        return [
+            'status' => 'new_device',
+            'message' => "Validation par SMS requise pour ce nouveau terminal",
+            'requires_otp' => true,
+            'phone' => $utilisateur->getTelephone()
+        ];
+    }
+
+    /**
+     * Enregistre officiellement le device une fois que le SMS a été valid" coté client
+     */
+    public function confirmDeviceRegistration(Utilisateur $utilisateur, string $deviceId, string $platform, string $model): void
+    {
+        $utilisateur->setDeviceId($deviceId);
+        $utilisateur->setDevicePlatform($platform);
+        $utilisateur->setDeviceModel($model);
+        $utilisateur->setDeviceVerified(true);
+        $utilisateur->setLastConnectedAt(new \DateTimeImmutable());
+
+        $this->em->flush();
+
+        $this->logger->info("Nouveau device enregistré avec succès",[
+            'user' => $utilisateur->getTelephone(),
+            'device_id' => $deviceId
+        ]);
     }
 
     /**
