@@ -104,6 +104,8 @@ class IntroController extends AbstractController
                     $deviceModel
                 );
 
+                $this->logger->info("==================");
+
                 $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
                 $profilDTO = ProfilDTO::fromScout($fonctions);
                 $champs = $this->champActiviteRepository->findAll();

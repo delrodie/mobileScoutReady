@@ -88,8 +88,8 @@ export default class extends Controller {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
 
+            console.log('RESPONSE DATA')
             console.log(response);
-            Toast.show({text: response, duration: 'short'});
 
             if (!response.ok) throw new Error("Erreur serveur");
 
