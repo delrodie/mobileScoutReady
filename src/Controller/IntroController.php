@@ -102,7 +102,6 @@ class IntroController extends AbstractController
                 $deviceCheck = $this->deviceManager->handleDeviceAuthentication(
                     $utilisateur,
                     $deviceId,
-//                    $fcmToken,
                     $devicePlatform,
                     $deviceModel
                 );

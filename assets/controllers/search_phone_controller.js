@@ -126,7 +126,7 @@ export default class extends Controller {
                 Turbo.visit('/inscription');
 
             } else {
-                throw new Error(data.message || 'Erreur inconnue');
+                throw new Error(data.message || 'Erreur inconnuuue');
             }
 
         } catch (error) {
