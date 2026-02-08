@@ -302,7 +302,7 @@ export default class extends Controller {
 
         // Enlever le 0 initial
         if (phone.startsWith('0')) {
-            phone = phone.substring(1);
+            phone = phone.substring(0);
             console.log("   Sans 0:", phone);
         }
 
