@@ -77,6 +77,8 @@ class IntroController extends AbstractController
                 try {
                 $scout = $scouts[0];
                 $utilisateur = $scout->getUtilisateur();
+                $this->logger->info($utilisateur);
+                $this->logger->warning("A l'interieur de try");
 
                 // 🔥 Correction: Créer l'utilisateur s'il n'existe pas
                 if (!$utilisateur) {
@@ -104,9 +106,6 @@ class IntroController extends AbstractController
                     $deviceModel
                 );
 
-                $this->logger->info("==================");
-                dd($deviceCheck);
-                
                 $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
                 $profilDTO = ProfilDTO::fromScout($fonctions);
                 $champs = $this->champActiviteRepository->findAll();
