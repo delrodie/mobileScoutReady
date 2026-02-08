@@ -27,18 +27,41 @@ export default class extends Controller {
         //     'firebase-sms'
         // );
 
+        const firebaseElement = document.querySelector('[data-controller="firebase-sms"]');
+
+        let firebaseInstance = null;
+        if (firebaseElement) {
+            firebaseInstance = this.application.getControllerForElementAndIdentifier(
+                firebaseElement,
+                'firebase-sms'
+            );
+        }
+
+        //let deviceInfo;
+        if (firebaseInstance) {
+            // ✅ Maintenant, on appelle la méthode sur l'INSTANCE
+            deviceInfo = await firebaseInstance.getDeviceInfo();
+        } else {
+            // Fallback si le contrôleur n'est pas trouvé
+            deviceInfo = {
+                deviceId: this.getOrCreateDeviceId(),
+                platform: 'web',
+                model: navigator.userAgent
+            };
+        }
+
         console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
         console.log(firebaseSmsController);
 
-        let deviceInfo = {
-            device_id: this.getOrCreateDeviceId(),
-            device_platform: 'web',
-            device_model: navigator.userAgent
-        };
-
-        if (firebaseSmsController) {
-            [deviceInfo] = await Promise.all([firebaseSmsController.getDeviceInfo()]);
-        }
+        // let deviceInfo = {
+        //     device_id: this.getOrCreateDeviceId(),
+        //     device_platform: 'web',
+        //     device_model: navigator.userAgent
+        // };
+        //
+        // if (firebaseSmsController) {
+        //     deviceInfo = await firebaseSmsController.getDeviceInfo();
+        // }
 
         // Ajouter les infos du device
         formData.append('device_id', deviceInfo.deviceId);
@@ -85,7 +108,7 @@ export default class extends Controller {
 
                 // Envoyer le SMS via Firebase
                 if (firebaseSmsController) {
-                    const [smsResult] = await Promise.all([firebaseSmsController.sendSmsOtp(phoneNumber)]);
+                    const smsResult = await firebaseSmsController.sendSmsOtp(phoneNumber);
 
                     if (smsResult.success) {
                         // Afficher le modal de saisie OTP
