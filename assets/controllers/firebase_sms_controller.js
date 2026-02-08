@@ -204,8 +204,9 @@ export default class extends Controller {
     formatPhoneNumber(phoneNumber) {
         let phone = phoneNumber.replace(/[^0-9]/g, '');
 
-        if (phone.startsWith('0')) {
-            phone = '225' + phone.substring(1);
+        if (!phone.startsWith('0')) {
+            //phone = '225' + phone.substring(1);
+            Toast.show({text: "Le numero de telephone est incorrect", duration: 'short'})
         }
 
         if (!phone.startsWith('225')) {
