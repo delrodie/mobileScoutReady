@@ -51,7 +51,7 @@ export default class extends Controller {
         }
 
         console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
-        console.log(firebaseSmsController);
+        console.log(firebaseInstance);
 
         // let deviceInfo = {
         //     device_id: this.getOrCreateDeviceId(),
@@ -107,8 +107,8 @@ export default class extends Controller {
                 sessionStorage.setItem('pending_login_data', JSON.stringify(data));
 
                 // Envoyer le SMS via Firebase
-                if (firebaseSmsController) {
-                    const smsResult = await firebaseSmsController.sendSmsOtp(phoneNumber);
+                if (firebaseInstance) {
+                    const smsResult = await firebaseInstance.sendSmsOtp(phoneNumber);
 
                     if (smsResult.success) {
                         // Afficher le modal de saisie OTP
