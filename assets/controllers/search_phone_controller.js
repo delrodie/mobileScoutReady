@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import LoadDbController from './local_db_controller.js';
 import { Capacitor } from '@capacitor/core';
 import { Toast } from '@capacitor/toast';
+import firebaseSmsController  from './firebase_sms_controller.js';
 
 /**
  * Contrôleur de connexion avec SMS OTP (version simplifiée)
@@ -21,10 +22,10 @@ export default class extends Controller {
         const phoneNumber = this.phoneTarget.value;
 
         // Récupérer les infos du device
-        const firebaseSmsController = this.application.getControllerForElementAndIdentifier(
-            document.body,
-            'firebase-sms'
-        );
+        // const firebaseSmsController = this.application.getControllerForElementAndIdentifier(
+        //     document.body,
+        //     'firebase-sms'
+        // );
 
         console.log('SEARCH_PHONE_CONTROLLER : appel de firebase-sms');
         console.log(firebaseSmsController);
