@@ -49,7 +49,7 @@ class IntroController extends AbstractController
             $phoneRequest = $request->request->get('_phone_search');
             $scouts = $scoutRepository->findBy(['telephone' => $phoneRequest]);
 
-            $this->logger->info("Le telephone {$phoneRequest}");
+            $this->logger->info("Le telephone saisi: {$phoneRequest}");
 
             $session->set('_phone_input', $phoneRequest);
 
@@ -74,11 +74,12 @@ class IntroController extends AbstractController
 
             // Si requête AJAX (depuis Stimulus)
             if ($request->isXmlHttpRequest()) {
+                $this->logger->info("Avant d'entrée dans try");
                 try {
                 $scout = $scouts[0];
                 $utilisateur = $scout->getUtilisateur();
                 $this->logger->info($utilisateur);
-                $this->logger->warning("A l'interieur de try");
+                $this->logger->info("A l'intérieur de try");
 
                 // 🔥 Correction: Créer l'utilisateur s'il n'existe pas
                 if (!$utilisateur) {
