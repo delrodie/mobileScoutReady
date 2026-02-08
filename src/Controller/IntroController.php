@@ -78,7 +78,7 @@ class IntroController extends AbstractController
                 try {
                 $scout = $scouts[0];
                 $utilisateur = $scout->getUtilisateur();
-                $this->logger->info($utilisateur);
+                //$this->logger->info([$utilisateur]);
                 $this->logger->info("A l'intérieur de try");
 
                 // 🔥 Correction: Créer l'utilisateur s'il n'existe pas
