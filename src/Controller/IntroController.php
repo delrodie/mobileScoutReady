@@ -42,98 +42,80 @@ class IntroController extends AbstractController
     #[Route('/phone', name:'app_search_phone', methods: ['GET','POST'])]
     public function phone(Request $request, ScoutRepository $scoutRepository): Response
     {
-        $session = $request->getSession();
-
-        if ($request->isMethod('POST') && $this->isCsrfTokenValid('_searchPhone', $request->get('_csrf_token'))) {
-
-            $phoneRequest = $request->request->get('_phone_search');
-            $scouts = $scoutRepository->findBy(['telephone' => $phoneRequest]);
-
-            $this->logger->info("Le telephone saisi: {$phoneRequest}");
-
-            $session->set('_phone_input', $phoneRequest);
-
-            // Aucun compte trouvé
-            if (!$scouts) {
-                if ($request->headers->has('Turbo-Frame')) {
-                    return $this->render('default/_search_error.html.twig', [
-                        'message' => "Numéro introuvable. Veuillez réessayer."
-                    ]);
-                }
-
-                if ($request->isXmlHttpRequest()){
-                    return $this->json(['status' => 'nouveau'], Response::HTTP_OK);
-                }
-                return $this->redirectToRoute('app_inscription_choixregion');
-            }
-
-            // Si c'est un parent → choix du profil
-            if ($scouts[0]->isPhoneParent()) {
-                $session->set('_getScouts', $scouts);
-            }
-
-            // Si requête AJAX (depuis Stimulus)
-            if ($request->isXmlHttpRequest()) {
-                $this->logger->info("Avant d'entrée dans try");
-                try {
-                $scout = $scouts[0];
-                $utilisateur = $scout->getUtilisateur();
-                //$this->logger->info([$utilisateur]);
-                $this->logger->info("A l'intérieur de try");
-
-                // 🔥 Correction: Créer l'utilisateur s'il n'existe pas
-                if (!$utilisateur) {
-                    $utilisateur = new Utilisateur();
-                    $utilisateur->setScout($scout);
-                    $utilisateur->setTelephone($scout->getTelephone());
-                    $this->entityManager->persist($utilisateur);
-                    $this->entityManager->flush();
-                }
-
-                // 🔥 Récupérer les infos device depuis le frontend
-                $deviceId = $request->request->get('device_id');
-                $fcmToken = $request->request->get('fcm_token');
-                $devicePlatform = $request->request->get('device_platform') ?? 'unknown';
-                $deviceModel = $request->request->get('device_model') ?? 'unknown';
-
-                $this->logger->info("device_plateforme: {$devicePlatform}, device_id: {$deviceId}, device_model: {$deviceModel}");
-
-                // 🔥 Vérifier le device
-                $deviceCheck = $this->deviceManager->handleDeviceAuthentication(
-                    $utilisateur,
-                    $deviceId,
-                    $devicePlatform,
-                    $deviceModel
-                );
-
-                $fonctions = $this->fonctionRepository->findAllByScout($scout->getId());
-                $profilDTO = ProfilDTO::fromScout($fonctions);
-                $champs = $this->champActiviteRepository->findAll();
-
-                return $this->json([
-                    'status' => 'ok',
-                    'device_check' => $deviceCheck, // 🔥 Nouveau : statut du device
-                    'profil' => $profilDTO->profil,
-                    'profil_fonction' => $profilDTO->profil_fonction,
-                    'profil_instance' => $profilDTO->profil_instance,
-                    'champs_activite' => ChampsDTO::listChamps($champs)
-                ]);
-                } catch (\Throwable $e) {
-                    $this->logger->info("Dans Catch {$e->getMessage()}");
-                    return $this->json([
-                        'error' => true,
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
-            }
-
-            // Cas fallback (classique)
-            $session->set('_profil', $scouts[0]);
-            return $this->redirectToRoute('app_accueil');
+        // 1. GESTION DU GET (Affichage initial)
+        if ($request->isMethod('GET')) {
+            return $this->render('default/_search_phone.html.twig');
         }
 
-        return $this->render('default/_search_phone.html.twig');
+        // 2. GESTION DU POST (Traitement AJAX/JSON)
+        $data = json_decode($request->getContent(), true);
+        $phoneNumber = $data['phone'] ?? $request->request->get('phone');
+
+        if (!$phoneNumber) {
+            return new JsonResponse(['error' => 'Numéro de téléphone manquant'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Logique métier : Recherche des scouts
+        $scouts = $scoutRepository->findBy(['telephone' => $phoneNumber]);
+
+        // CAS : Aucun scout trouvé (RESTAURATION DE TA LOGIQUE)
+        if (!$scouts) {
+            // Si c'est une demande Turbo-Frame (pour l'affichage d'erreur inline)
+            if ($request->headers->has('Turbo-Frame')) {
+                return $this->render('default/_search_error.html.twig', [
+                    'message' => "Numéro introuvable. Veuillez réessayer."
+                ]);
+            }
+
+            // Si c'est un appel API/AJAX pur
+            if ($request->isXmlHttpRequest() || str_contains($request->headers->get('Content-Type', ''), 'application/json')) {
+                return new JsonResponse([
+                    'status' => 'not_found',
+                    'message' => 'Numéro introuvable'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Fallback redirection
+            return $this->redirectToRoute('app_inscription_choixregion');
+        }
+
+        // On prend le premier scout et son utilisateur
+        $scout = $scouts[0];
+        $utilisateur = $scout->getUtilisateur();
+
+        if (!$utilisateur) {
+            return new JsonResponse(['error' => 'Compte non activé'], Response::HTTP_FORBIDDEN);
+        }
+
+        // 3. VÉRIFICATION DU DEVICE (SMS OTP)
+        $deviceId = $data['device_id'] ?? 'unknown';
+        $platform = $data['device_platform'] ?? 'web';
+        $model = $data['device_model'] ?? 'unknown';
+
+        $authResult = $this->deviceManager->handleDeviceAuthentication(
+            $utilisateur,
+            $deviceId,
+            $platform,
+            $model
+        );
+
+        // 4. INJECTION DES DTO SI LA CONNEXION EST OK (RESTAURATION DE TES DONNÉES)
+        if (isset($authResult['status']) && $authResult['status'] === 'ok') {
+            $champs = $this->champActiviteRepository->findAll();
+            $profilDTO = new ProfilDTO($utilisateur, $this->fonctionRepository);
+
+            // On enrichit la réponse JSON avec tes objets métiers
+            $authResult['profil'] = $profilDTO->profil;
+            $authResult['profil_fonction'] = $profilDTO->profil_fonction;
+            $authResult['profil_instance'] = $profilDTO->profil_instance;
+            $authResult['champs_activite'] = ChampsDTO::listChamps($champs);
+
+            // On ajoute une info pratique pour le JS (Parent ou non)
+            $authResult['profil']['isParent'] = in_array('ROLE_PARENT', $utilisateur->getRole() ?? []);
+        }
+
+        // On renvoie TOUT en JSON pour Stimulus
+        return new JsonResponse($authResult);
     }
 
     #[Route('/choix/profil', name: 'app_choix_profil', methods: ['GET','POST'])]

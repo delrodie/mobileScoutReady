@@ -49,7 +49,8 @@ class DeviceManagerService
             return [
                 'status' => 'ok',
                 'message' => 'Connexion autorisée',
-                'requires_otp' => false
+                'requires_otp' => false,
+                'phone' => $utilisateur->getTelephone()
             ];
         }
 
