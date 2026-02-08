@@ -119,6 +119,7 @@ class IntroController extends AbstractController
                     'champs_activite' => ChampsDTO::listChamps($champs)
                 ]);
                 } catch (\Throwable $e) {
+                    $this->logger->info("Dans Catch {$e->getMessage()}");
                     return $this->json([
                         'error' => true,
                         'message' => $e->getMessage(),
