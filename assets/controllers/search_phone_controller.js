@@ -37,7 +37,7 @@ export default class extends Controller {
             );
         }
 
-        //let deviceInfo;
+        let deviceInfo;
         if (firebaseInstance) {
             // ✅ Maintenant, on appelle la méthode sur l'INSTANCE
             deviceInfo = await firebaseInstance.getDeviceInfo();
