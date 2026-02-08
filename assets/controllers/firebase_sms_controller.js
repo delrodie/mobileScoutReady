@@ -4,6 +4,7 @@ import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth
 import { Device } from '@capacitor/device';
 import { Capacitor } from '@capacitor/core';
 import { Toast } from '@capacitor/toast';
+import {firebaseConfig} from "../firebaseConfig.js";
 
 /**
  * Contrôleur Firebase pour SMS OTP
@@ -21,14 +22,14 @@ export default class extends Controller {
         try {
             // ⚙️ CONFIGURATION FIREBASE
             // Récupérez ces valeurs depuis: Firebase Console > Paramètres du projet > Config
-            const firebaseConfig = {
-                apiKey: "VOTRE_API_KEY_ICI",
-                authDomain: "VOTRE_PROJECT_ID.firebaseapp.com",
-                projectId: "VOTRE_PROJECT_ID",
-                storageBucket: "VOTRE_PROJECT_ID.appspot.com",
-                messagingSenderId: "VOTRE_SENDER_ID",
-                appId: "VOTRE_APP_ID"
-            };
+            // const configFirebase = {
+            //     apiKey: firebaseConfig.apiKey, //"VOTRE_API_KEY_ICI",
+            //     authDomain: "VOTRE_PROJECT_ID.firebaseapp.com",
+            //     projectId: "VOTRE_PROJECT_ID",
+            //     storageBucket: "VOTRE_PROJECT_ID.appspot.com",
+            //     messagingSenderId: "VOTRE_SENDER_ID",
+            //     appId: "VOTRE_APP_ID"
+            // };
 
             // Initialiser Firebase
             const app = initializeApp(firebaseConfig);
