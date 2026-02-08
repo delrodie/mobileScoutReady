@@ -111,6 +111,7 @@ class IntroController extends AbstractController
                 $champs = $this->champActiviteRepository->findAll();
 
                 return $this->json([
+                    'status' => 'ok',
                     'device_check' => $deviceCheck, // 🔥 Nouveau : statut du device
                     'profil' => $profilDTO->profil,
                     'profil_fonction' => $profilDTO->profil_fonction,

@@ -120,7 +120,7 @@ export default class extends Controller {
                     alert('❌ Firebase SMS non initialisé');
                 }
 
-            } else if (data.status === 'new_user') {
+            } else if (data.status === 'nouveau') {
                 // 🆕 Nouvel utilisateur
                 sessionStorage.setItem('_phone_input', phoneNumber);
                 Turbo.visit('/inscription');
