@@ -2,19 +2,13 @@
 
 {% block body %}
     <div
-        data-controller="search-phone firebase-sms form-loader"
+        data-controller="search-phone form-loader"
         data-firebase-phone-value=""
         class="d-flex justify-content-center align-items-center align-content-center vh-100"
     >
         <div class="mx-w-sm mx-auto d-flex flex-column justify-content-center align-items-center px-3">
             <img src="{{ asset('img/logo-scoutready.png') }}" alt="" class="img-fluid" style="width:250px">
 
-            {# Statut des notifications #}
-            <div class="w-100 mt-3" style="max-width: 340px;">
-                <div data-search-phone-target="permissionStatus">
-                    {# Sera rempli dynamiquement #}
-                </div>
-            </div>
 
             <div class="d-flex flex-column justify-content-center align-items-center mt-3">
                 <p class="px-4 text-center" style="font-size: 15px;">
@@ -39,7 +33,6 @@
                         <i class="bi bi-phone position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
                     </div>
 
-                    <div id="recaptcha-container"></div>
 
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('_searchPhone') }}">
 
@@ -57,64 +50,17 @@
                     </div>
                 </form>
 
-                {# Bouton de debug pour tester les notifications #}
-                <div class="mt-3 w-100" style="max-width: 340px;">
-                    <button
-                        class="btn btn-outline-secondary btn-sm w-100"
-                        onclick="testNotificationStatus()"
-                        type="button">
-                        <i class="bi bi-bell"></i> Vérifier les notifications
-                    </button>
-                </div>
             </div>
 
             <p class="fst-italic fw-light text-center mt-5 px-4" style="font-size:13px">
                 NB: Le numéro de téléphone ne sera partagé à aucun membre de la communauté sauf aux Admins.
             </p>
 
-            {# Info sur les notifications #}
-            <div class="alert alert-info small mt-3 px-3" style="max-width: 340px;">
-                <i class="bi bi-info-circle"></i>
-                <strong>Notifications requises :</strong><br>
-                Cette application utilise les notifications pour vous envoyer des codes de vérification sécurisés.
+            <div class="alert alert-info small mt-4 w-100">
+                <i class="bi bi-shield-check"></i>
+                <strong>Sécurité :</strong><br>
+                Votre compte est protégé par un code PIN à 4 chiffres
             </div>
-        </div>
-
-        {# --- BLOC 2 : VERIFICATION OTP (Caché par défaut avec d-none) --- #}
-        <div data-search-phone-target="otpContainer" class="d-none text-center animate__animated animate__fadeIn">
-            <div class="mb-3">
-                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-                <h4 class="fw-bold">Vérification</h4>
-                <p class="text-muted small">
-                    Un code a été envoyé au <span data-search-phone-target="displayPhone" class="fw-bold"></span>
-                </p>
-            </div>
-
-            <div class="form-group mb-4">
-                <input
-                    type="number"
-                    data-search-phone-target="otpInput"
-                    class="form-control form-control-lg text-center fw-bold"
-                    placeholder="000000"
-                    style="letter-spacing: 0.5rem; font-size: 2rem;"
-                    maxlength="6"
-                >
-            </div>
-
-            <button
-                data-action="click->search-phone#verifyOtp"
-                class="btn btn-success btn-lg w-100 mb-3"
-                style="border-radius: 12px;"
-            >
-                Valider le code
-            </button>
-
-            <button
-                data-action="click->search-phone#resendOtp"
-                class="btn btn-link btn-sm text-decoration-none"
-            >
-                Renvoyer un code
-            </button>
         </div>
 
     </div>
@@ -123,101 +69,20 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .animate__fadeIn { animation-duration: 0.5s; }
-        .input-group-text { border-radius: 12px 0 0 12px; }
-        .form-control { border-radius: 12px; }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    </style>
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script type="module">
-        // Import des modules nécessaires
-        import { PushNotifications } from '@capacitor/push-notifications';
-        import { Capacitor } from '@capacitor/core';
-
-        // Fonction de test des notifications (accessible globalement)
-        window.testNotificationStatus = async function() {
-            const results = [];
-
-            // 1. Vérifier localStorage
-            const fcmToken = localStorage.getItem('fcm_token');
-            const deviceId = localStorage.getItem('device_id');
-
-            results.push(`📱 Device ID: ${deviceId ? '✅ Présent' : '❌ Absent'}`);
-            results.push(`🔑 Token FCM: ${fcmToken ? '✅ Présent (' + fcmToken.length + ' chars)' : '❌ Absent'}`);
-
-            if (fcmToken) {
-                results.push(`   Aperçu: ${fcmToken.substring(0, 30)}...`);
-            }
-
-            // 2. Vérifier Capacitor
-            try {
-                results.push(`⚡ Capacitor: ✅ Chargé`);
-                results.push(`📍 Platform: ${Capacitor.getPlatform()}`);
-                results.push(`🔌 Native: ${Capacitor.isNativePlatform() ? '✅ Oui' : '⚠️ Non (web)'}`);
-
-                // 3. Vérifier PushNotifications (si plateforme native)
-                if (Capacitor.isNativePlatform()) {
-                    try {
-                        const permStatus = await PushNotifications.checkPermissions();
-                        results.push(`🔔 Permissions: ${permStatus.receive}`);
-
-                        if (permStatus.receive === 'denied') {
-                            results.push(`   ❌ Les notifications sont DÉSACTIVÉES`);
-                            results.push(`   👉 Activer dans: Paramètres > Apps > ScoutReady > Notifications`);
-                        } else if (permStatus.receive === 'prompt') {
-                            results.push(`   ⏸️ Permissions non encore demandées`);
-                            results.push(`   👉 Elles seront demandées lors de la connexion`);
-                        } else if (permStatus.receive === 'granted') {
-                            results.push(`   ✅ Permissions ACCORDÉES`);
-                        }
-                    } catch (e) {
-                        results.push(`❌ Erreur PushNotifications: ${e.message}`);
-                    }
-                } else {
-                    results.push(`🔔 Mode web - notifications limitées`);
-                }
-
-            } catch (e) {
-                results.push(`❌ Erreur Capacitor: ${e.message}`);
-            }
-
-            // 4. Vérifier les controllers Stimulus
-            const firebaseController = document.querySelector('[data-controller~="firebase"]');
-            results.push(`🔥 Firebase Controller: ${firebaseController ? '✅ Présent' : '❌ Absent'}`);
-
-            // 5. Recommandations
-            results.push('');
-            results.push('=== RECOMMANDATIONS ===');
-
-            if (!fcmToken && Capacitor.isNativePlatform()) {
-                results.push('⚠️ TOKEN MANQUANT - Actions:');
-                results.push('1. Redémarrer l\'application');
-                results.push('2. Vérifier les permissions');
-                results.push('3. Vérifier la connexion internet');
-            } else if (fcmToken) {
-                results.push('✅ Tout semble OK !');
-                results.push('Le token FCM est présent et prêt à être utilisé.');
-            }
-
-            // Afficher les résultats
-            alert(results.join('\n'));
-
-            // Logger dans la console
-            console.log('=== DIAGNOSTIC NOTIFICATIONS ===');
-            results.forEach(r => console.log(r));
-
-            return {
-                fcmToken,
-                deviceId,
-                platform: Capacitor.getPlatform(),
-                isNative: Capacitor.isNativePlatform()
-            };
+        .form-control {
+            border-radius: 12px;
         }
-    </script>
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
 {% endblock %}
 
 {% block title %}Connexion{% endblock %}

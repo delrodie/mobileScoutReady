@@ -8,14 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Service de gestion des devices avec SMS OTP
- * Version finale - 100% compatible avec le flux existant
+ * Service de gestion des devices avec code PIN
+ * VERSION SIMPLIFIÉE - Pas de Firebase, juste un PIN
  */
 class DeviceManagerService
 {
-    private const OTP_EXPIRY_MINUTES = 10;
-    private const ADMIN_PHONE = '0709321521';
-
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UtilisateurRepository $utilisateurRepository,
@@ -24,7 +21,7 @@ class DeviceManagerService
 
     /**
      * Gère l'authentification du device
-     * Retourne le statut pour que le frontend sache quoi faire
+     * Retourne le statut pour indiquer au frontend quoi faire
      */
     public function handleDeviceAuthentication(
         Utilisateur $utilisateur,
@@ -36,124 +33,92 @@ class DeviceManagerService
             'user_id' => $utilisateur->getId(),
             'device_id' => $deviceId,
             'current_device' => $utilisateur->getDeviceId(),
-            'is_verified' => $utilisateur->isDeviceVerified()
+            'has_pin' => $utilisateur->hasPinCode()
         ]);
 
-        // CAS 1: AUCUN DEVICE ENREGISTRÉ → Premier device
-        if (!$utilisateur->getDeviceId()) {
-            return $this->initializeFirstDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
+        // CAS 1: Utilisateur n'a PAS ENCORE de PIN → Créer le PIN
+        if (!$utilisateur->hasPinCode()) {
+            return $this->requestPinCreation($utilisateur, $deviceId, $devicePlatform, $deviceModel);
         }
 
-        // CAS 2: MÊME DEVICE ET VÉRIFIÉ → Accès direct
+        // CAS 2: Utilisateur n'a PAS de device enregistré → Premier device avec PIN existant
+        if (!$utilisateur->getDeviceId()) {
+            return $this->registerFirstDeviceWithPin($utilisateur, $deviceId, $devicePlatform, $deviceModel);
+        }
+
+        // CAS 3: MÊME DEVICE et vérifié → Connexion directe
         if ($utilisateur->getDeviceId() === $deviceId && $utilisateur->isDeviceVerified()) {
-            $this->logger->info('✅ Device connu et vérifié', [
-                'user_id' => $utilisateur->getId(),
-                'device_id' => $deviceId
+            $this->logger->info('✅ Même device vérifié - connexion directe', [
+                'user_id' => $utilisateur->getId()
             ]);
 
             return [
                 'status' => 'ok',
-                'message' => 'Device vérifié',
-                'requires_otp' => false
+                'message' => 'Connexion autorisée',
+                'requires_pin' => false
             ];
         }
 
-        // CAS 3: MÊME DEVICE MAIS NON VÉRIFIÉ → Renvoyer OTP
-        if ($utilisateur->getDeviceId() === $deviceId && !$utilisateur->isDeviceVerified()) {
-            return $this->requestOtpVerification($utilisateur);
-        }
-
-        // CAS 4: NOUVEAU DEVICE → Demander vérification
+        // CAS 4: NOUVEAU DEVICE → Demander le PIN
         return $this->handleNewDevice($utilisateur, $deviceId, $devicePlatform, $deviceModel);
     }
 
     /**
-     * Initialise le premier device (jamais connecté)
-     * Génère un OTP que le frontend enverra par SMS Firebase
+     * Demande la création d'un PIN (première connexion)
      */
-    private function initializeFirstDevice(
+    private function requestPinCreation(
         Utilisateur $utilisateur,
         string $deviceId,
         string $devicePlatform,
         string $deviceModel
     ): array {
-        $otp = $this->generateOtp();
-
-        // Enregistrer le device
+        // Enregistrer temporairement le device (non vérifié)
         $utilisateur->setDeviceId($deviceId);
         $utilisateur->setDevicePlatform($devicePlatform);
         $utilisateur->setDeviceModel($deviceModel);
-
-        // Stocker l'OTP pour validation
-        $utilisateur->setDeviceVerificationOtp($otp);
-        $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
-        );
         $utilisateur->setDeviceVerified(false);
 
         $this->em->flush();
 
-        $this->logger->info('📱 Premier device initialisé', [
-            'user_id' => $utilisateur->getId(),
-            'device_id' => $deviceId,
-            'phone' => $utilisateur->getTelephone(),
-            'otp_generated' => '***' // Ne pas logger l'OTP complet
-        ]);
-
-        return [
-            'status' => 'verification_required',
-            'message' => 'Premier device - Vérification requise',
-            'requires_otp' => true,
-            'phone' => $utilisateur->getTelephone(),
-            'otp_expiry' => self::OTP_EXPIRY_MINUTES,
-            // En dev: décommenter pour voir l'OTP dans les logs
-            // 'dev_otp' => $otp
-        ];
-    }
-
-    /**
-     * Demande une vérification OTP pour un device non vérifié
-     */
-    private function requestOtpVerification(Utilisateur $utilisateur): array
-    {
-        // Vérifier si l'OTP est encore valide
-        if ($utilisateur->getDeviceVerificationOtp()
-            && $utilisateur->getDeviceVerificationOtpExpiry()
-            && new \DateTimeImmutable() < $utilisateur->getDeviceVerificationOtpExpiry()) {
-
-            $this->logger->info('♻️ OTP encore valide', [
-                'user_id' => $utilisateur->getId()
-            ]);
-
-            return [
-                'status' => 'verification_required',
-                'message' => 'Vérification en attente',
-                'requires_otp' => true,
-                'phone' => $utilisateur->getTelephone(),
-                'otp_expiry' => self::OTP_EXPIRY_MINUTES
-            ];
-        }
-
-        // Générer un nouvel OTP
-        $otp = $this->generateOtp();
-
-        $utilisateur->setDeviceVerificationOtp($otp);
-        $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
-        );
-
-        $this->em->flush();
-
-        $this->logger->info('🔄 Nouvel OTP généré', [
+        $this->logger->info('📱 Demande création PIN', [
             'user_id' => $utilisateur->getId()
         ]);
 
         return [
-            'status' => 'verification_required',
-            'message' => 'Nouveau code requis',
-            'requires_otp' => true,
-            'phone' => $utilisateur->getTelephone(),
-            'otp_expiry' => self::OTP_EXPIRY_MINUTES
+            'status' => 'pin_creation_required',
+            'message' => 'Veuillez créer un code PIN',
+            'requires_pin' => false,
+            'requires_pin_creation' => true
+        ];
+    }
+
+    /**
+     * Enregistre le premier device avec un PIN existant
+     */
+    private function registerFirstDeviceWithPin(
+        Utilisateur $utilisateur,
+        string $deviceId,
+        string $devicePlatform,
+        string $deviceModel
+    ): array {
+        // L'utilisateur a un PIN mais pas de device enregistré
+        // Enregistrer le device et demander le PIN pour vérification
+
+        $utilisateur->setDeviceId($deviceId);
+        $utilisateur->setDevicePlatform($devicePlatform);
+        $utilisateur->setDeviceModel($deviceModel);
+        $utilisateur->setDeviceVerified(false);
+
+        $this->em->flush();
+
+        $this->logger->info('📱 Premier device avec PIN existant', [
+            'user_id' => $utilisateur->getId()
+        ]);
+
+        return [
+            'status' => 'pin_required',
+            'message' => 'Entrez votre code PIN',
+            'requires_pin' => true
         ];
     }
 
@@ -169,34 +134,23 @@ class DeviceManagerService
         $this->logger->warning('⚠️ Nouveau device détecté', [
             'user_id' => $utilisateur->getId(),
             'old_device' => $utilisateur->getDeviceId(),
-            'new_device' => $newDeviceId,
-            'old_platform' => $utilisateur->getDevicePlatform(),
-            'new_platform' => $newDevicePlatform
+            'new_device' => $newDeviceId
         ]);
 
-        // Générer un OTP pour le nouveau device
-        $otp = $this->generateOtp();
-
-        // Sauvegarder le pending device
-        $utilisateur->setPendingDeviceId($newDeviceId);
-        $utilisateur->setDeviceVerificationOtp($otp);
-        $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
-        );
-
+        // Marquer comme non vérifié et demander le PIN
+        $utilisateur->setDeviceVerified(false);
         $this->em->flush();
 
         return [
-            'status' => 'new_device',
-            'message' => 'Nouveau device détecté',
-            'requires_otp' => true,
-            'phone' => $utilisateur->getTelephone(),
-            'otp_expiry' => self::OTP_EXPIRY_MINUTES,
+            'status' => 'new_device_pin_required',
+            'message' => 'Nouveau device détecté. Entrez votre code PIN',
+            'requires_pin' => true,
             'old_device' => [
                 'platform' => $utilisateur->getDevicePlatform(),
                 'model' => $utilisateur->getDeviceModel()
             ],
             'new_device' => [
+                'id' => $newDeviceId,
                 'platform' => $newDevicePlatform,
                 'model' => $newDeviceModel
             ]
@@ -204,178 +158,122 @@ class DeviceManagerService
     }
 
     /**
-     * Vérifie l'OTP et valide le device
-     * MÉTHODE PRINCIPALE appelée après que Firebase ait envoyé le SMS
+     * Crée le code PIN pour l'utilisateur
      */
-    public function verifyDeviceOtp(Utilisateur $utilisateur, string $otp): bool
+    public function createPin(Utilisateur $utilisateur, string $pin): array
     {
-        $this->logger->info('🔍 Vérification OTP', [
-            'user_id' => $utilisateur->getId(),
-            'has_otp' => !empty($utilisateur->getDeviceVerificationOtp()),
-            'otp_expired' => $utilisateur->getDeviceVerificationOtpExpiry()
-                ? (new \DateTimeImmutable() > $utilisateur->getDeviceVerificationOtpExpiry())
-                : true
-        ]);
-
-        // Vérifier la validité de l'OTP
-        if (!$utilisateur->isDeviceOptValid($otp)) {
-            $this->logger->warning('❌ OTP invalide ou expiré', [
-                'user_id' => $utilisateur->getId()
-            ]);
-            return false;
+        // Validation
+        if (!preg_match('/^\d{4}$/', $pin)) {
+            return [
+                'success' => false,
+                'error' => 'Le PIN doit contenir exactement 4 chiffres'
+            ];
         }
 
-        // ✅ OTP VALIDE → Marquer le device comme vérifié
-        $utilisateur->setDeviceVerified(true);
-        $utilisateur->setDeviceVerificationOtp(null);
-        $utilisateur->setDeviceVerificationOtpExpiry(null);
-
-        // Si c'était un pending device, l'activer
-        if ($utilisateur->getPendingDeviceId()) {
-            $oldDeviceId = $utilisateur->getDeviceId();
-            $utilisateur->setDeviceId($utilisateur->getPendingDeviceId());
-            $utilisateur->setPendingDeviceId(null);
-
-            $this->logger->info('🔄 Device changé', [
-                'user_id' => $utilisateur->getId(),
-                'old_device' => $oldDeviceId,
-                'new_device' => $utilisateur->getDeviceId()
-            ]);
-        }
+        $utilisateur->setPinCode($pin);
+        $utilisateur->setDeviceVerified(true); // Premier device automatiquement vérifié
 
         $this->em->flush();
 
-        $this->logger->info('✅ Device vérifié avec succès', [
-            'user_id' => $utilisateur->getId(),
-            'device_id' => $utilisateur->getDeviceId(),
-            'verified' => true
-        ]);
-
-        return true;
-    }
-
-    /**
-     * Renvoie un nouvel OTP
-     */
-    public function resendOtp(Utilisateur $utilisateur): array
-    {
-        $otp = $this->generateOtp();
-
-        $utilisateur->setDeviceVerificationOtp($otp);
-        $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+' . self::OTP_EXPIRY_MINUTES . ' minutes')
-        );
-        $this->em->flush();
-
-        $this->logger->info('🔄 OTP renvoyé', [
-            'user_id' => $utilisateur->getId(),
-            'phone' => $utilisateur->getTelephone()
+        $this->logger->info('✅ PIN créé avec succès', [
+            'user_id' => $utilisateur->getId()
         ]);
 
         return [
             'success' => true,
-            'message' => 'Nouveau code généré',
-            'phone' => $utilisateur->getTelephone(),
-            'otp_expiry' => self::OTP_EXPIRY_MINUTES
+            'message' => 'Code PIN créé avec succès'
         ];
     }
 
     /**
-     * Gère le cas où l'utilisateur n'a plus accès à l'ancien téléphone
+     * Vérifie le PIN et valide le device
      */
-    public function handleNoAccessToOldDevice(Utilisateur $utilisateur): array
+    public function verifyPin(Utilisateur $utilisateur, string $pin, string $newDeviceId): array
     {
-        $otp = $this->generateOtp();
-
-        $utilisateur->setDeviceVerificationOtp($otp);
-        $utilisateur->setDeviceVerificationOtpExpiry(
-            (new \DateTimeImmutable())->modify('+24 hours') // 24h pour laisser le temps
-        );
-        $this->em->flush();
-
-        $this->logger->warning('⚠️ Demande sans accès ancien device', [
-            'user_id' => $utilisateur->getId(),
-            'phone' => $utilisateur->getTelephone()
-        ]);
-
-        // TODO: Notifier un admin si nécessaire
-        // $this->notifyAdmin($utilisateur, $otp);
-
-        return [
-            'status' => 'otp_sent',
-            'message' => 'Un code OTP va être envoyé',
-            'phone' => $utilisateur->getTelephone(),
-            'otp_expiry' => 1440 // 24h en minutes
-        ];
-    }
-
-    /**
-     * Approuve le transfert vers un nouveau device (legacy - pour compatibilité)
-     */
-    public function approveDeviceTransfer(Utilisateur $utilisateur, string $newDeviceId, string $newFcmToken): bool
-    {
-        if ($utilisateur->getPendingDeviceId() !== $newDeviceId) {
-            $this->logger->error('Device ID ne correspond pas', [
-                'pending' => $utilisateur->getPendingDeviceId(),
-                'provided' => $newDeviceId
-            ]);
-            return false;
-        }
-
-        $utilisateur->setDeviceId($newDeviceId);
-        $utilisateur->setDeviceVerified(true);
-        $utilisateur->setPendingDeviceId(null);
-        $utilisateur->setDeviceVerificationOtp(null);
-        $utilisateur->setDeviceVerificationOtpExpiry(null);
-
-        // Sauvegarder le FCM token si fourni (pour compatibilité)
-        if ($newFcmToken) {
-            $utilisateur->setFcmToken($newFcmToken);
-        }
-
-        $this->em->flush();
-
-        $this->logger->info('✅ Transfert approuvé', [
-            'user_id' => $utilisateur->getId(),
-            'new_device_id' => $newDeviceId
-        ]);
-
-        return true;
-    }
-
-    /**
-     * Refuse le transfert de device
-     */
-    public function denyDeviceTransfer(Utilisateur $utilisateur): void
-    {
-        $utilisateur->setPendingDeviceId(null);
-        $utilisateur->setDeviceVerificationOtp(null);
-        $utilisateur->setDeviceVerificationOtpExpiry(null);
-        $this->em->flush();
-
-        $this->logger->warning('❌ Transfert refusé', [
+        $this->logger->info('🔍 Vérification PIN', [
             'user_id' => $utilisateur->getId()
         ]);
-    }
 
-    /**
-     * Génère un code OTP aléatoire à 6 chiffres
-     */
-    private function generateOtp(): string
-    {
-        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-    }
+        // Vérifier le PIN
+        if (!$utilisateur->verifyPin($pin)) {
+            $this->logger->warning('❌ PIN incorrect', [
+                'user_id' => $utilisateur->getId()
+            ]);
 
-    /**
-     * Debug: Obtient l'OTP actuel (À SUPPRIMER EN PRODUCTION)
-     */
-    public function getCurrentOtp(Utilisateur $utilisateur): ?string
-    {
-        if ($utilisateur->getDeviceVerificationOtpExpiry()
-            && new \DateTimeImmutable() <= $utilisateur->getDeviceVerificationOtpExpiry()) {
-            return $utilisateur->getDeviceVerificationOtp();
+            return [
+                'success' => false,
+                'error' => 'Code PIN incorrect'
+            ];
         }
 
-        return null;
+        // ✅ PIN CORRECT → Changer le device et marquer comme vérifié
+        $utilisateur->setDeviceId($newDeviceId);
+        $utilisateur->setDeviceVerified(true);
+
+        $this->em->flush();
+
+        $this->logger->info('✅ PIN vérifié - device changé', [
+            'user_id' => $utilisateur->getId(),
+            'new_device' => $newDeviceId
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Code PIN vérifié avec succès'
+        ];
+    }
+
+    /**
+     * Change le code PIN
+     */
+    public function changePin(Utilisateur $utilisateur, string $oldPin, string $newPin): array
+    {
+        // Vérifier l'ancien PIN
+        if (!$utilisateur->verifyPin($oldPin)) {
+            return [
+                'success' => false,
+                'error' => 'Ancien code PIN incorrect'
+            ];
+        }
+
+        // Valider le nouveau PIN
+        if (!preg_match('/^\d{4}$/', $newPin)) {
+            return [
+                'success' => false,
+                'error' => 'Le nouveau PIN doit contenir exactement 4 chiffres'
+            ];
+        }
+
+        // Changer le PIN
+        $utilisateur->setPinCode($newPin);
+        $this->em->flush();
+
+        $this->logger->info('✅ PIN changé avec succès', [
+            'user_id' => $utilisateur->getId()
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Code PIN changé avec succès'
+        ];
+    }
+
+    /**
+     * Réinitialise le PIN (admin uniquement)
+     */
+    public function resetPin(Utilisateur $utilisateur): array
+    {
+        $utilisateur->setPinCode(null);
+        $utilisateur->setDeviceVerified(false);
+        $this->em->flush();
+
+        $this->logger->warning('⚠️ PIN réinitialisé', [
+            'user_id' => $utilisateur->getId()
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'PIN réinitialisé'
+        ];
     }
 }

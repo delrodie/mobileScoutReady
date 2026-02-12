@@ -46,8 +46,6 @@ class Utilisateur
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastConnectedIp = null;
 
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?string $fcmToken = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $deviceId = null;
@@ -58,23 +56,19 @@ class Utilisateur
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $deviceModel = null;
 
+
+
+    #[ORM\Column(length: 4, nullable: true)]
+    private ?string $pinCode = null;
+
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $fcmTokenUpdatedAt = null;
+    private ?\DateTimeImmutable $pinCodeCreatedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $pinCodeUpdatedAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $deviceVerified = null;
-
-    #[ORM\Column(length: 6, nullable: true)]
-    private ?string $deviceVerificationOtp = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $deviceVerificationOtpExpiry = null;
-
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?string $previousFcmToken = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $pendingDeviceId = null;
 
     public function getId(): ?int
     {
@@ -201,18 +195,7 @@ class Utilisateur
         return $this;
     }
 
-    public function getFcmToken(): ?string
-    {
-        return $this->fcmToken;
-    }
 
-    public function setFcmToken(?string $fcmToken): static
-    {
-        $this->fcmToken = $fcmToken;
-        $this->fcmTokenUpdatedAt = new \DateTimeImmutable();
-
-        return $this;
-    }
 
     public function getDeviceId(): ?string
     {
@@ -250,16 +233,57 @@ class Utilisateur
         return $this;
     }
 
-    public function getFcmTokenUpdatedAt(): ?\DateTimeImmutable
+
+    public function getPinCode(): ?string
     {
-        return $this->fcmTokenUpdatedAt;
+        return $this->pinCode;
     }
 
-    public function setFcmTokenUpdatedAt(?\DateTimeImmutable $fcmTokenUpdatedAt): static
+    public function setPinCode(?string $pinCode): static
     {
-        $this->fcmTokenUpdatedAt = $fcmTokenUpdatedAt;
+        $this->pinCode = $pinCode;
 
         return $this;
+    }
+
+    public function getPinCodeCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->pinCodeCreatedAt;
+    }
+
+    public function setPinCodeCreatedAt(?\DateTimeImmutable $pinCodeCreatedAt): static
+    {
+        $this->pinCodeCreatedAt = $pinCodeCreatedAt;
+
+        return $this;
+    }
+
+    public function getPinCodeUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->pinCodeUpdatedAt;
+    }
+
+    public function setPinCodeUpdatedAt(?\DateTimeImmutable $pinCodeUpdatedAt): static
+    {
+        $this->pinCodeUpdatedAt = $pinCodeUpdatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Vérifie si le PIN est correct
+     */
+    public function verifyPin(string $pin): bool
+    {
+        return $this->pinCode === $pin;
+    }
+
+    /**
+     * Vérifie si l'utilisateur à configurer un PIN
+     */
+    public function hasPinCode(): bool
+    {
+        return !empty($this->pinCode);
     }
 
     public function isDeviceVerified(): ?bool
@@ -272,66 +296,5 @@ class Utilisateur
         $this->deviceVerified = $deviceVerified;
 
         return $this;
-    }
-
-    public function getDeviceVerificationOtp(): ?string
-    {
-        return $this->deviceVerificationOtp;
-    }
-
-    public function setDeviceVerificationOtp(?string $deviceVerificationOtp): static
-    {
-        $this->deviceVerificationOtp = $deviceVerificationOtp;
-
-        return $this;
-    }
-
-    public function getDeviceVerificationOtpExpiry(): ?\DateTimeImmutable
-    {
-        return $this->deviceVerificationOtpExpiry;
-    }
-
-    public function setDeviceVerificationOtpExpiry(?\DateTimeImmutable $deviceVerificationOtpExpiry): static
-    {
-        $this->deviceVerificationOtpExpiry = $deviceVerificationOtpExpiry;
-
-        return $this;
-    }
-
-    public function getPreviousFcmToken(): ?string
-    {
-        return $this->previousFcmToken;
-    }
-
-    public function setPreviousFcmToken(?string $previousFcmToken): static
-    {
-        $this->previousFcmToken = $previousFcmToken;
-
-        return $this;
-    }
-
-    public function getPendingDeviceId(): ?string
-    {
-        return $this->pendingDeviceId;
-    }
-
-    public function setPendingDeviceId(?string $pendingDeviceId): static
-    {
-        $this->pendingDeviceId = $pendingDeviceId;
-
-        return $this;
-    }
-
-    public function isDeviceOptValid(string $otp): bool
-    {
-        if (!$this->deviceVerificationOtp || !$this->deviceVerificationOtpExpiry) {
-            return false;
-        }
-
-        if (new \DateTimeImmutable() > $this->deviceVerificationOtpExpiry){
-            return false;
-        }
-
-        return $this->deviceVerificationOtp === $otp;
     }
 }
