@@ -29,8 +29,12 @@
                 <div class="fsize-13 text-color-main fw-bold" data-header-target="code"></div>
             </div>
         </a>
-        <a href="#" class="text-decoration-none text-secondary me-3">
+        <a href="{{ path('app_notifications_list') }}" class="text-decoration-none text-secondary me-3 position-relative">
             <i class="bi bi-bell-fill fs-2"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                1
+                <span class="visually-hidden">messages non lus</span>
+              </span>
         </a>
     </div>
 </header>

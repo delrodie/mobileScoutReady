@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+        {% block body %}
+            {{ render(url('app_main_header'))}}
+
+            <main class="max-w-sm mx-auto mt-3 mb-5"
+                  data-controller="activite reunion"
+                  data-activite-api-url-list-value="{{ path('api_activite_list') }}"
+                  data-reunion-api-url-reunion-list-value="{{ path('api_reunion_list') }}"
+            >
+                <section class="notification px-3 mt-5">
+
+                    <div class="list-group rounded-0">
+                        <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Titre de la notification</h6>
+                                <small>30s</small>
+                            </div>
+                            <small>
+                                Résumé du messages
+                            </small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Titre de la notification</h6>
+                                <small class="text-body-secondary">02h </small>
+                            </div>
+                            <small class="text-body-secondary">Résumé du messages</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Titre de la notification</h6>
+                                <small class="text-body-secondary">3j</small>
+                            </div>
+                            <small class="text-body-secondary">Résumé du message</small>
+                        </a>
+                    </div>
+
+                </section>
+
+            </main>
+
+            <div class="floating-action-menu" id="fabMenu">
+                <div class="floating-menu-items">
+                    <a href="{{ path('app_activite_new') }}"
+                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
+                       title="Nouvelle activité"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-calendar-event fs-5"></i>
+                    </a>
+                    <a href="{{ path('app_reunion_new') }}" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5"
+                       title="Nouvelle réunion"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-people-fill fs-5"></i>
+                    </a>
+                </div>
+
+                <div class="btn-flottant" onclick="function toggleFAB() {
+                document.getElementById('fabMenu').classList.toggle('active');
+                }
+                toggleFAB()">
+                    <i class="bi bi-plus fs-2"></i>
+                </div>
+            </div>
+
+        {% endblock %}
+        {% block extra_stylesheets %}
+            {{ parent() }}
+            <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
+                  crossorigin="anonymous">
+        {% endblock %}
+    </turbo-frame>
+
+{% endblock %}
