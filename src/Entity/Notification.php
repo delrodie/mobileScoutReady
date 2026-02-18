@@ -20,6 +20,26 @@ class Notification
     public const TARGET_ALL = 'all';
     public const TARGET_SPECIFIC = 'specific';
 
+    // Cibles prédéfinies (groupes)
+    public const CIBLE_TOUS_JEUNES = 'tous_jeunes';
+    public const CIBLE_TOUS_ADULTES = 'tous_adultes';
+    public const CIBLE_CHEFS_UNITES = 'chefs_unites';
+    public const CIBLE_EQUIPE_REGIONALE = 'equipe_regionale';
+    public const CIBLE_CD = 'cd';
+    public const CIBLE_EQUIPE_DISTRICT = 'equipe_district';
+    public const CIBLE_CG = 'cg';
+    public const CIBLE_MAITRISE_GROUPE = 'maitrise_groupe';
+    public const CIBLE_CHEFS_OISILLONS = 'chefs_oisillons';
+    public const CIBLE_CHEFS_MEUTE = 'chefs_meute';
+    public const CIBLE_CHEFS_TROUPE = 'chefs_troupe';
+    public const CIBLE_CHEFS_GENERATION = 'chefs_generation';
+    public const CIBLE_CHEFS_COMMUNAUTE = 'chefs_communaute';
+    public const CIBLE_OISILLONS = 'oisillons';
+    public const CIBLE_LOUVETEAUX = 'louveteaux';
+    public const CIBLE_ECLAIREURS = 'eclaireurs';
+    public const CIBLE_CHEMINOTS = 'cheminots';
+    public const CIBLE_ROUTIERS = 'routiers';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -36,6 +56,9 @@ class Notification
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $typeCible = self::TARGET_ALL;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $cible = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $urlAction = null;
@@ -66,6 +89,7 @@ class Notification
      */
     #[ORM\OneToMany(targetEntity: Notificationlog::class, mappedBy: 'notification', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $logs;
+
 
     public function __construct()
     {
@@ -272,5 +296,44 @@ class Notification
     public function __toString(): string
     {
         return $this->titre ?? "Notification #" . $this->id;
+    }
+
+    public function getCible(): ?string
+    {
+        return $this->cible;
+    }
+
+    public function setCible(string $cible): static
+    {
+        $this->cible = $cible;
+
+        return $this;
+    }
+
+    /**
+     * Retourne la liste des cibles disponibles pour le dropdown
+     */
+    public static function getCiblesDisponibles(): array
+    {
+        return [
+            'Tous les jeunes' => self::CIBLE_TOUS_JEUNES,
+            'Tous les adultes' => self::CIBLE_TOUS_ADULTES,
+            "Tous les chefs d'unités" => self::CIBLE_CHEFS_UNITES,
+            "Équipe régionale" => self::CIBLE_EQUIPE_REGIONALE,
+            "CD" => self::CIBLE_CD,
+            "Équipe de district" => self::CIBLE_EQUIPE_DISTRICT,
+            "CG" => self::CIBLE_CG,
+            "Maîtrise de groupe" => self::CIBLE_MAITRISE_GROUPE,
+            "Chefs des oisillons" => self::CIBLE_CHEFS_OISILLONS,
+            "Chefs de meute" => self::CIBLE_CHEFS_MEUTE,
+            "Chefs de troupe" => self::CIBLE_CHEFS_TROUPE,
+            "Chefs de génération" => self::CIBLE_CHEFS_GENERATION,
+            "Chefs de communauté" => self::CIBLE_CHEFS_COMMUNAUTE,
+            "Oisillons" => self::CIBLE_OISILLONS,
+            "Louveteaux" => self::CIBLE_LOUVETEAUX,
+            "Éclaireurs" => self::CIBLE_ECLAIREURS,
+            "Cheminots" => self::CIBLE_CHEMINOTS,
+            "Routiers" => self::CIBLE_ROUTIERS,
+        ];
     }
 }

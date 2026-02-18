@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\ChampActivite;
 use App\Entity\Instance;
+use App\Entity\Notification;
 use App\Entity\Scout;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -54,6 +55,7 @@ class DashboardController extends AbstractDashboardController
          ]);
 
          yield MenuItem::section('Gestion');
+         yield MenuItem::linkToCrud("Notifications", 'fa-solid fa-bell', Notification::class);
          yield MenuItem::linkToCrud("Champs d'activités", 'fa-solid fa-signs-post', ChampActivite::class);
          yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
              MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),

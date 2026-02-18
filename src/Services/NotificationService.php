@@ -9,17 +9,18 @@ use App\Entity\UtilisateurNotification;
 use App\Repository\NotificationRepository;
 use App\Repository\UtilisateurNotificationRepository;
 use App\Repository\UtilisateurRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class NotificationService
 {
     public function __construct(
-        private EntityManager          $entityManager,
+        private EntityManagerInterface          $entityManager,
         private NotificationRepository $notificationRepository,
         private RequestStack           $requestStack,
         private UtilisateurRepository  $utilisateurRepository,
-        private readonly UtilisateurNotificationRepository $utilisateurNotificationRepository
+        private readonly UtilisateurNotificationRepository $utilisateurNotificationRepository,
+        private readonly NotificationCibleService $cibleService
     )
     {
     }
@@ -27,7 +28,7 @@ class NotificationService
     /**
      * Envoie de notification à tous les utilisateurs
      */
-    public function envoyerATous(Notification $notification)
+    public function envoyerATous(Notification $notification): void
     {
         $utilisateurs = $this->utilisateurRepository->findAll();
         foreach ($utilisateurs as $utilisateur) {
@@ -45,6 +46,35 @@ class NotificationService
     {
         $this->creerUtilisateurNotification($utilisateur, $notification);
         $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Envoie une notification à plusieurs utilisateurs
+     */
+    public function envoyerAUtilisateurs(array $utilisateurs, Notification $notification): void
+    {
+        foreach ($utilisateurs as $utilisateur) {
+            $this->creerUtilisateurNotification($utilisateur, $notification);
+        }
+
+        $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Envoie une notification à une cible prédéfinie (groupe)
+     */
+    public function envoyerACible(string $cible, Notification $notification): void
+    {
+        $utilisateurs = $this->cibleService->getUtilisateursParCible($cible);
+
+        foreach ($utilisateurs as $utilisateur) {
+            $this->creerUtilisateurNotification($utilisateur, $notification);
+        }
+
+        $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+        $notification->setCible($cible);
         $this->entityManager->flush();
     }
 
@@ -78,7 +108,7 @@ class NotificationService
         }
     }
 
-    private function enregistrerAction(?Utilisateur $utilisateur, ?Notification $notification, string $action): void
+    public function enregistrerAction(?Utilisateur $utilisateur, ?Notification $notification, string $action): void
     {
         $log = new Notificationlog();
         $log->setUtilisateur($utilisateur);

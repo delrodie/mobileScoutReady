@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Utilisateur;
 use App\Entity\UtilisateurNotification;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -48,7 +49,7 @@ class UtilisateurNotificationRepository extends ServiceEntityRepository
             ->select('count(un.id)')
             ->innerJoin('un.notification', 'n')
             ->where('un.utilisateur = :utilisateur')
-            ->andWhere('un.estLue = :estLue')
+            ->andWhere('un.estLue = :estLue OR un.estLue IS NULL')
             ->andWhere('n.estActif = :estActif')
             ->andWhere('(n.expireLe IS NULL OR n.expireLe > :maintenant)')
             ->setParameter('utilisateur', $utilisateur)
@@ -73,7 +74,7 @@ class UtilisateurNotificationRepository extends ServiceEntityRepository
             ->setParameter('estActif', true)
             ->setParameter('maintenant', new \DateTimeImmutable())
             ->orderBy('un.estLue', 'ASC')
-            ->addOrderBy('un.creeLe', 'DESC')
+            ->addOrderBy('un.createdAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -87,7 +88,7 @@ class UtilisateurNotificationRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('un')
             ->update()
             ->set('un.estLue', ':vrai')
-            ->set('un.lueLe', ':maintenant')
+            ->set('un.luLe', ':maintenant')
             ->where('un.utilisateur = :utilisateur')
             ->andWhere('un.estLue = :faux')
             ->setParameter('vrai', true)

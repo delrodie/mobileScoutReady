@@ -1,0 +1,91 @@
+{# templates/admin/field/utilisateur_notifications.html.twig #}
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="fa fa-users"></i> Scouts notifiés
+            <span class="badge bg-primary">{{ field.value|length }}</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if field.value|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Scout</th>
+                            <th>Téléphone</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for userNotif in field.value %}
+                            <tr>
+                                <td>
+                                    {% if userNotif.utilisateur.scout %}
+                                        <strong>{{ userNotif.utilisateur.scout }}</strong>
+                                    {% else %}
+                                        <span class="text-muted">Scout #{{ userNotif.utilisateur.id }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if userNotif.utilisateur.telephone %}
+                                        <small class="text-muted">{{ userNotif.utilisateur.telephone }}</small>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if userNotif.estLue %}
+                                        <span class="badge bg-success">
+                                            <i class="fa fa-check"></i> Lue
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">
+                                            le {{ userNotif.lule|date('d/m/Y à H:i') }}
+                                        </small>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fa fa-clock"></i> Non lue
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        Envoyée le<br>
+                                        {{ userNotif.createdAt|date('d/m/Y à H:i') }}
+                                    </small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Statistiques #}
+            <div class="card-footer bg-light">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <strong class="d-block">{{ field.value|length }}</strong>
+                        <small class="text-muted">Total</small>
+                    </div>
+                    <div class="col-4">
+                        {% set lues = field.value|filter(un => un.estLue)|length %}
+                        <strong class="d-block text-success">{{ lues }}</strong>
+                        <small class="text-muted">Lues</small>
+                    </div>
+                    <div class="col-4">
+                        {% set nonLues = field.value|filter(un => not un.estLue)|length %}
+                        <strong class="d-block text-warning">{{ nonLues }}</strong>
+                        <small class="text-muted">Non lues</small>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="fa fa-info-circle"></i>
+                Cette notification n'a pas encore été envoyée.
+            </div>
+        {% endif %}
+    </div>
+</div>

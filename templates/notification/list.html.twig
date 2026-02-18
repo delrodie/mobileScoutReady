@@ -3,76 +3,193 @@
 {% block turbo_frame %}
     <turbo-frame id="main-frame">
         {% block body %}
-            {{ render(url('app_main_header'))}}
+            {{ render(url('app_main_header')) }}
 
             <main class="max-w-sm mx-auto mt-3 mb-5"
-                  data-controller="activite reunion"
-                  data-activite-api-url-list-value="{{ path('api_activite_list') }}"
-                  data-reunion-api-url-reunion-list-value="{{ path('api_reunion_list') }}"
+                  data-controller="notification-list"
+                  data-notification-list-url-toutes-value="{{ path('api_notification_all') }}"
+                  data-notification-list-url-marquer-lue-value="{{ path('api_notification_marquer_comme_lue', {id: '__ID__'}) }}"
+                  data-notification-list-url-log-clic-value="{{ path('api_notification_log_clic', {id: '__ID__'}) }}"
+                  data-notification-list-url-marquer-toutes-value="{{ path('api_notification_marquee_toutes_lues') }}"
             >
                 <section class="notification px-3 mt-5">
 
-                    <div class="list-group rounded-0">
-                        <a href="#" class="list-group-item list-group-item-action" aria-current="true">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Titre de la notification</h6>
-                                <small>30s</small>
-                            </div>
-                            <small>
-                                Résumé du messages
-                            </small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Titre de la notification</h6>
-                                <small class="text-body-secondary">02h </small>
-                            </div>
-                            <small class="text-body-secondary">Résumé du messages</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Titre de la notification</h6>
-                                <small class="text-body-secondary">3j</small>
-                            </div>
-                            <small class="text-body-secondary">Résumé du message</small>
-                        </a>
+                    {# --- HEADER (affiché/masqué par Stimulus) --- #}
+                    <div class="d-flex justify-content-between align-items-center mb-3"
+                         data-notification-list-target="header"
+                         style="display: none !important;">
+                        <h5 class="fs-6 text-color-main fw-semibold mb-0">Mes notifications</h5>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                data-action="click->notification-list#marquerToutesLues">
+                            <i class="bi bi-check2-all"></i> Tout marquer comme lu
+                        </button>
+                    </div>
+
+                    {# --- ÉTAT CHARGEMENT --- #}
+                    <div data-notification-list-target="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
+                        <p class="text-muted fsize-13">Chargement...</p>
+                    </div>
+
+                    {# --- LISTE (remplie par Stimulus) --- #}
+                    <div class="list-group rounded-0"
+                         data-notification-list-target="liste"
+                         style="display: none;">
+                    </div>
+
+                    {# --- ÉTAT VIDE --- #}
+                    <div class="text-center py-5"
+                         data-notification-list-target="vide"
+                         style="display: none;">
+                        <i class="bi bi-bell-slash fs-1 text-muted mb-3 d-block"></i>
+                        <h5 class="text-muted">Aucune notification</h5>
+                        <p class="text-muted fsize-13">Vous n'avez pas encore reçu de notification</p>
+                    </div>
+
+                    {# --- ÉTAT ERREUR --- #}
+                    <div class="text-center py-5"
+                         data-notification-list-target="erreur"
+                         style="display: none;">
+                        <i class="bi bi-wifi-off fs-1 text-muted mb-3 d-block"></i>
+                        <h5 class="text-muted">Impossible de charger</h5>
+                        <p class="text-muted fsize-13">Vérifiez votre connexion</p>
+                        <button class="btn btn-sm btn-outline-primary mt-2"
+                                data-action="click->notification-list#charger">
+                            <i class="bi bi-arrow-clockwise"></i> Réessayer
+                        </button>
                     </div>
 
                 </section>
 
+                {# ========================================
+                   MODAL DÉTAILS NOTIFICATION (slide up)
+                   ======================================== #}
+                <div class="modal fade modal-slide-up"
+                     id="notificationModal"
+                     tabindex="-1"
+                     data-notification-list-target="modal"
+                     aria-labelledby="notificationModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-bottom">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title" id="notificationModalLabel" data-notification-list-target="modalTitre"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                                {# Badge type #}
+                                <div class="mb-3" data-notification-list-target="modalBadge"></div>
+
+                                {# Icône + Date #}
+                                <div class="d-flex align-items-center text-white mb-3" data-notification-list-target="modalMeta">
+                                    <i class="bi bi-clock me-2"></i>
+                                    <small data-notification-list-target="modalDate"></small>
+                                </div>
+
+                                {# Message complet #}
+                                <div class="notification-modal-message" data-notification-list-target="modalMessage"></div>
+                            </div>
+                            <div class="modal-footer border-0" data-notification-list-target="modalFooter">
+                                {# Bouton d'action (si URL existe) #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
 
-            <div class="floating-action-menu" id="fabMenu">
-                <div class="floating-menu-items">
-                    <a href="{{ path('app_activite_new') }}"
-                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
-                       title="Nouvelle activité"
-                       data-turbo="false"
-                    >
-                        <i class="bi bi-calendar-event fs-5"></i>
-                    </a>
-                    <a href="{{ path('app_reunion_new') }}" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5"
-                       title="Nouvelle réunion"
-                       data-turbo="false"
-                    >
-                        <i class="bi bi-people-fill fs-5"></i>
-                    </a>
-                </div>
-
-                <div class="btn-flottant" onclick="function toggleFAB() {
-                document.getElementById('fabMenu').classList.toggle('active');
-                }
-                toggleFAB()">
-                    <i class="bi bi-plus fs-2"></i>
-                </div>
-            </div>
-
         {% endblock %}
+
         {% block extra_stylesheets %}
             {{ parent() }}
-            <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
-                  crossorigin="anonymous">
+            <style>
+                /* Styles inline pour éviter conflit */
+                .notification-non-lue {
+                    background-color: #e7f3ff;
+                    border-left: 4px solid #0d6efd;
+                    font-weight: 500;
+                }
+                .notification-lue {
+                    opacity: 0.7;
+                    background-color: #ffffff;
+                    border-left: 4px solid transparent;
+                }
+                .list-group-item {
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                }
+                .list-group-item:hover {
+                    background-color: #f8f9fa !important;
+                }
+                .badge-non-lu {
+                    font-size: 0.7rem;
+                }
+
+                /* Animation slide-up pour le modal */
+                .modal-slide-up .modal-dialog {
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    margin: 0;
+                    width: 100%;
+                    max-width: 100%;
+                }
+
+                .modal-slide-up .modal-content {
+                    border-radius: 20px 20px 0 0;
+                    border: none;
+                    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+                }
+
+                .modal-slide-up.show .modal-dialog {
+                    animation: slideUp 0.3s ease-out;
+                }
+
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(100%);
+                    }
+                    to {
+                        transform: translateY(0);
+                    }
+                }
+
+                .modal-slide-up.fade:not(.show) .modal-dialog {
+                    transform: translateY(100%);
+                }
+
+                /* Style du contenu du modal */
+                .notification-modal-message {
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    color: #ffffff;
+                    white-space: pre-line;
+                }
+
+                .modal-header .btn-close {
+                    padding: 1rem;
+                }
+
+                /* Badge type dans le modal */
+                .type-badge {
+                    display: inline-block;
+                    padding: 0.35rem 0.75rem;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                }
+
+                /* Responsive */
+                @media (min-width: 576px) {
+                    .modal-slide-up .modal-dialog {
+                        max-width: 500px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                    }
+                }
+            </style>
         {% endblock %}
     </turbo-frame>
-
 {% endblock %}
