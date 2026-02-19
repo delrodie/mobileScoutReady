@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Notification;
 use App\Entity\Notificationlog;
+use App\Entity\Scout;
 use App\Entity\Utilisateur;
 use App\Entity\UtilisateurNotification;
 use App\Repository\NotificationRepository;
@@ -76,6 +77,21 @@ class NotificationService
         $notification->setTypeCible(Notification::TARGET_SPECIFIC);
         $notification->setCible($cible);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Envoyer a un utilisateur specifique
+     */
+    public function envoyerASuperAdmin(Scout $scout): void
+    {
+        $notification = $this->notificationRepository->findOneBy(['titre' => 'Nouvel inscrit !']);
+        $utilisateur = $this->utilisateurRepository->findOneBy(['telephone' => "0709321521"]);
+        if ($notification && $utilisateur){
+            $this->creerUtilisateurNotification($utilisateur, $notification);
+            $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+            $notification->setMessage("{$scout->getNom()} {$scout->getPrenom()} vient de s'inscrire");
+            $this->entityManager->flush();
+        }
     }
 
     /**

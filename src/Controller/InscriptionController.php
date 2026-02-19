@@ -11,6 +11,8 @@ use App\Enum\FonctionPoste;
 use App\Enum\InstanceType;
 use App\Enum\ScoutStatut;
 use App\Repository\InstanceRepository;
+use App\Repository\NotificationRepository;
+use App\Services\NotificationService;
 use App\Services\UtilityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,9 +25,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class InscriptionController extends AbstractController
 {
     public function __construct(
-        private readonly InstanceRepository $instanceRepository,
-        private readonly UtilityService $utilityService,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly InstanceRepository     $instanceRepository,
+        private readonly UtilityService         $utilityService,
+        private readonly EntityManagerInterface $entityManager, private readonly NotificationRepository $notificationRepository, private readonly NotificationService $notificationService,
     )
     {
     }
@@ -91,8 +93,14 @@ class InscriptionController extends AbstractController
         $civilSession = $session->get('inscription_civile');
 
         $age = $this->utilityService->calculAge($civilSession['dateNaissance']);
-        if ($age <= 21) $statut = ScoutStatut::JEUNE;
-        else $statut = ScoutStatut::ADULTE;
+        if ($age <= 21) {
+            $statut = ScoutStatut::JEUNE;
+            $notification = $this->notificationRepository->findOneBy(['titre' => "Bravo !!!"]);
+        }
+        else {
+            $statut = ScoutStatut::ADULTE;
+            $notification = $this->notificationRepository->findOneBy(['titre' => "Félicitations !!!"]);
+        }
 
         if ($request->isMethod('POST') &&
             $this->isCsrfTokenValid('_scout_token', $request->get('_csrf_token'))
@@ -139,6 +147,12 @@ class InscriptionController extends AbstractController
             $this->entityManager->persist($utilisateur);
 
             $this->entityManager->flush();
+
+            // Notification de bienvenue
+            if ($notification){
+                $this->notificationService->envoyerAUtilisateur($utilisateur, $notification);
+            }
+            $this->notificationService->envoyerASuperAdmin($scout);
 
             notyf()->success("Votre inscription a été effectuée avec succès! Veuillez vous reconnecter pour la synchronisation des données.");
 
