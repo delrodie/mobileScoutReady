@@ -41,3 +41,7 @@ services:
 #            $firebaseService: '@App\Services\FirebaseNotificationService'
             $logger: '@logger'
 
+    App\Services\FcmNotificationService:
+        arguments:
+            $messaging: '@kreait_firebase.app.messaging'
+            $logger: '@logger'

@@ -21,7 +21,8 @@ class NotificationService
         private RequestStack           $requestStack,
         private UtilisateurRepository  $utilisateurRepository,
         private readonly UtilisateurNotificationRepository $utilisateurNotificationRepository,
-        private readonly NotificationCibleService $cibleService
+        private readonly NotificationCibleService $cibleService,
+        private readonly FcmNotificationService $fcmService
     )
     {
     }
@@ -38,6 +39,8 @@ class NotificationService
 
         $notification->setTypeCible(Notification::TARGET_ALL);
         $this->entityManager->flush();
+
+        $this->fcmService->envoyerAUtilisateurs($utilisateurs, $notification);
     }
 
     /**
@@ -48,6 +51,8 @@ class NotificationService
         $this->creerUtilisateurNotification($utilisateur, $notification);
         $notification->setTypeCible(Notification::TARGET_SPECIFIC);
         $this->entityManager->flush();
+
+        $this->fcmService->envoyerAUtilisateur($utilisateur, $notification);
     }
 
     /**
@@ -77,6 +82,8 @@ class NotificationService
         $notification->setTypeCible(Notification::TARGET_SPECIFIC);
         $notification->setCible($cible);
         $this->entityManager->flush();
+
+        $this->fcmService->envoyerAUtilisateurs($utilisateurs, $notification);
     }
 
     /**
@@ -91,6 +98,8 @@ class NotificationService
             $notification->setTypeCible(Notification::TARGET_SPECIFIC);
             $notification->setMessage("{$scout->getNom()} {$scout->getPrenom()} vient de s'inscrire");
             $this->entityManager->flush();
+
+            $this->fcmService->envoyerAUtilisateur($utilisateur, $notification);
         }
     }
 

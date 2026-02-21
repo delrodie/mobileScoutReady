@@ -6,11 +6,12 @@
             {{ render(url('app_main_header')) }}
 
             <main class="max-w-sm mx-auto mt-3 mb-5"
-                  data-controller="notification-list"
+                  data-controller="notification-list push-notification"
                   data-notification-list-url-toutes-value="{{ path('api_notification_all') }}"
                   data-notification-list-url-marquer-lue-value="{{ path('api_notification_marquer_comme_lue', {id: '__ID__'}) }}"
                   data-notification-list-url-log-clic-value="{{ path('api_notification_log_clic', {id: '__ID__'}) }}"
                   data-notification-list-url-marquer-toutes-value="{{ path('api_notification_marquee_toutes_lues') }}"
+                  data-push-notification-url-enregistrer-value="{{ path('api_notification_fcm_enregistrement') }}"
             >
                 <section class="notification px-3 mt-5">
 

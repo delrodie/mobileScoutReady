@@ -70,6 +70,15 @@ class Utilisateur
     #[ORM\Column(nullable: true)]
     private ?bool $deviceVerified = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fcmToken = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $fcmPlatform = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $fcmTokenUpdatedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -294,6 +303,42 @@ class Utilisateur
     public function setDeviceVerified(?bool $deviceVerified): static
     {
         $this->deviceVerified = $deviceVerified;
+
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
+
+        return $this;
+    }
+
+    public function getFcmPlatform(): ?string
+    {
+        return $this->fcmPlatform;
+    }
+
+    public function setFcmPlatform(?string $fcmPlatform): static
+    {
+        $this->fcmPlatform = $fcmPlatform;
+
+        return $this;
+    }
+
+    public function getFcmTokenUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->fcmTokenUpdatedAt;
+    }
+
+    public function setFcmTokenUpdatedAt(?\DateTimeImmutable $fcmTokenUpdatedAt): static
+    {
+        $this->fcmTokenUpdatedAt = $fcmTokenUpdatedAt;
 
         return $this;
     }

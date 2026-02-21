@@ -155,7 +155,7 @@ class ApiNotificationController extends AbstractController
      * Récupère l'Utilisateur depuis le corps JSON de la requête (slug + code).
      * Retourne un JsonResponse en cas d'erreur pour un early-return propre.
      */
-    private function getUtilisateurByRequest(Request $request): mixed
+    public function getUtilisateurByRequest(Request $request): mixed
     {
         $donnees = json_decode($request->getContent(), true);
 
