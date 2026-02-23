@@ -12,17 +12,18 @@ use App\Repository\UtilisateurNotificationRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationService
 {
     public function __construct(
-        private EntityManagerInterface          $entityManager,
-        private NotificationRepository $notificationRepository,
-        private RequestStack           $requestStack,
-        private UtilisateurRepository  $utilisateurRepository,
+        private EntityManagerInterface                     $entityManager,
+        private NotificationRepository                     $notificationRepository,
+        private RequestStack                               $requestStack,
+        private UtilisateurRepository                      $utilisateurRepository,
         private readonly UtilisateurNotificationRepository $utilisateurNotificationRepository,
-        private readonly NotificationCibleService $cibleService,
-        private readonly FcmNotificationService $fcmService
+        private readonly NotificationCibleService          $cibleService,
+        private readonly FcmNotificationService            $fcmService, private readonly UrlGeneratorInterface $urlGenerator
     )
     {
     }
@@ -91,12 +92,21 @@ class NotificationService
      */
     public function envoyerASuperAdmin(Scout $scout): void
     {
-        $notification = $this->notificationRepository->findOneBy(['titre' => 'Nouvel inscrit !']);
+//        $notification = $this->notificationRepository->findOneBy(['titre' => 'Nouvel inscrit !']);
         $utilisateur = $this->utilisateurRepository->findOneBy(['telephone' => "0709321521"]);
-        if ($notification && $utilisateur){
-            $this->creerUtilisateurNotification($utilisateur, $notification);
-            $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+        if ($utilisateur){
+            $notification = new Notification();
+            $notification->setTitre("Nouvel inscrit");
             $notification->setMessage("{$scout->getNom()} {$scout->getPrenom()} vient de s'inscrire");
+            $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+            $notification->setType("info");
+            $notification->setUrlAction($this->urlGenerator->generate('app_communaute_membre',['slug' => $scout->getSlug()]));
+            $notification->setLibelleAction("Voir le profil");
+            $notification->setIcone("bi-award");
+            $notification->setEstActif(true);
+            $this->entityManager->persist($notification);
+
+            $this->creerUtilisateurNotification($utilisateur, $notification);
             $this->entityManager->flush();
 
             $this->fcmService->envoyerAUtilisateur($utilisateur, $notification);

@@ -159,60 +159,80 @@
                                         <ul class="list-group list-group-flush">
                                             <li
                                                 class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1 mt-3">
-                                                <div class="text-muted fsize-13">Nom: </div>
-                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.nom }}</div>
+                                                <div class="text-muted fsize-13">Branche d'origine: </div>
+                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ complementaire ? complementaire.branche : 'Non definie' }}</div>
                                             </li>
 
                                             <li
                                                 class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                <div class="text-muted fsize-13">Prénoms: </div>
-                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.scout.prenom }}</div>
+                                                <div class="text-muted fsize-13">Participation à une formation: </div>
+                                                <div class="float-end fw-semibold text-body-secondary fsize-14">{{ complementaire ? complementaire.formation ? "OUI" : "NON" : "Non" }}</div>
                                             </li>
 
-                                            <li
-                                                class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                <div class="text-muted fsize-13">Fonction/branche: </div>
-                                                <div class="float-end fw-semibold text-body-secondary fsize-14">
-                                                    {{ membre.detailPoste ?? membre.branche }}
-                                                </div>
-                                            </li>
+                                            {% if complementaire ? complementaire.formation == 1  %}
+                                                {% if complementaire.stageBaseNiveau1 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage de base Niveau 1: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageBaseNiveau1 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeBaseNiveau1 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                                {% if complementaire.stageBaseNiveau2 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage de base Niveau 2: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageBaseNiveau2 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeBaseNiveau2 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                                {% if complementaire.stageAvanceNiveau1 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage avancé Niveau 1: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageAvanceNiveau1 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeAvanceNiveau1 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                                {% if complementaire.stageAvanceNiveau2 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage avancé Niveau 2: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageAvanceNiveau2 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeAvanceNiveau2 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                                {% if complementaire.stageAvanceNiveau3 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage avancé Niveau 3: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageAvanceNiveau3 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeAvanceNiveau3 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
+                                                {% if complementaire.stageAvanceNiveau4 %}
+                                                    <li
+                                                        class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
+                                                        <div class="text-muted fsize-13">Stage avancé Niveau 4: </div>
+                                                        <div class="float-end fw-semibold text-body-secondary fsize-14">
+                                                            {{ complementaire.stageAvanceNiveau4 ?? "Non défini" }}
+                                                            ({{ complementaire.anneeAvanceNiveau4 ?? "N/D" }})
+                                                        </div>
+                                                    </li>
+                                                {% endif %}
 
-                                            {% if membre.poste == 'REGIONAL' %}
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">Région: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
-                                                </li>
-
-                                            {% elseif membre.poste == 'DISTRICT' %}
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">Région: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
-                                                </li>
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">District: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
-                                                </li>
-
-                                            {% elseif membre.poste == 'GROUPE' or membre.poste == 'UNITE' %}
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">District: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
-                                                </li>
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">Groupe: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
-                                                </li>
-
-                                            {% else %}
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">District: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.instanceParent.nom }}</div>
-                                                </li>
-                                                <li class="list-group-item mb-2 rounded-end rounded-start d-flex justify-content-between align-items-center py-1">
-                                                    <div class="text-muted fsize-13">Groupe: </div>
-                                                    <div class="float-end fw-semibold text-body-secondary fsize-14">{{ membre.instance.nom }}</div>
-                                                </li>
                                             {% endif %}
+
 
                                         </ul>
 

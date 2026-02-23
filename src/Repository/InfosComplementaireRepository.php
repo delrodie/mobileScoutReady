@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\InfosComplementaire;
+use App\Services\UtilityService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,9 +12,27 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class InfosComplementaireRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry,
+                                private readonly UtilityService $utilityService
+    )
     {
         parent::__construct($registry, InfosComplementaire::class);
+    }
+
+    public function findByScoutSlug(string $slug)
+    {
+        $uuid = $this->utilityService->convertSlugToUuid($slug);
+        if (!$uuid) {
+            return null;
+        }
+
+        return $this->createQueryBuilder('i')
+            ->addSelect('s')
+            ->leftJoin('i.scout', 's')
+            ->where('s.slug = :slug')
+            ->setParameter('slug', $uuid, 'uuid')
+            ->getQuery()->getOneOrNullResult()
+            ;
     }
 
     //    /**
