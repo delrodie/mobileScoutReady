@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="turbo-frame">
+        {% block body  %}
+            <header class="max-w-sm mx-auto px-2 py-3 sticky-top">
+                <div class="row pt-4">
+                    <div class="col-3">
+                        <a href="{{ historique_navigation() ?? path('app_notifications_list') }}" class="retour">
+                            <i class="bi bi-arrow-left fs-5"></i>
+                        </a>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="fs-4">Notifications</h5>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-sm px-4 mx-auto mt-5" data-controller="profil notification-save">
+                <div class="mt-3">
+                    <form action="">
+                        <div class="form-group">
+                            <div class="position-relative form-floating mt-3">
+                                <input type="text"
+                                       class="form-control rounded-start-pill rounded-end-pill input-style  ps-5"
+                                       id="notificationTitre"
+                                       placeholder="Nom de famille"
+                                       name="_notificationTitre"
+                                       autocomplete="off"
+                                >
+                                <label for="notificationTitre" class="ms-3">Titre</label>
+                                <i
+                                    class="bi bi-bell position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                            </div>
+
+                            <div class="position-relative form-floating mt-3">
+                                <textarea
+                                       class="form-control rounded-3 input-style  ps-5"
+                                       id="notificationMessage"
+                                       placeholder="Message"
+                                       name="_notificationMessage"
+                                       style="height: 100px"
+                                > </textarea>
+                                <label for="notificationMessage" class="ms-3">Message</label>
+                                <i
+                                    class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y text-secondary fs-5 ms-1 me-5"></i>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </main>
+        {% endblock %}
+    </turbo-frame>
+{% endblock %}
+

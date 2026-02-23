@@ -100,6 +100,27 @@
 
             </main>
 
+
+            <!--<div class="floating-action-menu" id="fabMenu">
+                <div class="floating-menu-items">
+
+                    <a href="{{ path('app_notification_new') }}" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5"
+                       title="Nouvelle réunion"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-bell-fill fs-5"></i>
+                    </a>
+                </div>
+
+                <div class="btn-flottant" onclick="function toggleFAB() {
+                document.getElementById('fabMenu').classList.toggle('active');
+                }
+                toggleFAB()">
+                    <i class="bi bi-plus fs-2"></i>
+                </div>
+            </div>-->
+
+
             {{ include('default/_nav.html.twig')}}
 
         {% endblock %}

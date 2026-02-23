@@ -16,4 +16,10 @@ class NotificationController extends AbstractController
     {
         return $this->render('notification/list.html.twig');
     }
+
+    #[Route('/new', name: 'app_notification_new')]
+    public function new()
+    {
+        return $this->render('notification/new.html.twig');
+    }
 }
