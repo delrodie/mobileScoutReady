@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\Activite;
 use App\Entity\Notification;
 use App\Entity\Notificationlog;
 use App\Entity\Scout;
@@ -111,6 +112,44 @@ class NotificationService
 
             $this->fcmService->envoyerAUtilisateur($utilisateur, $notification);
         }
+    }
+
+    /**
+     * Notifier l'activité dans à la cible
+     */
+    public function notifierActivite(Activite $activite): void
+    {
+        // Creation de la notification
+        $notification = new Notification();
+        $notification->setTitre($activite->getTitre());
+        $notification->setTypeCible(Notification::TARGET_ALL);
+        $notification->setType(Notification::TYPE_INFO);
+        $notification->setEstActif(true);
+        $notification->setMessage($activite->getDescription());
+        $notification->setUrlAction($this->urlGenerator->generate('app_activite_show',['id' => $activite->getId()]));
+        $notification->setLibelleAction("Voir les details");
+//        $notification->setExpireLe(new \DateTimeImmutable($activite->getDateFinAt()));
+        $notification->setCreatedAt(new \DateTimeImmutable());
+        $this->entityManager->persist($notification);
+        $this->entityManager->flush();
+
+        // Gestion des utilisation
+        foreach ($activite->getCible() as $cible) {
+            $utilisateurs = $this->cibleService->getUtilisateursParCible($cible);
+
+            if ($utilisateurs){
+                foreach ($utilisateurs as $utilisateur) {
+                    $this->creerUtilisateurNotification($utilisateur, $notification);
+                }
+
+                $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+                $notification->setCible($cible);
+                $this->entityManager->flush();
+
+                $this->fcmService->notifierActiviteAuxUtilisateurs($utilisateurs, $notification, $activite);
+            }
+        }
+
     }
 
     /**

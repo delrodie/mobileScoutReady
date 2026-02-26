@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Activite;
 use App\Entity\AutorisationPointageActivite;
+use App\Entity\Notification;
 use App\Entity\Scout;
 use App\Enum\AutorisationPointeur;
 use App\Form\ActiviteType;
@@ -15,11 +16,13 @@ use App\Repository\InstanceRepository;
 use App\Repository\ParticiperRepository;
 use App\Repository\ScoutRepository;
 use App\Services\GestionAffiche;
+use App\Services\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/activites')]
 class ActiviteController extends AbstractController
@@ -29,7 +32,7 @@ class ActiviteController extends AbstractController
         private readonly InstanceRepository     $instanceRepository,
         private readonly ActiviteRepository     $activiteRepository,
         private readonly GestionAffiche         $gestionAffiche,
-        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly ParticiperRepository $participerRepository
+        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly ParticiperRepository $participerRepository, private readonly UrlGeneratorInterface $urlGenerator, private readonly NotificationService $notificationService
     )
     {
     }
@@ -87,6 +90,8 @@ class ActiviteController extends AbstractController
             $this->entityManager->persist($activite);
             $this->entityManager->flush();
 
+            $this->notificationService->notifierActivite($activite);
+
             notyf()->success("L'activité a été enregistrée avec succès!");
 
             return $this->redirectToRoute('app_activite_show',['id' => $activite->getId()]);
@@ -115,6 +120,9 @@ class ActiviteController extends AbstractController
             }
 
             $this->entityManager->flush();
+
+            $this->notificationService->notifierActivite($activite);
+
             notyf()->success("L'activité a été mise à jour !");
 
             return $this->redirectToRoute('app_activite_show', ['id' => $activite->getId()]);
