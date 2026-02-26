@@ -24,6 +24,13 @@
                 <section class="form mt-5 px-4" data-controller="activite">
                     {{ form_start(form, {"attr":{'data-turbo': 'false'}}) }}
                     <div class="row form-group">
+                        {% if activite.affiche %}
+                            <div class="col-12 mt-3">
+                                <figure class="overflow-hidden" data-bs-toggle="modal" data-bs-target="#afficheModal">
+                                    <img src="{{ asset('uploads/activites/affiche/' ~ activite.affiche) }}" alt="" class="img-fluid object-fit-cover" style="width:360px; height:150px">
+                                </figure>
+                            </div>
+                        {% endif %}
                         <div class="col-12 mt-3">{{ form_row(form.affiche) }}</div>
                         <div class="col-12 mt-5">{{ form_row(form.titre) }}</div>
                         <div class="col-12 mt-3">{{ form_row(form.theme) }}</div>
@@ -34,7 +41,7 @@
                         <div class="col-6 mt-3">{{ form_row(form.heureFin) }}</div>
                         <div class="col-12 mt-3">{{ form_row(form.description) }}</div>
                         <div class="col-12 mt-3">{{ form_row(form.cible) }}</div>
-                        {#  <div class="col-12 mt-3">{{ form_row(form.tdr) }}</div>#}
+{#                        <div class="col-12 mt-3">{{ form_row(form.tdr) }}</div>#}
                     </div>
                     <div class="row mt-5">
                         <input type="hidden"
@@ -47,10 +54,10 @@
                                data-activite-target="scoutInstance"
                         >
                         <div class="col d-grid gap-2">
-                            <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill">Annuler</a>
+                            <a href="{{ path('app_activite_show',{'id' : activite.id}) }}" class="btn btn-outline-secondary rounded-pill">Annuler</a>
                         </div>
                         <div class="col d-grid gap-2">
-                            <button type="submit" class="btn btn-main rounded-pill">Enregistrer</button>
+                            <button type="submit" class="btn btn-main rounded-pill">Modifier</button>
                         </div>
                     </div>
                     {{ form_end(form) }}
@@ -58,6 +65,23 @@
 
             </main>
             <div class="" style="margin-top: 50px;">.</div>
+
+            <div class="modal fade" id="afficheModal" tabindex="-1" aria-labelledby="afficheModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="afficheModalLabel">Affiche</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <figure class="overflow-hidden">
+                                <img src="{{ asset('uploads/activites/affiche/' ~ activite.affiche) }}" alt="" class="img-fluid">
+                            </figure>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
         {% endblock %}
 

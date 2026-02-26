@@ -80,18 +80,20 @@ class ActiviteType extends AbstractType
                 'label_attr' => ['class' => "text-muted fst-italic"],
                 'required' => true
             ])
-            ->add('tdr', FileType::class,[
-                'attr' => ['class' => 'form-control'],
-                'label' => "Téléchargez le TDR",
-                'label_attr' => ['class' => 'text-muted fst-italic '],
-                'required' => false
-            ])
+//            ->add('tdr', FileType::class,[
+//                'attr' => ['class' => 'form-control'],
+//                'label' => "Téléchargez le TDR",
+//                'label_attr' => ['class' => 'text-muted fst-italic '],
+//                'required' => false,
+//                'data_class' => null,
+//            ])
             ->add('affiche', DropzoneType::class,[
                 'attr' => ['class' => 'form-control', 'placeholder' => "Cliquez pour télécharger l'affiche (360 x 200 pixels) "],
                 'label' => "L'affiche de l'activité  <sup class='text-danger'>*</sup>",
                 'label_attr' => ['class' => 'text-muted fst-italic'] ,
                 'label_html' => true,
-                'required' => false
+                'required' => false,
+                'data_class' => null
             ])
             //->add('urlPointage')
 //            ->add('instance', EntityType::class, [

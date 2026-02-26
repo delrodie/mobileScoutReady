@@ -40,6 +40,16 @@ class ActiviteController extends AbstractController
         return $this->render('activite/index.html.twig');
     }
 
+    #[Route('/{id}', name: 'app_activite_show', methods: ['GET','POST'])]
+    public function show(Activite $activite): Response
+    {
+        return $this->render('activite/show.html.twig', [
+            'activite' => $activite,
+            'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId()),
+            'participants' =>$this->participerRepository->findOneBy(['activite' => $activite])
+        ]);
+    }
+
     #[Route('/new/nouveau', name:'app_activite_new', methods: ['GET','POST'])]
     public function new(Request $request)
     {
@@ -88,13 +98,31 @@ class ActiviteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_activite_show', methods: ['GET','POST'])]
-    public function show(Activite $activite): Response
+    #[Route('/{id}/edit/activite', name:'app_activite_edit', methods: ['GET','POST'])]
+    public function edit(Request $request, Activite $activite): Response
     {
-        return $this->render('activite/show.html.twig', [
+        $ancienneAffiche = $activite->getAffiche();
+        $ancienTdr = $activite->getTdr();
+
+        $form = $this->createForm(ActiviteType::class, $activite);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()){
+            if (!$form->get('affiche')->getData()) {
+                $activite->setAffiche($ancienneAffiche);
+            } else {
+                $this->gestionAffiche->media($form, $activite);
+            }
+
+            $this->entityManager->flush();
+            notyf()->success("L'activité a été mise à jour !");
+
+            return $this->redirectToRoute('app_activite_show', ['id' => $activite->getId()]);
+        }
+
+        return $this->render('activite/edit.html.twig', [
             'activite' => $activite,
-            'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId()),
-            'participants' =>$this->participerRepository->findOneBy(['activite' => $activite])
+            'form' => $form
         ]);
     }
 
