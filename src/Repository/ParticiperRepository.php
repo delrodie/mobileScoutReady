@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Participer;
+use App\Services\UtilityService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,7 +13,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ParticiperRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly UtilityService $utilityService
+    )
     {
         parent::__construct($registry, Participer::class);
     }
@@ -65,6 +69,21 @@ class ParticiperRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function findActiviteByScout(?string $scoutSlug)
+    {
+        $uuid = $this->utilityService->convertSlugToUuid($scoutSlug);
+        if (!$uuid) {
+            return null;
+        }
+
+        return $this->query()
+            ->where('s.slug = :slug')
+            ->orderBy('p.pointageAt', "DESC")
+            ->setParameter('slug', $uuid, 'uuid')
+            ->getQuery()->getResult()
+            ;
     }
 
     private function query(): QueryBuilder

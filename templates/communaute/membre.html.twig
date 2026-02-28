@@ -35,8 +35,10 @@
                                     {% else %}
                                         <div class="card-body d-flex flex-column justify-content-center align-items-center py-3"
                                              style="width: 150px;">
-                                            <span class="fs-1 text-color-main fw-bold">0</span>
-                                            <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">Activité</div>
+                                            <span class="fs-1 text-color-main fw-bold">{{ total_activite ? total_activite|length : 0 }}</span>
+                                            <div class="fsize-16 fw-medium text-nowrap px-3 py-1 text-nowrap">
+                                                {{ total_activite ? total_activite|length >= 2 ? 'Activités' : 'Activité' : 'Activité' }}
+                                            </div>
                                         </div>
                                     {% endif %}
 

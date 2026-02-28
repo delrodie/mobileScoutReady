@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Repository\AssisterRepository;
 use App\Repository\FonctionRepository;
 use App\Repository\InfosComplementaireRepository;
+use App\Repository\ParticiperRepository;
 use App\Repository\ScoutRepository;
 use App\Services\UtilityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,8 @@ class CommunauteController extends AbstractController
         private readonly ScoutRepository $scoutRepository,
         private readonly UtilityService  $utilityService,
         private readonly AssisterRepository $assisterRepository,
-        private readonly InfosComplementaireRepository $complementaireRepository
+        private readonly InfosComplementaireRepository $complementaireRepository,
+        private readonly ParticiperRepository $participerRepository
     )
     {
     }
@@ -39,7 +41,8 @@ class CommunauteController extends AbstractController
         return $this->render('communaute/membre.html.twig',[
             'membre' => $this->fonctionRepository->findOneByScoutSlug($slug),
             'total_reunion' => $this->assisterRepository->findReunionByScout($slug),
-            'complementaire' => $this->complementaireRepository->findByScoutSlug($slug)
+            'complementaire' => $this->complementaireRepository->findByScoutSlug($slug),
+            'total_activite' => $this->participerRepository->findActiviteByScout($slug)
         ]);
     }
 }
