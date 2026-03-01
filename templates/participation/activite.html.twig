@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block turbo_frame %}
+    <turbo-frame id="main-frame">
+        {% block body %}
+            {{ render(url('app_main_header'))}}
+
+            <main class="max-w-sm mx-auto mt-3 mb-5"
+                  data-controller="activite reunion"
+                  data-activite-api-url-list-value="{{ path('api_participation_activite') }}"
+            >
+                <section class="carousel px-3"
+                         data-activite-target="carouselSection"
+                >
+                    <div class="swiffy-slider slider-item-show2-sm slider-item-ratio slider-nav-arrow slider-nav-visible slider-nav-autohide slider-nav-autoplay  slider-nav-autopause slider-indicators-round slider-indicators-dark slider-indicators-outside slider-indicators-sm slider-nav-animation slider-nav-animation-appear slider-nav-animation-slow slider-nav-mousedrag"
+                         data-slider-nav-autoplay-interval="7000">
+                        <ul class="slider-container"
+                            data-activite-target="listCarousel"
+                        >
+
+
+                        </ul>
+
+
+                        <ul class="slider-indicators"
+                            data-activite-target="indicator"
+                        >
+                            <li class="active"></li>
+                            <li class=""></li>
+                        </ul>
+                    </div>
+                </section>
+
+
+                <div class="mt-5" data-activite-target="listSection">
+                    <h5 class="fs-6 text-color-main fw-semibold mb-3 mt-4">Liste des activités</h5>
+                    <div class="row row-cols-1 g-2 mt-3"
+                         data-activite-target="listActivite"
+                    >
+                    </div>
+                </div>
+                <div class="liste-vide d-flex justify-content-center align-content-center align-items-center px-3 mt-5 d-none"
+                     data-activite-target="emptySection"
+                     style="height: 50vh;"
+                >
+                    <div class="text-center fst-italic text-color-main">
+                        <h3 class="">Oupss!!!!</h3>
+                        Aucune activité programmée!
+                    </div>
+                </div>
+
+
+
+
+                {#  Liste des activités   #}
+                <template data-activite-target="template">
+                    <div class="col mb-3">
+                        <a href="#" class="text-decoration-none activite-details-url" data-turbo="false">
+                            <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
+                                <div class="card-body py-3 px-2">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="fsize-12 fw-semibold text-color-main activite-instance"></div>
+                                            <h5 class="fs-6 py-1 activite-titre">Retrouvailles des anciens chefs du groupe</h5>
+
+                                        </div>
+                                        <div class="col-4">
+                                            <img src="{{ asset('img/activites/jambognan2.png') }}" alt="" class="img-fluid activite-img" style="width: 100%; height: 80px; object-fit: cover">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                    <span class="text-color-main fw-medium fsize-12 activite-participant">
+                                        <i class="bi bi-people-fill text-body"></i> ND
+                                    </span>
+                                        <span class="text-color-main fw-medium fsize-12 ms-3 activite-periode">
+                                        <i class="bi bi-calendar-event text-body"></i> periode
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </template>
+
+                {#  Carousel #}
+                <template data-activite-target="carouselTemplate">
+                    <li class="slide-visible">
+                        <div id="slide1">
+                            <a href="#" class="carousel-link">
+                                <img src="{{ asset('img/activites/jambognan2.png') }}"
+                                     alt=""
+                                     class="img-fluid rounded-2 img-carousel"
+                                     style="width: 100%; height: 190px; object-fit: cover"
+                                >
+                            </a>
+                        </div>
+                    </li>
+                </template>
+
+                {#  Liste des reunions   #}
+                <template data-reunion-target="reunionTemplate">
+                    <div class="col mb-3">
+                        <a href="#" class="text-decoration-none reunion-details-url" data-turbo="false">
+                            <div class="card h-100 px-0 py-0 rounded-0 shadow-sm">
+                                <div class="card-body py-3 px-2">
+                                    <div class="row">
+                                        <div class="fsize-12 fw-semibold text-color-main reunion-instance"></div>
+                                        <h5 class="fs-6 py-1 reunion-titre">Retrouvailles des anciens chefs du groupe</h5>
+                                        <div class=" d-flex mt-1">
+                                            <small class="text-muted fsize-12 me-1">Champs d'activité: </small>
+                                            <span class="fst-italic fsize-12 fw-medium reunion-champ"></span>
+                                        </div>
+                                        <div class=" d-flex mt-1">
+                                            <small class="text-muted fsize-12 me-1">Objectif: </small>
+                                            <span class="fst-italic fsize-12 fw-medium reunion-objectif"></span>
+                                        </div>
+                                        <div class=" d-flex mt-1">
+                                            <small class="text-muted fsize-12 me-1">Lieu: </small>
+                                            <span class="fst-italic fsize-12 fw-medium reunion-lieu"></span>
+                                        </div>
+                                        <div class=" d-flex mt-1">
+                                            <small class="text-muted fsize-12 me-1">Cible: </small>
+                                            <span class="fst-italic fsize-12 fw-medium reunion-cible"></span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center mt-3">
+                                    <span class="text-color-main fw-medium fsize-12 reunion-participant">
+                                        <i class="bi bi-people-fill text-body"></i> ND
+                                    </span>
+                                        <span class="text-color-main fw-medium fsize-12 ms-3 reunion-periode">
+                                        <i class="bi bi-calendar-event text-body"></i> periode
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </template>
+            </main>
+
+            <div class="floating-action-menu" id="fabMenu">
+                <div class="floating-menu-items">
+                    <a href="{{ path('app_activite_new') }}"
+                       class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-1 me-3"
+                       title="Nouvelle activité"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-calendar-event fs-5"></i>
+                    </a>
+                    <a href="{{ path('app_reunion_new') }}" class="btn-flottant-secondaire d-flex justify-content-center align-items-center shadow text-white mb-4 me-5"
+                       title="Nouvelle réunion"
+                       data-turbo="false"
+                    >
+                        <i class="bi bi-people-fill fs-5"></i>
+                    </a>
+                </div>
+
+                <div class="btn-flottant" onclick="function toggleFAB() {
+                document.getElementById('fabMenu').classList.toggle('active');
+                }
+                toggleFAB()">
+                    <i class="bi bi-plus fs-2"></i>
+                </div>
+            </div>
+
+            {{ include('default/_nav.html.twig')}}
+        {% endblock %}
+        {% block extra_stylesheets %}
+            {{ parent() }}
+            <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet"
+                  crossorigin="anonymous">
+        {% endblock %}
+    </turbo-frame>
+
+{% endblock %}
