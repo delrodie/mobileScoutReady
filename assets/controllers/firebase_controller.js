@@ -24,7 +24,7 @@ export default class extends Controller {
     async initializePushNotifications() {
         try {
             // 1. Demander les permissions pour les notifications locales aussi
-            await LocalNotifications.requestPermissions();
+            await LocalNotifications.requstPermissions();
 
             // 2. Demander la permission pour push notifications
             let permStatus = await PushNotifications.checkPermissions();

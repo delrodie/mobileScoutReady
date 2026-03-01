@@ -31,6 +31,18 @@ export default class extends Controller {
             return;
         }
 
+        if (Capacitor.getPlatform() === 'android') {
+            await PushNotifications.createChannel({
+                id: 'notifications',
+                name: 'Alertes',
+                description: 'Notifications ScoutReady',
+                importance: 5, // 5 = High (nécessaire pour afficher les images/bannières)
+                visibility: 1,
+                lights: true,
+                vibration: true
+            });
+        }
+
         // 2. S'enregistrer auprès de FCM
         await PushNotifications.register();
 
@@ -98,11 +110,22 @@ export default class extends Controller {
     }
 
     #afficherNotificationInApp(notification) {
+        // Récupération de l'image (Capacitor la place souvent dans notification.image ou notification.data.image)
+        const imageUrl = notification.image || notification.largeIcon || notification.data?.image;
+
         // Toast simple Bootstrap
         const toast = document.createElement('div');
         toast.className = 'toast align-items-center text-bg-primary border-0 position-fixed bottom-0 end-0 m-3';
+        toast.style.zIndex = "9999";
         toast.setAttribute('role', 'alert');
+
+        // Ajout de l'image dans le HTML du Toast si elle existe
+        const imageHtml = imageUrl
+            ? `<img src="${imageUrl}" class="img-fluid rounded-top mb-2" style="max-height: 150px; width: 100%; object-fit: cover;">`
+            : '';
+
         toast.innerHTML = `
+            ${imageHtml}
             <div class="d-flex">
                 <div class="toast-body">
                     <strong>${notification.title ?? ''}</strong><br>
@@ -112,7 +135,7 @@ export default class extends Controller {
             </div>
         `;
         document.body.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+        const bsToast = new bootstrap.Toast(toast, { delay: 8000 });
         bsToast.show();
         toast.addEventListener('hidden.bs.toast', () => toast.remove());
     }
