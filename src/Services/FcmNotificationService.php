@@ -73,13 +73,13 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? '',
-                    'icone'          => $notification->getIcone() ?? 'ic_launcher',
+//                    'icon'          => $this->getFavicon() ?? 'ic_launcher',
                 ])
                 ->withAndroidConfig([
                     'notification' => [
                         'sound'       => 'default',
                         'channel_id'  => 'notifications',
-                        'icon' => 'ic_launcher'
+//                        'icon' => 'ic_launcher'
                     ],
                     'priority' => 'high',
                 ])
@@ -129,13 +129,13 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? $this->urlGenerator->generate('app_activite_index'),
-                    'icon'          => $this->getFavicon() ?? $notification->getIcone(),
+//                    'icon'          => $this->getFavicon() ?? $notification->getIcone(),
                 ])
                 ->withAndroidConfig([
                     'notification' => [
                         'sound'       => 'default',
                         'channel_id'  => 'notifications',
-                        'icon' => 'ic_launcher',
+//                        'icon' => 'ic_launcher',
                         'image'       => $imageUrl,
                     ],
                     'priority' => 'high',
@@ -172,9 +172,9 @@ class FcmNotificationService
 
     }
 
-    public function getFavicon(): void
+    public function getFavicon(): string
     {
-        $this->urlGenerator->generate(
+        return $this->urlGenerator->generate(
                 'app_home',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
