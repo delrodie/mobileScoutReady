@@ -73,13 +73,13 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? '',
-//                    'icon'          => $this->getFavicon() ?? 'ic_launcher',
+                    'icon'          => 'logo_scoutready_splash',
                 ])
                 ->withAndroidConfig([
                     'notification' => [
                         'sound'       => 'default',
                         'channel_id'  => 'notifications',
-//                        'icon' => 'ic_launcher'
+                        'icon' => 'logo_scoutready_splash'
                     ],
                     'priority' => 'high',
                 ])
@@ -129,13 +129,13 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? $this->urlGenerator->generate('app_activite_index'),
-//                    'icon'          => $this->getFavicon() ?? $notification->getIcone(),
+                    'icon'          => 'logo_scoutready_splash',
                 ])
                 ->withAndroidConfig([
                     'notification' => [
                         'sound'       => 'default',
                         'channel_id'  => 'notifications',
-//                        'icon' => 'ic_launcher',
+                        'icon' => 'logo_scoutready_splash',
                         'image'       => $imageUrl,
                     ],
                     'priority' => 'high',
