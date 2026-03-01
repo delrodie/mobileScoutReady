@@ -129,7 +129,7 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? $this->urlGenerator->generate('app_activite_index'),
-                    'icon'          => 'ic_launcher' ?? $notification->getIcone(),
+                    'icon'          => $this->getFavicon() ?? $notification->getIcone(),
                 ])
                 ->withAndroidConfig([
                     'notification' => [
@@ -168,5 +168,16 @@ class FcmNotificationService
             $this->logger->error('FCM erreur envoi: ' . $e->getMessage());
             return 0;
         }
+
+
+    }
+
+    public function getFavicon(): void
+    {
+        $this->urlGenerator->generate(
+                'app_home',
+                [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ).'img/favico-bw.png';
     }
 }
