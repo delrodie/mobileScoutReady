@@ -72,7 +72,13 @@ class ApiCommunauteController extends AbstractController
                         $this->utilityService->annee()
                     );
                 }
-            }elseif($poste === FonctionPoste::DISTRICT->value){
+                $fonctions[] = $this->fonctionRepository->findCommunauteByDistrict(
+                    $scoutConnecte->getId(),
+                    $fonction->getInstance()->getId(),
+                    $this->utilityService->annee()
+                );
+            }
+            elseif($poste === FonctionPoste::DISTRICT->value){
                 $fonctions[] = $this->fonctionRepository->findCommunauteByDistrict(
                     $scoutConnecte->getId(),
                     $fonction->getInstance()->getId(),
