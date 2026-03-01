@@ -91,7 +91,7 @@ class NotificationCibleService
     private function getCD(): array
     {
         return $this->utilisateurRepository->findByDetailPoste([
-            'CD', 'Commissaire de District', 'COMMISSAIRE DE DISTRICT', 'commissaire de district'
+            'CD', 'Commissaire de District', 'COMMISSAIRE DE DISTRICT', 'commissaire de district', 'Administrateur'
         ]);
     }
 

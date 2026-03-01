@@ -133,22 +133,32 @@ class NotificationService
         $this->entityManager->persist($notification);
         $this->entityManager->flush();
 
-        // Gestion des utilisation
-        foreach ($activite->getCible() as $cible) {
-            $utilisateurs = $this->cibleService->getUtilisateursParCible($cible);
-
-            if ($utilisateurs){
-                foreach ($utilisateurs as $utilisateur) {
-                    $this->creerUtilisateurNotification($utilisateur, $notification);
-                }
-
-                $notification->setTypeCible(Notification::TARGET_SPECIFIC);
-                $notification->setCible($cible);
-                $this->entityManager->flush();
-
-                $this->fcmService->notifierActiviteAuxUtilisateurs($utilisateurs, $notification, $activite);
-            }
+        $utilisateurs = $this->utilisateurRepository->findAll();
+        foreach ($utilisateurs as $utilisateur) {
+            $this->creerUtilisateurNotification($utilisateur, $notification);
         }
+
+        $notification->setTypeCible(Notification::TARGET_ALL);
+        $this->entityManager->flush();
+
+        $this->fcmService->notifierActiviteAuxUtilisateurs($utilisateurs, $notification, $activite);
+
+        // Gestion des utilisation
+//        foreach ($activite->getCible() as $cible) {
+//            $utilisateurs = $this->cibleService->getUtilisateursParCible($cible);
+//
+//            if ($utilisateurs){
+//                foreach ($utilisateurs as $utilisateur) {
+//                    $this->creerUtilisateurNotification($utilisateur, $notification);
+//                }
+//
+//                $notification->setTypeCible(Notification::TARGET_SPECIFIC);
+//                $notification->setCible($cible);
+//                $this->entityManager->flush();
+//
+//                $this->fcmService->notifierActiviteAuxUtilisateurs($utilisateurs, $notification, $activite);
+//            }
+//        }
 
     }
 
