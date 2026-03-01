@@ -113,7 +113,7 @@ export default class extends Controller {
         if (notif.urlAction && notif.urlAction !== '#') {
             this.modalFooterTarget.innerHTML = `
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <a href="${notif.urlAction}" class="btn btn-primary">
+                <a href="${notif.urlAction}" class="btn btn-primary" data-turbo="false">
                     ${notif.libelleAction || 'Voir'}
                     <i class="bi bi-arrow-right ms-1"></i>
                 </a>

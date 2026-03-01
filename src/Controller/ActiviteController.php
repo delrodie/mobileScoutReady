@@ -32,7 +32,11 @@ class ActiviteController extends AbstractController
         private readonly InstanceRepository     $instanceRepository,
         private readonly ActiviteRepository     $activiteRepository,
         private readonly GestionAffiche         $gestionAffiche,
-        private readonly EntityManagerInterface $entityManager, private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository, private readonly ParticiperRepository $participerRepository, private readonly UrlGeneratorInterface $urlGenerator, private readonly NotificationService $notificationService
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AutorisationPointageActiviteRepository $autorisationPointageActiviteRepository,
+        private readonly ParticiperRepository $participerRepository,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly NotificationService $notificationService
     )
     {
     }
@@ -46,6 +50,7 @@ class ActiviteController extends AbstractController
     #[Route('/{id}', name: 'app_activite_show', methods: ['GET','POST'])]
     public function show(Activite $activite): Response
     {
+
         return $this->render('activite/show.html.twig', [
             'activite' => $activite,
             'pointeurs' => $this->autorisationPointageActiviteRepository->findPointeurs($activite->getId()),

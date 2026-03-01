@@ -112,7 +112,11 @@ class FcmNotificationService
     private function envoyerActivite(array $tokens, Notification $notification, Activite $activite): int
     {
         try {
-            $imageUrl = $this->urlGenerator->generate('app_home').'uploads/activites/affiche/'. $activite->getAffiche();
+            $imageUrl = $this->urlGenerator->generate(
+                'app_home',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ).'uploads/activites/affiche/'. $activite->getAffiche();
 
             $message = CloudMessage::new()
                 ->withNotification(
@@ -125,7 +129,7 @@ class FcmNotificationService
                     'notificationId' => (string) ($notification->getId() ?? ''),
                     'type'           => $notification->getType() ?? 'info',
                     'url'            => $notification->getUrlAction() ?? $this->urlGenerator->generate('app_activite_index'),
-                    'icon'          => $notification->getIcone() ?? 'ic_launcher',
+                    'icon'          => 'ic_launcher' ?? $notification->getIcone(),
                 ])
                 ->withAndroidConfig([
                     'notification' => [
