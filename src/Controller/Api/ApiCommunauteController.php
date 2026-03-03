@@ -61,20 +61,20 @@ class ApiCommunauteController extends AbstractController
 
         }else{
             $poste = $fonction?->getPoste();
-            if ($poste === FonctionPoste::REGIONAL->value ){
-                $districts = $this->instanceRepository->findBy(['instanceParent' => $fonction->getInstance()->getId()]);
+            if ($poste === FonctionPoste::REGIONAL->value) {
+                $instanceParentId = $fonction->getInstance()->getId();
 
-                $fonctions=[];
-                foreach ($districts as $district){
-                    $fonctions[] = $this->fonctionRepository->findCommunauteByDistrict(
-                        $scoutConnecte->getId(),
-                        $district->getId(),
-                        $this->utilityService->annee()
-                    );
-                }
-                $fonctions[] = $this->fonctionRepository->findCommunauteByDistrict(
+                $districtIds = array_map(
+                    fn($district) => $district->getId(),
+                    $this->instanceRepository->findBy(['instanceParent' => $instanceParentId])
+                );
+
+                // On inclut l'instance régionale elle-même
+                $instanceIds = [...$districtIds, $instanceParentId];
+
+                $fonctions[] = $this->fonctionRepository->findCommunauteByDistricts(
                     $scoutConnecte->getId(),
-                    $fonction->getInstance()->getId(),
+                    $instanceIds,
                     $this->utilityService->annee()
                 );
             }

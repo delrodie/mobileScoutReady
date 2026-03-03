@@ -35,7 +35,7 @@ class InstanceCrudController extends AbstractCrudController
             ->setPageTitle('new', "Enregistrement d'une nouvelle instance")
             ->setPageTitle('edit', fn(Instance $instance) => sprintf('Modification de <b>%s</b>', $instance->getNom()))
 
-            ->setSearchFields(['instanceParent', 'nom', 'sigle'])
+            ->setSearchFields(['instanceParent.nom', 'nom', 'sigle'])
             ->setAutofocusSearch(true)
             ;
     }

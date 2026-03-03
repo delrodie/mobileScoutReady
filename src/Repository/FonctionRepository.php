@@ -93,12 +93,34 @@ class FonctionRepository extends ServiceEntityRepository
             ->orWhere('i.instanceParent = :instance')
             ->andWhere('s.id <> :profil')
             ->andWhere('f.annee = :annee')
+            ->orderBy('s.nom', 'ASC')
+            ->addOrderBy('s.prenom', 'ASC')
             ->setParameter('instance', $instance)
             ->setParameter('profil', $profil)
             ->setParameter('annee', $annee)
             ->getQuery()->getResult()
             ;
     }
+
+    public function findCommunauteByDistricts(int $profil, array $instanceIds, string $annee): array
+    {
+        return $this->query()           // ← leftJoin comme l'original
+            ->where(
+                '(i.id IN (:instances) OR IDENTITY(f.instance) IN (:instancesParent))'
+            )                                        // ← IDENTITY() pour la relation
+            ->andWhere('s.id <> :profil')
+            ->andWhere('f.annee = :annee')
+            ->orderBy('s.nom', 'ASC')
+            ->addOrderBy('s.prenom', 'ASC')
+            ->setParameter('instances', $instanceIds)
+            ->setParameter('instancesParent', $instanceIds)
+            ->setParameter('profil', $profil)
+            ->setParameter('annee', $annee)
+            ->getQuery()
+            ->getResult();
+
+    }
+
 
     public function findCommunauteByGroupe(int $profil, int $instance, string $annee)
     {
@@ -127,7 +149,7 @@ class FonctionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('f')
             ->addSelect('s', 'i')
             ->innerJoin('f.scout', 's')
-            ->leftJoin('f.instance', 'i');
+            ->innerJoin('f.instance', 'i');
     }
 
 
